@@ -4,6 +4,7 @@ public enum TargetLanguage: String, CaseIterable, Identifiable, Codable {
     case swift = "swift"
     case python = "python"
     case csharp = "csharp"
+    case sql = "sql"
     
     public var id: String { rawValue }
     
@@ -12,6 +13,7 @@ public enum TargetLanguage: String, CaseIterable, Identifiable, Codable {
         case .swift: return "Swift"
         case .python: return "Python"
         case .csharp: return "C#"
+        case .sql: return "SQL"
         }
     }
     
@@ -24,6 +26,7 @@ public enum TargetLanguage: String, CaseIterable, Identifiable, Codable {
         case .swift: return "Swift 6"
         case .python: return "Python 3.12"
         case .csharp: return "C# 12 / .NET 8"
+        case .sql: return "SQL / SQLite & Postgres"
         }
     }
     
@@ -32,6 +35,7 @@ public enum TargetLanguage: String, CaseIterable, Identifiable, Codable {
         case .swift: return "swift"
         case .python: return "chevron.left.forwardslash.chevron.right"
         case .csharp: return "number"
+        case .sql: return "cylinder.split.1x2"
         }
     }
     
@@ -40,6 +44,7 @@ public enum TargetLanguage: String, CaseIterable, Identifiable, Codable {
         case .swift: return "swift"
         case .python: return "py"
         case .csharp: return "cs"
+        case .sql: return "sql"
         }
     }
 }
@@ -57,6 +62,10 @@ public enum CurriculumTrack: String, CaseIterable, Identifiable, Codable {
     case csharpCore = "csharp_core"
     case csharpAdvanced = "csharp_advanced"
     
+    // SQL Tracks
+    case sqlCore = "sql_core"
+    case sqlAdvanced = "sql_advanced"
+    
     public var id: String { rawValue }
     
     public var language: TargetLanguage {
@@ -64,6 +73,7 @@ public enum CurriculumTrack: String, CaseIterable, Identifiable, Codable {
         case .swiftCore, .swiftUI: return .swift
         case .pythonCore, .pythonAdvanced: return .python
         case .csharpCore, .csharpAdvanced: return .csharp
+        case .sqlCore, .sqlAdvanced: return .sql
         }
     }
     
@@ -81,6 +91,10 @@ public enum CurriculumTrack: String, CaseIterable, Identifiable, Codable {
             return language == .russian ? "C# Core & ООП" : "C# Core & OOP"
         case .csharpAdvanced:
             return language == .russian ? "C# LINQ & Асинхронность" : "C# LINQ & Async"
+        case .sqlCore:
+            return language == .russian ? "SQL Запросы & DDL" : "SQL Queries & DDL"
+        case .sqlAdvanced:
+            return language == .russian ? "SQL JOIN & Аналитика" : "SQL JOIN & Analytics"
         }
     }
     
@@ -92,6 +106,8 @@ public enum CurriculumTrack: String, CaseIterable, Identifiable, Codable {
         case .pythonAdvanced: return "cube.transparent"
         case .csharpCore: return "number"
         case .csharpAdvanced: return "arrow.triangle.branch"
+        case .sqlCore: return "cylinder.split.1x2"
+        case .sqlAdvanced: return "chart.bar.xaxis"
         }
     }
 }
@@ -136,6 +152,16 @@ public enum LessonCategory: String, CaseIterable, Identifiable, Codable {
     case csharpLINQ = "csharp_linq"
     case csharpModern = "csharp_modern"
     
+    // MARK: - Track 7: SQL Core
+    case sqlBasics = "sql_basics"
+    case sqlFiltering = "sql_filtering"
+    case sqlAggregations = "sql_aggregations"
+    
+    // MARK: - Track 8: SQL Advanced
+    case sqlJoins = "sql_joins"
+    case sqlDdlDml = "sql_ddl_dml"
+    case sqlWindow = "sql_window"
+    
     public var id: String { rawValue }
     
     public var language: TargetLanguage {
@@ -169,6 +195,14 @@ public enum LessonCategory: String, CaseIterable, Identifiable, Codable {
         // C# Advanced
         case .csharpCollections, .csharpLINQ, .csharpModern:
             return .csharpAdvanced
+            
+        // SQL Core
+        case .sqlBasics, .sqlFiltering, .sqlAggregations:
+            return .sqlCore
+            
+        // SQL Advanced
+        case .sqlJoins, .sqlDdlDml, .sqlWindow:
+            return .sqlAdvanced
         }
     }
     
@@ -239,6 +273,22 @@ public enum LessonCategory: String, CaseIterable, Identifiable, Codable {
             return language == .russian ? "5. LINQ и Функциональные Запросы" : "5. LINQ & Functional Queries"
         case .csharpModern:
             return language == .russian ? "6. Records, Pattern Matching & Async" : "6. Records, Pattern Matching & Async"
+            
+        // SQL Core
+        case .sqlBasics:
+            return language == .russian ? "1. Основы SQL и выборка SELECT" : "1. SQL Basics & SELECT"
+        case .sqlFiltering:
+            return language == .russian ? "2. Фильтрация WHERE и Сортировка" : "2. Filtering & Sorting"
+        case .sqlAggregations:
+            return language == .russian ? "3. Агрегатные функции и GROUP BY" : "3. Aggregations & GROUP BY"
+            
+        // SQL Advanced
+        case .sqlJoins:
+            return language == .russian ? "4. Объединение таблиц JOIN" : "4. Table Joins (INNER, LEFT, RIGHT)"
+        case .sqlDdlDml:
+            return language == .russian ? "5. DDL и DML: Создание и Модификация" : "5. DDL & DML Operations"
+        case .sqlWindow:
+            return language == .russian ? "6. Оконные функции и Аналитика" : "6. Window Functions & Analytics"
         }
     }
     
@@ -277,6 +327,14 @@ public enum LessonCategory: String, CaseIterable, Identifiable, Codable {
         case .csharpCollections: return "square.stack.3d.up"
         case .csharpLINQ: return "line.3.horizontal.decrease.circle"
         case .csharpModern: return "bolt.badge.clock"
+            
+        // SQL
+        case .sqlBasics: return "cylinder.split.1x2"
+        case .sqlFiltering: return "line.3.horizontal.decrease.circle"
+        case .sqlAggregations: return "function"
+        case .sqlJoins: return "link"
+        case .sqlDdlDml: return "plus.square.on.square"
+        case .sqlWindow: return "chart.bar.xaxis"
         }
     }
 }

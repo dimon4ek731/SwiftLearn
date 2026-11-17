@@ -465,7 +465,12 @@ public struct LessonDetailView: View {
         
         for tc in allTestCases {
             let testHarness: String
-            if challenge.language == .python {
+            if challenge.language == .sql {
+                testHarness = """
+\(tc.validationCode);
+\(code);
+"""
+            } else if challenge.language == .python {
                 testHarness = """
 \(code)
 
@@ -496,6 +501,23 @@ print("__TEST_RESULT:" + String(__testPassed))
                     message: "\(lang.localized("Ошибка", "Error")): \(err.message)"
                 ))
                 everyTestPassed = false
+            } else if challenge.language == .sql {
+                let cleanedOutput = exec.output.replacingOccurrences(of: " ", with: "").lowercased()
+                let cleanedExpected = tc.expectedOutput.replacingOccurrences(of: " ", with: "").lowercased()
+                if cleanedOutput.contains(cleanedExpected) {
+                    results.append(LessonTestExecutionResult(
+                        testCase: tc,
+                        passed: true,
+                        message: "\(tc.inputDescription) -> \(tc.expectedOutput)"
+                    ))
+                } else {
+                    results.append(LessonTestExecutionResult(
+                        testCase: tc,
+                        passed: false,
+                        message: "\(lang.localized("Ожидалось", "Expected")): \(tc.expectedOutput)"
+                    ))
+                    everyTestPassed = false
+                }
             } else if exec.output.contains("__TEST_RESULT:true") {
                 results.append(LessonTestExecutionResult(
                     testCase: tc,

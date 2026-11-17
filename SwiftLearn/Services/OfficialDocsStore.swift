@@ -1492,6 +1492,98 @@ var topScores = scores.Where(s => s >= 80).OrderByDescending(s => s);
 """##
             ),
 
+            OfficialDocTopic(
+                id: "sql_doc_intro",
+                language: .sql,
+                section: .welcome,
+                chapterNumber: 1,
+                titleEN: "SQL & Relational Databases Overview",
+                titleRU: "Обзор языка SQL и Реляционных БД",
+                summaryEN: "Official SQLite and standard SQL introduction covering tables, relational modeling, and query execution.",
+                summaryRU: "Официальное руководство по реляционной модели данных, таблицам и принципам выполнения SQL-запросов.",
+                webSlug: "lang.html",
+                contentMarkdownEN: ##"""
+# SQL Overview & Relational Architecture
+
+SQL (Structured Query Language) is the standard language for dealing with Relational Databases. A relational database defines database relationships in the form of tables.
+
+## The Relational Table
+A table is composed of rows (records) and columns (attributes). Every column has a specific datatype:
+- `INTEGER`: Signed integer stored in 1, 2, 3, 4, 6, or 8 bytes.
+- `REAL`: 8-byte IEEE floating-point number.
+- `TEXT`: UTF-8 or UTF-16 character string.
+- `BLOB`: Binary data stored exactly as input.
+
+```sql
+SELECT 'Hello, SQL Database!' AS greeting;
+```
+"""##,
+                contentMarkdownRU: ##"""
+# Обзор языка SQL и Реляционной Архитектуры
+
+SQL (Structured Query Language) — международный стандарт декларативного языка для взаимодействия с реляционными системами управления базами данных (СУБД).
+
+## Табличная Модель
+Данные организуются в виде таблиц, состоящих из строк (записей) и столбцов (атрибутов):
+- **INTEGER**: целочисленный тип.
+- **REAL**: вещественные числа с плавающей точкой.
+- **TEXT**: текстовые строки Unicode (UTF-8).
+- **BLOB**: бинарные данные без преобразования.
+
+```sql
+SELECT 'Добро пожаловать в SQL!' AS приветствие;
+```
+"""##
+            ),
+            OfficialDocTopic(
+                id: "sql_doc_queries",
+                language: .sql,
+                section: .languageGuide,
+                chapterNumber: 2,
+                titleEN: "SQL Queries: SELECT, WHERE & ORDER BY",
+                titleRU: "Синтаксис запросов: SELECT, WHERE и ORDER BY",
+                summaryEN: "Official reference for querying tables, projection, conditional filtering, and row ordering.",
+                summaryRU: "Официальное руководство по проекции полей, предикатам фильтрации WHERE и сортировке ORDER BY.",
+                webSlug: "lang_select.html",
+                contentMarkdownEN: ##"""
+# SQL Query Syntax: SELECT & Filtering
+
+The `SELECT` statement is used to query the database and retrieve selected data that match the specified criteria.
+
+```sql
+SELECT column1, column2, column3
+FROM table_name
+WHERE condition
+ORDER BY column1 DESC
+LIMIT 10;
+```
+
+## Logical Operators in WHERE
+- `AND` / `OR` / `NOT`: Boolean logic combination.
+- `IN (val1, val2, ...)`: Value belongs to a discrete list.
+- `BETWEEN low AND high`: Value falls within inclusive bounds.
+- `LIKE 'pattern%'`: Pattern matching using wildcards.
+"""##,
+                contentMarkdownRU: ##"""
+# Синтаксис запросов в SQL
+
+Оператор `SELECT` извлекает строки из одной или нескольких таблиц:
+
+```sql
+SELECT name, price 
+FROM products 
+WHERE price >= 100.00 AND category = 'Electronics'
+ORDER BY price DESC 
+LIMIT 5;
+```
+
+## Операторы фильтрации
+- **BETWEEN a AND b**: проверка вхождения в диапазон.
+- **IN (x, y, z)**: проверка вхождения в список.
+- **LIKE '%шаблон%'**: поиск по подстроке.
+"""##
+            ),
+
         ]
     }
     

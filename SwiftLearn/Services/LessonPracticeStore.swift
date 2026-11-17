@@ -645,6 +645,111 @@ public static int SumEvens(int a, int b, int c) {
             hintsEN: ["Check remainder: `x % 2 == 0`."]
         )
 
+        // MARK: - SQL Challenges
+        customChallenges["sql_basics_select"] = LessonPracticeChallenge(
+            id: "practice_sql_basics_select",
+            language: .sql,
+            titleRU: "Практика: Запрос SELECT",
+            titleEN: "Practice: SELECT Statement",
+            taskPromptRU: "Напишите SQL-запрос, который выбирает столбцы `title` и `price` из таблицы `books`.",
+            taskPromptEN: "Write a SQL query selecting `title` and `price` from table `books`.",
+            starterCode: ##"""
+-- Напишите ваш SQL-запрос
+SELECT 
+"""##,
+            solutionCode: ##"""
+SELECT title, price FROM books;
+"""##,
+            testCases: [
+                TaskTestCase(
+                    title: "Выборка книг",
+                    inputDescription: "SELECT title, price FROM books",
+                    expectedOutput: "| Swift Guide | 45 |",
+                    validationCode: "CREATE TABLE books (id INT, title TEXT, price INT); INSERT INTO books VALUES (1, 'Swift Guide', 45), (2, 'SQL Handbook', 30);"
+                )
+            ],
+            hintsRU: ["Используйте синтаксис: `SELECT title, price FROM books;`."],
+            hintsEN: ["Use syntax: `SELECT title, price FROM books;`."]
+        )
+
+        customChallenges["sql_filtering_where"] = LessonPracticeChallenge(
+            id: "practice_sql_filtering_where",
+            language: .sql,
+            titleRU: "Практика: Фильтрация WHERE",
+            titleEN: "Practice: WHERE Filtering",
+            taskPromptRU: "Выберите имя (`name`) и город (`city`) пользователей из таблицы `users`, которые проживают в городе `'Moscow'`.",
+            taskPromptEN: "Select `name` and `city` from `users` WHERE `city = 'Moscow'`.",
+            starterCode: ##"""
+-- Напишите запрос с фильтром WHERE
+SELECT 
+"""##,
+            solutionCode: ##"""
+SELECT name, city FROM users WHERE city = 'Moscow';
+"""##,
+            testCases: [
+                TaskTestCase(
+                    title: "Пользователи из Москвы",
+                    inputDescription: "SELECT name, city FROM users WHERE city = 'Moscow'",
+                    expectedOutput: "| Ivan | Moscow |",
+                    validationCode: "CREATE TABLE users (id INT, name TEXT, city TEXT); INSERT INTO users VALUES (1, 'Ivan', 'Moscow'), (2, 'John', 'London');"
+                )
+            ],
+            hintsRU: ["Добавьте условие: `WHERE city = 'Moscow'`."],
+            hintsEN: ["Add clause: `WHERE city = 'Moscow'`."]
+        )
+
+        customChallenges["sql_aggregations_group"] = LessonPracticeChallenge(
+            id: "practice_sql_aggregations_group",
+            language: .sql,
+            titleRU: "Практика: GROUP BY и Агрегация",
+            titleEN: "Practice: GROUP BY & Aggregation",
+            taskPromptRU: "Напишите запрос, возвращающий `department`, количество сотрудников `COUNT(*)` и среднюю зарплату `AVG(salary)` из таблицы `staff`, сгруппировав по отделу (`GROUP BY department`).",
+            taskPromptEN: "Return `department`, `COUNT(*)`, and `AVG(salary)` grouped by `department` from `staff`.",
+            starterCode: ##"""
+-- Напишите агрегатный запрос с GROUP BY
+SELECT 
+"""##,
+            solutionCode: ##"""
+SELECT department, COUNT(*), AVG(salary) FROM staff GROUP BY department;
+"""##,
+            testCases: [
+                TaskTestCase(
+                    title: "Агрегация отделов",
+                    inputDescription: "SELECT department, COUNT(*), AVG(salary) FROM staff GROUP BY department",
+                    expectedOutput: "| IT | 2 | 150.0 |",
+                    validationCode: "CREATE TABLE staff (id INT, department TEXT, salary INT); INSERT INTO staff VALUES (1, 'IT', 100), (2, 'IT', 200), (3, 'HR', 80);"
+                )
+            ],
+            hintsRU: ["Используйте `SELECT department, COUNT(*), AVG(salary) FROM staff GROUP BY department;`."],
+            hintsEN: ["Use `SELECT department, COUNT(*), AVG(salary) FROM staff GROUP BY department;`."]
+        )
+
+        customChallenges["sql_joins_types"] = LessonPracticeChallenge(
+            id: "practice_sql_joins_types",
+            language: .sql,
+            titleRU: "Практика: INNER JOIN",
+            titleEN: "Practice: INNER JOIN",
+            taskPromptRU: "Объедините таблицу `students` с таблицей `courses` через `INNER JOIN` по условию `students.course_id = courses.id` и выберите имя студента (`students.name`) и название курса (`courses.title`).",
+            taskPromptEN: "Join `students` with `courses` ON `students.course_id = courses.id`, selecting `students.name, courses.title`.",
+            starterCode: ##"""
+-- Напишите запрос с INNER JOIN
+SELECT 
+"""##,
+            solutionCode: ##"""
+SELECT students.name, courses.title FROM students INNER JOIN courses ON students.course_id = courses.id;
+"""##,
+            testCases: [
+                TaskTestCase(
+                    title: "Связка студенты и курсы",
+                    inputDescription: "SELECT students.name, courses.title FROM students INNER JOIN courses ON students.course_id = courses.id",
+                    expectedOutput: "| Anna | CS101 |",
+                    validationCode: "CREATE TABLE courses (id INT, title TEXT); INSERT INTO courses VALUES (1, 'CS101'); CREATE TABLE students (id INT, name TEXT, course_id INT); INSERT INTO students VALUES (1, 'Anna', 1);"
+                )
+            ],
+            hintsRU: ["Используйте `FROM students INNER JOIN courses ON students.course_id = courses.id`."],
+            hintsEN: ["Use `FROM students INNER JOIN courses ON students.course_id = courses.id`."]
+        )
+
     }
     
     private func fallbackChallenge(for lesson: Lesson) -> LessonPracticeChallenge {
@@ -652,7 +757,33 @@ public static int SumEvens(int a, int b, int c) {
         let titleRU = "Практическое задание: \(lesson.titleRU)"
         let titleEN = "Hands-on Practice: \(lesson.titleEN)"
         
-        if lesson.category.language == .python {
+        if lesson.category.language == .sql {
+            return LessonPracticeChallenge(
+                id: "practice_\(lesson.id)",
+                language: .sql,
+                titleRU: titleRU,
+                titleEN: titleEN,
+                taskPromptRU: "Напишите SQL-запрос, выбирающий `name` и `salary` из таблицы `employees` для сотрудников с зарплатой строго больше 50000.",
+                taskPromptEN: "Write a SQL query selecting `name, salary` from `employees` WHERE `salary > 50000`.",
+                starterCode: ##"""
+-- Напишите ваш SQL-запрос
+SELECT name, salary FROM employees WHERE salary > 50000;
+"""##,
+                solutionCode: ##"""
+SELECT name, salary FROM employees WHERE salary > 50000;
+"""##,
+                testCases: [
+                    TaskTestCase(
+                        title: "Тест выборки",
+                        inputDescription: "SELECT name, salary FROM employees WHERE salary > 50000",
+                        expectedOutput: "| Dmitry | 80000 |",
+                        validationCode: "CREATE TABLE employees (id INT, name TEXT, salary INT); INSERT INTO employees VALUES (1, 'Alice', 45000), (2, 'Dmitry', 80000);"
+                    )
+                ],
+                hintsRU: ["Используйте фильтрацию WHERE salary > 50000."],
+                hintsEN: ["Use WHERE salary > 50000."]
+            )
+        } else if lesson.category.language == .python {
             return LessonPracticeChallenge(
                 id: "practice_\(lesson.id)",
                 language: .python,

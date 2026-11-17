@@ -1,4 +1,5 @@
 import Foundation
+import SQLite3
 
 public struct RuntimeVariable: Identifiable, Equatable {
     public var id: String { name }
@@ -38,6 +39,23 @@ public final class PlaygroundEngine {
     
     // MARK: - Core Execution
     public func execute(code: String, language: TargetLanguage = .swift) async -> PlaygroundExecutionResult {
+        if language == .sql {
+            return await Task.detached(priority: .userInitiated) {
+                let start = DispatchTime.now()
+                let result = PlaygroundEngine.executeSQLite(script: code)
+                let end = DispatchTime.now()
+                let durationMs = Double(end.uptimeNanoseconds - start.uptimeNanoseconds) / 1_000_000.0
+                
+                return PlaygroundExecutionResult(
+                    success: result.error == nil,
+                    output: result.output.joined(separator: "\n"),
+                    durationMs: durationMs,
+                    variables: [],
+                    error: result.error != nil ? RuntimeError(line: 1, message: result.error!) : nil
+                )
+            }.value
+        }
+        
         return await Task.detached(priority: .userInitiated) {
             let start = DispatchTime.now()
             let normalizedSource = PlaygroundEngine.normalizeCode(code, language: language)
@@ -56,10 +74,66 @@ public final class PlaygroundEngine {
         }.value
     }
     
+    // MARK: - Native In-Memory SQLite Engine
+    public static func executeSQLite(script: String) -> (output: [String], error: String?) {
+        var db: OpaquePointer?
+        guard sqlite3_open(":memory:", &db) == SQLITE_OK else {
+            return ([], "Cannot initialize in-memory SQLite database.")
+        }
+        defer { sqlite3_close(db) }
+        
+        var outputLines: [String] = []
+        let rawStatements = script.components(separatedBy: ";")
+        
+        for rawStmt in rawStatements {
+            let stmt = rawStmt.trimmingCharacters(in: .whitespacesAndNewlines)
+            if stmt.isEmpty { continue }
+            
+            var stmtPtr: OpaquePointer?
+            if sqlite3_prepare_v2(db, stmt, -1, &stmtPtr, nil) == SQLITE_OK {
+                let colCount = sqlite3_column_count(stmtPtr)
+                var hasHeader = false
+                
+                while sqlite3_step(stmtPtr) == SQLITE_ROW {
+                    if !hasHeader && colCount > 0 {
+                        var headers: [String] = []
+                        for c in 0..<colCount {
+                            if let name = sqlite3_column_name(stmtPtr, c) {
+                                headers.append(String(cString: name))
+                            }
+                        }
+                        outputLines.append("| " + headers.joined(separator: " | ") + " |")
+                        hasHeader = true
+                    }
+                    
+                    var row: [String] = []
+                    for c in 0..<colCount {
+                        if let text = sqlite3_column_text(stmtPtr, c) {
+                            row.append(String(cString: text))
+                        } else {
+                            row.append("NULL")
+                        }
+                    }
+                    outputLines.append("| " + row.joined(separator: " | ") + " |")
+                }
+                sqlite3_finalize(stmtPtr)
+            } else {
+                let errMsg = String(cString: sqlite3_errmsg(db))
+                return (outputLines, "SQL Error: \(errMsg)")
+            }
+        }
+        
+        if outputLines.isEmpty {
+            outputLines.append("(Запрос выполнен успешно)")
+        }
+        
+        return (outputLines, nil)
+    }
+    
     // MARK: - Multi-Language Normalization & Preprocessing
     public static func normalizeCode(_ source: String, language: TargetLanguage) -> String {
         switch language {
-        case .swift:
+        case .swift, .sql:
             return source
             
         case .python:

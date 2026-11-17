@@ -43,6 +43,8 @@ public struct OfficialDocumentationView: View {
             return URL(string: "https://docs.python.org/3/tutorial/")!
         case .csharp:
             return URL(string: "https://learn.microsoft.com/en-us/dotnet/csharp/tour-of-csharp/")!
+        case .sql:
+            return URL(string: "https://www.sqlite.org/lang.html")!
         }
     }
     

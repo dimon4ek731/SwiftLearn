@@ -17,6 +17,26 @@ public final class CodeIntegrityValidator {
     public func validate(code: String, challenge: LessonPracticeChallenge) -> CodeIntegrityValidationResult {
         let trimmed = code.trimmingCharacters(in: .whitespacesAndNewlines)
         
+        // 0. SQL Integrity Check
+        if challenge.language == .sql {
+            let upper = trimmed.uppercased()
+            if !upper.contains("SELECT") && !upper.contains("INSERT") && !upper.contains("UPDATE") && !upper.contains("DELETE") && !upper.contains("CREATE") {
+                return CodeIntegrityValidationResult(
+                    isValid: false,
+                    failureReasonRU: "Анти-хардкод: напишите корректный SQL-запрос (например, SELECT ... FROM ...).",
+                    failureReasonEN: "Anti-hardcode: write a valid SQL statement (e.g. SELECT ... FROM ...)."
+                )
+            }
+            if upper.contains("SELECT") && !upper.contains("FROM") && !upper.contains("CREATE") {
+                return CodeIntegrityValidationResult(
+                    isValid: false,
+                    failureReasonRU: "Анти-хардкод: запрещено возвращать фиксированный литерал без выборки из таблицы (укажите FROM <table>).",
+                    failureReasonEN: "Anti-hardcode: returning static literals without querying a table is forbidden (specify FROM <table>)."
+                )
+            }
+            return .valid
+        }
+        
         // 1. Extract function parameters from starter code
         let parameters = extractParameterNames(from: challenge.starterCode)
         

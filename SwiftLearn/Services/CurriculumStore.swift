@@ -5332,6 +5332,364 @@ var c = new Coordinate(55.75, 37.61);
 Console.WriteLine($"Location: {c.Lat}, {c.Lon}");
 """,
                 xpReward: 50
+            ),
+
+            // MARK: - SQL Lessons
+            Lesson(
+                id: "sql_basics_select",
+                category: .sqlBasics,
+                titleRU: "Выборка данных: SELECT, AS и DISTINCT",
+                titleEN: "Data Querying: SELECT, AS & DISTINCT",
+                summaryRU: "Основы языка SQL: операторы SELECT, выбор конкретных колонок, переименование через AS и исключение дубликатов DISTINCT.",
+                summaryEN: "Core SQL syntax: querying data with SELECT, column aliasing with AS, and eliminating duplicates with DISTINCT.",
+                contentMarkdownRU: ##"""
+# Основы SQL и Оператор SELECT
+
+SQL (Structured Query Language) — декларативный язык структурированных запросов для взаимодействия с реляционными базами данных (PostgreSQL, SQLite, MySQL).
+
+## Простейший запрос
+Символ `*` выбирает абсолютно все доступные колонки из таблицы:
+```sql
+SELECT * FROM employees;
+```
+
+## Выбор конкретных колонок и псевдонимы (AS)
+Для минимизации сетевого трафика и расхода памяти рекомендуется запрашивать только нужные поля, а также давать им понятные имена:
+```sql
+SELECT 
+    first_name AS name,
+    salary * 12 AS annual_salary
+FROM employees;
+```
+
+## Устранение дубликатов (DISTINCT)
+Ключевое слово `DISTINCT` оставляет только уникальные комбинации значений:
+```sql
+SELECT DISTINCT department FROM employees;
+```
+
+## Ограничение выборки (LIMIT и OFFSET)
+```sql
+SELECT name, price FROM products 
+ORDER BY price DESC 
+LIMIT 5 OFFSET 0;
+```
+"""##,
+                contentMarkdownEN: ##"""
+# SQL Fundamentals: SELECT Statement
+
+SQL is the universal declarative language for relational database management systems.
+
+## Basic Query
+```sql
+SELECT first_name AS name, salary 
+FROM employees;
+```
+
+## Removing Duplicates
+```sql
+SELECT DISTINCT country FROM customers;
+```
+"""##,
+                codeSnippet: ##"""
+SELECT 
+    name, 
+    department, 
+    salary 
+FROM employees 
+WHERE salary > 50000;
+"""##,
+                xpReward: 35
+            ),
+            Lesson(
+                id: "sql_filtering_where",
+                category: .sqlFiltering,
+                titleRU: "Фильтрация строк: WHERE, IN, BETWEEN и LIKE",
+                titleEN: "Row Filtering: WHERE, IN, BETWEEN & LIKE",
+                summaryRU: "Построение предикатов и условий: сравнение, логические операторы AND/OR, проверка вхождения IN и поиск по шаблону LIKE.",
+                summaryEN: "Filter rows with WHERE clauses, logical operators AND/OR, range checks BETWEEN, and wildcard pattern matching LIKE.",
+                contentMarkdownRU: ##"""
+# Фильтрация данных с помощью WHERE
+
+Предложение `WHERE` фильтрует строки таблицы до их попадания в итоговую выборку.
+
+## Операторы сравнения и логика
+```sql
+SELECT * FROM orders 
+WHERE amount >= 100.00 AND status = 'completed';
+```
+
+## Поиск в диапазоне (BETWEEN)
+```sql
+SELECT * FROM products 
+WHERE price BETWEEN 50 AND 150;
+```
+
+## Проверка множества (IN)
+```sql
+SELECT * FROM users 
+WHERE role IN ('admin', 'moderator', 'editor');
+```
+
+## Поиск по подстроке (LIKE)
+- `%` — любая последовательность символов (ноль или больше).
+- `_` — ровно один любой символ.
+```sql
+SELECT * FROM customers 
+WHERE email LIKE '%@gmail.com';
+```
+"""##,
+                contentMarkdownEN: ##"""
+# Filtering Rows with WHERE
+
+```sql
+SELECT * FROM employees
+WHERE department = 'IT' AND salary >= 70000;
+```
+"""##,
+                codeSnippet: ##"""
+SELECT title, rating FROM movies
+WHERE release_year >= 2020 AND rating >= 8.0;
+"""##,
+                xpReward: 40
+            ),
+            Lesson(
+                id: "sql_aggregations_group",
+                category: .sqlAggregations,
+                titleRU: "Агрегатные функции и GROUP BY",
+                titleEN: "Aggregate Functions & GROUP BY",
+                summaryRU: "Вычисление итоговых метрик: COUNT, SUM, AVG, MIN, MAX. Группировка строк через GROUP BY и фильтрация групп HAVING.",
+                summaryEN: "Compute dataset aggregates with COUNT, SUM, AVG, MIN, MAX. Group rows with GROUP BY and filter group metrics with HAVING.",
+                contentMarkdownRU: ##"""
+# Агрегатные функции и Группировка
+
+Агрегатные функции сворачивают множество значений в одно итоговое число.
+
+## Базовые агрегаты
+- `COUNT(*)` — общее количество строк.
+- `SUM(column)` — сумма числовых значений.
+- `AVG(column)` — среднее арифметическое.
+- `MIN(column)` / `MAX(column)` — минимальное и максимальное значения.
+
+```sql
+SELECT 
+    COUNT(*) AS total_workers,
+    AVG(salary) AS average_salary,
+    MAX(salary) AS max_salary
+FROM employees;
+```
+
+## Предложение GROUP BY
+Разбивает строки на непересекающиеся группы по указанному признаку:
+```sql
+SELECT 
+    department, 
+    COUNT(*) AS employee_count, 
+    AVG(salary) AS avg_sal
+FROM employees
+GROUP BY department;
+```
+
+## Разница между WHERE и HAVING
+- `WHERE` фильтрует строки **до** группировки.
+- `HAVING` фильтрует группы **после** вычисления агрегатов:
+```sql
+SELECT department, COUNT(*) AS cnt
+FROM employees
+GROUP BY department
+HAVING COUNT(*) > 5;
+```
+"""##,
+                contentMarkdownEN: ##"""
+# Aggregations & GROUP BY
+
+```sql
+SELECT department, AVG(salary) AS avg_salary
+FROM employees
+GROUP BY department
+HAVING COUNT(*) >= 3;
+```
+"""##,
+                codeSnippet: ##"""
+SELECT category, COUNT(*) AS items_count, AVG(price) AS avg_price
+FROM store_products
+GROUP BY category;
+"""##,
+                xpReward: 45
+            ),
+            Lesson(
+                id: "sql_joins_types",
+                category: .sqlJoins,
+                titleRU: "Объединение таблиц: INNER, LEFT и FULL JOIN",
+                titleEN: "Table Joins: INNER, LEFT & FULL JOIN",
+                summaryRU: "Связывание реляционных данных по ключам. Строгое пересечение INNER JOIN и сохранение родительских записей в LEFT JOIN.",
+                summaryEN: "Link data across tables with foreign keys. Compare strict INNER JOIN with non-matching preserved rows in LEFT JOIN.",
+                contentMarkdownRU: ##"""
+# Реляционные связи: Табличные JOIN
+
+Реляционные базы данных нормализуют информацию, разнося сущности по разным таблицам. Операторы `JOIN` восстанавливают целостную картину.
+
+## INNER JOIN
+Возвращает только те строки, для которых условие связи истинно в **обеих** таблицах:
+```sql
+SELECT 
+    users.name,
+    orders.amount,
+    orders.created_at
+FROM users
+INNER JOIN orders ON users.id = orders.user_id;
+```
+
+## LEFT JOIN (LEFT OUTER JOIN)
+Возвращает **все** строки из левой таблицы. Если в правой таблице совпадений нет, её поля заполняются значением `NULL`:
+```sql
+SELECT 
+    users.name,
+    COUNT(orders.id) AS total_orders
+FROM users
+LEFT JOIN orders ON users.id = orders.user_id
+GROUP BY users.name;
+```
+"""##,
+                contentMarkdownEN: ##"""
+# Combining Tables with JOIN
+
+```sql
+SELECT u.username, o.product_name, o.price
+FROM users u
+INNER JOIN orders o ON u.id = o.user_id;
+```
+"""##,
+                codeSnippet: ##"""
+SELECT employees.name, departments.title
+FROM employees
+INNER JOIN departments ON employees.dept_id = departments.id;
+"""##,
+                xpReward: 50
+            ),
+            Lesson(
+                id: "sql_ddl_tables",
+                category: .sqlDdlDml,
+                titleRU: "DDL & DML: Создание таблиц и Изменение данных",
+                titleEN: "DDL & DML: Schema Design & Data Mutation",
+                summaryRU: "Проектирование схемы: CREATE TABLE, PRIMARY KEY, типы данных. Вставка строк INSERT INTO, модификация UPDATE и удаление DELETE.",
+                summaryEN: "Schema definition with CREATE TABLE, primary keys, and data types. Data mutation with INSERT, UPDATE, and DELETE.",
+                contentMarkdownRU: ##"""
+# DDL и DML Операции
+
+SQL делится на две ключевые подсистемы:
+- **DDL (Data Definition Language)** — структура и схема БД.
+- **DML (Data Manipulation Language)** — работа со строками данных.
+
+## Создание таблицы (CREATE TABLE)
+```sql
+CREATE TABLE tasks (
+    id INTEGER PRIMARY KEY,
+    title TEXT NOT NULL,
+    priority INTEGER DEFAULT 1,
+    is_completed BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+## Вставка данных (INSERT INTO)
+```sql
+INSERT INTO tasks (title, priority) 
+VALUES ('Изучить SQL', 5), ('Собрать проект', 3);
+```
+
+## Обновление данных (UPDATE)
+> Внимание: всегда указывайте условие `WHERE`, иначе обновятся абсолютно все строки в таблице!
+```sql
+UPDATE tasks 
+SET is_completed = TRUE 
+WHERE id = 1;
+```
+
+## Удаление данных (DELETE)
+```sql
+DELETE FROM tasks 
+WHERE is_completed = TRUE;
+```
+"""##,
+                contentMarkdownEN: ##"""
+# DDL and DML in SQL
+
+```sql
+CREATE TABLE authors (id INTEGER PRIMARY KEY, name TEXT);
+INSERT INTO authors (id, name) VALUES (1, 'Leo Tolstoy');
+UPDATE authors SET name = 'Lev Tolstoy' WHERE id = 1;
+```
+"""##,
+                codeSnippet: ##"""
+CREATE TABLE courses (id INT PRIMARY KEY, name TEXT, hours INT);
+INSERT INTO courses VALUES (1, 'SQL Mastery', 40);
+SELECT * FROM courses;
+"""##,
+                xpReward: 40
+            ),
+            Lesson(
+                id: "sql_window_functions",
+                category: .sqlWindow,
+                titleRU: "Оконные функции: OVER, ROW_NUMBER и RANK",
+                titleEN: "Window Functions: OVER, ROW_NUMBER & Analytics",
+                summaryRU: "Аналитические вычисления без схлопывания строк: нумерация строк с ROW_NUMBER(), ранжирование RANK() и секционирование PARTITION BY.",
+                summaryEN: "Advanced row analytics without collapsing: calculate running totals, ROW_NUMBER(), and RANK() across PARTITION BY windows.",
+                contentMarkdownRU: ##"""
+# Оконные функции в SQL
+
+В отличие от `GROUP BY`, оконные функции вычисляют агрегатные и ранжирующие значения, **сохраняя каждую индивидуальную строку** выборки.
+
+## Синтаксис OVER
+Окно вычисления задается с помощью конструкции `OVER(...)`:
+- `PARTITION BY <колонка>` — секционирует строки (как локальный GROUP BY).
+- `ORDER BY <колонка>` — упорядочивает строки внутри каждого окна.
+
+## Нумерация строк: ROW_NUMBER()
+```sql
+SELECT 
+    name, 
+    department, 
+    salary,
+    ROW_NUMBER() OVER (PARTITION BY department ORDER BY salary DESC) AS dept_rank
+FROM employees;
+```
+
+## Ранжирование: RANK() и DENSE_RANK()
+```sql
+SELECT 
+    name, 
+    score,
+    RANK() OVER (ORDER BY score DESC) AS rank_pos
+FROM students_results;
+```
+
+## Накопительный итог (Running Total)
+```sql
+SELECT 
+    date, 
+    amount,
+    SUM(amount) OVER (ORDER BY date) AS cumulative_sales
+FROM daily_revenue;
+```
+"""##,
+                contentMarkdownEN: ##"""
+# Window Functions in SQL
+
+```sql
+SELECT 
+    employee_name,
+    salary,
+    ROW_NUMBER() OVER (ORDER BY salary DESC) as rank
+FROM company_salaries;
+```
+"""##,
+                codeSnippet: ##"""
+SELECT name, salary,
+       ROW_NUMBER() OVER (ORDER BY salary DESC) AS rank
+FROM employees;
+"""##,
+                xpReward: 50
             )
 
         ]

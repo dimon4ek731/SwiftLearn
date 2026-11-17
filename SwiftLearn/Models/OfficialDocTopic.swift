@@ -48,6 +48,8 @@ public struct OfficialDocTopic: Identifiable, Codable, Hashable {
             return URL(string: "https://docs.python.org/3/\(webSlug)")!
         case .csharp:
             return URL(string: "https://learn.microsoft.com/en-us/dotnet/csharp/\(webSlug)")!
+        case .sql:
+            return URL(string: "https://www.sqlite.org/\(webSlug)")!
         }
     }
     

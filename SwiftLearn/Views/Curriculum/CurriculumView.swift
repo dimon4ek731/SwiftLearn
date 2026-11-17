@@ -50,41 +50,43 @@ public struct CurriculumView: View {
     
     // MARK: - Language Selector
     private var languageSelector: some View {
-        HStack(spacing: 8) {
-            ForEach(TargetLanguage.allCases) { item in
-                Button(action: {
-                    withAnimation(.spring(response: 0.3, dampingFraction: 0.75)) {
-                        selectedLanguage = item
-                        if let firstTrack = CurriculumTrack.allCases.first(where: { $0.language == item }) {
-                            selectedTrack = firstTrack
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 8) {
+                ForEach(TargetLanguage.allCases) { item in
+                    Button(action: {
+                        withAnimation(.spring(response: 0.3, dampingFraction: 0.75)) {
+                            selectedLanguage = item
+                            if let firstTrack = CurriculumTrack.allCases.first(where: { $0.language == item }) {
+                                selectedTrack = firstTrack
+                            }
                         }
+                    }) {
+                        HStack(spacing: 6) {
+                            Image(systemName: item.icon)
+                                .font(.system(size: 13, weight: .semibold))
+                            Text(item.displayName)
+                                .font(.subheadline.weight(.semibold))
+                                .fixedSize(horizontal: true, vertical: false)
+                        }
+                        .padding(.horizontal, 14)
+                        .padding(.vertical, 8)
+                        .background(
+                            selectedLanguage == item ?
+                            LinearGradient(colors: [Color(red: 0.14, green: 0.38, blue: 0.88), Color(red: 0.28, green: 0.52, blue: 0.95)], startPoint: .topLeading, endPoint: .bottomTrailing) :
+                            LinearGradient(colors: [Color(UIColor.secondarySystemBackground), Color(UIColor.secondarySystemBackground)], startPoint: .topLeading, endPoint: .bottomTrailing)
+                        )
+                        .foregroundColor(selectedLanguage == item ? .white : .primary)
+                        .clipShape(Capsule())
+                        .overlay(
+                            Capsule()
+                                .stroke(selectedLanguage == item ? Color.clear : Color.primary.opacity(0.08), lineWidth: 1)
+                        )
                     }
-                }) {
-                    HStack(spacing: 6) {
-                        Image(systemName: item.icon)
-                            .font(.system(size: 13, weight: .semibold))
-                        Text(item.displayName)
-                            .font(.subheadline.weight(.semibold))
-                    }
-                    .padding(.horizontal, 14)
-                    .padding(.vertical, 8)
-                    .background(
-                        selectedLanguage == item ?
-                        LinearGradient(colors: [Color(red: 0.14, green: 0.38, blue: 0.88), Color(red: 0.28, green: 0.52, blue: 0.95)], startPoint: .topLeading, endPoint: .bottomTrailing) :
-                        LinearGradient(colors: [Color(UIColor.secondarySystemBackground), Color(UIColor.secondarySystemBackground)], startPoint: .topLeading, endPoint: .bottomTrailing)
-                    )
-                    .foregroundColor(selectedLanguage == item ? .white : .primary)
-                    .clipShape(Capsule())
-                    .overlay(
-                        Capsule()
-                            .stroke(selectedLanguage == item ? Color.clear : Color.primary.opacity(0.08), lineWidth: 1)
-                    )
+                    .buttonStyle(.plain)
                 }
-                .buttonStyle(.plain)
             }
-            Spacer()
+            .padding(.horizontal)
         }
-        .padding(.horizontal)
     }
     
     // MARK: - Track Selector
@@ -128,6 +130,10 @@ public struct CurriculumView: View {
             cardSubtitle = lang.localized("Платформа .NET 8, строгая типизация C# 12, классы, свойства и интерфейсы.", ".NET 8 platform, C# 12 static typing, classes, properties, and interfaces.")
         case .csharpAdvanced:
             cardSubtitle = lang.localized("Обобщения (generics), LINQ-запросы, records и асинхронное программирование (async/await).", "Generics, LINQ queries, immutable records, and async/await programming.")
+        case .sqlCore:
+            cardSubtitle = lang.localized("Реляционная модель, выборка SELECT, фильтрация WHERE, агрегации и группировка GROUP BY.", "Relational model, SELECT queries, WHERE filtering, aggregations, and GROUP BY.")
+        case .sqlAdvanced:
+            cardSubtitle = lang.localized("Объединения таблиц JOIN, вложенные подзапросы, DDL/DML и оконные функции OVER.", "Table JOINs, subqueries, DDL/DML schema operations, and OVER window functions.")
         }
         
         return VStack(alignment: .leading, spacing: 14) {

@@ -581,7 +581,18 @@ private enum SyntaxRules {
         "bool", "char", "object", "record", "interface", "new", "null", "this", "base",
         "foreach", "typeof", "sizeof", "stackalloc", "checked", "unchecked",
         "lock", "yield", "partial", "ref", "out", "params", "sealed", "virtual",
-        "abstract", "extern", "event", "delegate", "fixed", "stackalloc"
+        "abstract", "extern", "event", "delegate", "fixed", "stackalloc",
+        
+        // SQL Keywords
+        "SELECT", "select", "FROM", "from", "WHERE", "where", "JOIN", "join", "INNER", "inner",
+        "LEFT", "left", "RIGHT", "right", "FULL", "full", "ON", "on", "GROUP", "group",
+        "BY", "by", "HAVING", "having", "ORDER", "order", "ASC", "asc", "DESC", "desc",
+        "LIMIT", "limit", "OFFSET", "offset", "CREATE", "create", "TABLE", "table",
+        "INSERT", "insert", "INTO", "into", "VALUES", "values", "UPDATE", "update",
+        "SET", "set", "DELETE", "delete", "PRIMARY", "primary", "KEY", "key",
+        "FOREIGN", "foreign", "REFERENCES", "references", "DISTINCT", "distinct",
+        "UNION", "union", "ALL", "all", "LIKE", "like", "BETWEEN", "between",
+        "OVER", "over", "PARTITION", "partition"
     ]
     
     static let builtInTypes: Set<String> = [
@@ -599,6 +610,10 @@ private enum SyntaxRules {
         
         // C# Types & .NET
         "Console", "List", "Dictionary", "HashSet", "IEnumerable", "ICollection", "IList",
-        "Task", "Action", "Func", "Math", "DateTime", "Guid", "HttpClient", "StringBuilder"
+        "Task", "Action", "Func", "Math", "DateTime", "Guid", "HttpClient", "StringBuilder",
+        
+        // SQL Types & Aggregations
+        "INTEGER", "TEXT", "REAL", "BLOB", "VARCHAR", "BOOLEAN", "TIMESTAMP", "DATE",
+        "COUNT", "SUM", "AVG", "MIN", "MAX", "ROW_NUMBER", "RANK", "DENSE_RANK", "COALESCE"
     ]
 }
