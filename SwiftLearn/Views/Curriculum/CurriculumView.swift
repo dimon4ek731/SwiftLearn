@@ -90,15 +90,40 @@ public struct CurriculumView: View {
     }
     
     // MARK: - Track Selector
+    @ViewBuilder
     private var trackSelector: some View {
         let tracks = CurriculumTrack.allCases.filter { $0.language == selectedLanguage }
-        return Picker("Трек обучения", selection: $selectedTrack) {
-            ForEach(tracks) { track in
-                Text(track.title(for: lang.currentLanguage)).tag(track)
+        if tracks.count > 2 {
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 8) {
+                    ForEach(tracks) { track in
+                        Button(action: {
+                            withAnimation(.spring(response: 0.25, dampingFraction: 0.8)) {
+                                selectedTrack = track
+                            }
+                        }) {
+                            Text(track.title(for: lang.currentLanguage))
+                                .font(.subheadline.weight(.semibold))
+                                .padding(.horizontal, 14)
+                                .padding(.vertical, 8)
+                                .background(selectedTrack == track ? Color(red: 0.14, green: 0.38, blue: 0.88) : Color(UIColor.secondarySystemBackground))
+                                .foregroundColor(selectedTrack == track ? .white : .primary)
+                                .clipShape(RoundedRectangle(cornerRadius: 10))
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+                .padding(.horizontal)
             }
+        } else {
+            Picker("Трек обучения", selection: $selectedTrack) {
+                ForEach(tracks) { track in
+                    Text(track.title(for: lang.currentLanguage)).tag(track)
+                }
+            }
+            .pickerStyle(.segmented)
+            .padding(.horizontal)
         }
-        .pickerStyle(.segmented)
-        .padding(.horizontal)
     }
     
     // MARK: - Overall Progress Card
@@ -123,9 +148,13 @@ public struct CurriculumView: View {
         case .swiftUI:
             cardSubtitle = lang.localized("Анатомия View, стеки и layout, @Observable, адаптивные сетки, анимации и навигация.", "View anatomy, stacks, layout rules, @Observable, grids, physics animations, and navigation.")
         case .pythonCore:
-            cardSubtitle = lang.localized("Синтаксис Python 3.12, типизация, динамические списки, словари, функции и лямбды.", "Python 3.12 syntax, dynamic typing, lists, dicts, functions, and lambdas.")
+            cardSubtitle = lang.localized("Синтаксис Python 3.12, PEP 8, типы, списки, словари, функции и лямбды.", "Python 3.12 syntax, PEP 8, types, lists, dicts, functions, and lambdas.")
         case .pythonAdvanced:
-            cardSubtitle = lang.localized("Классы, наследование, dunder-методы, генераторы, итераторы и декораторы.", "Classes, inheritance, magic dunder methods, generators, and decorators.")
+            cardSubtitle = lang.localized("ООП: классы, инкапсуляция, dunder-методы, дескрипторы, слоты и метаклассы.", "OOP: classes, encapsulation, dunder protocols, descriptors, slots, and metaclasses.")
+        case .pythonStdlib:
+            cardSubtitle = lang.localized("Стандартная библиотека: collections, itertools, heapq, генераторы, декораторы и pathlib.", "Standard library: collections, itertools, heapq, generators, decorators, and pathlib.")
+        case .pythonSystems:
+            cardSubtitle = lang.localized("Системный Python: исключения, asyncio, Event Loop, архитектура GIL и профилирование.", "Systems Python: exceptions, asyncio, Event Loop, GIL architecture, and profiling.")
         case .csharpCore:
             cardSubtitle = lang.localized("Платформа .NET 8, строгая типизация C# 12, классы, свойства и интерфейсы.", ".NET 8 platform, C# 12 static typing, classes, properties, and interfaces.")
         case .csharpAdvanced:

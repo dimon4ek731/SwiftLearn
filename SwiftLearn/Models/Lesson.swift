@@ -57,6 +57,8 @@ public enum CurriculumTrack: String, CaseIterable, Identifiable, Codable {
     // Python Tracks
     case pythonCore = "python_core"
     case pythonAdvanced = "python_advanced"
+    case pythonStdlib = "python_stdlib"
+    case pythonSystems = "python_systems"
     
     // C# Tracks
     case csharpCore = "csharp_core"
@@ -71,7 +73,7 @@ public enum CurriculumTrack: String, CaseIterable, Identifiable, Codable {
     public var language: TargetLanguage {
         switch self {
         case .swiftCore, .swiftUI: return .swift
-        case .pythonCore, .pythonAdvanced: return .python
+        case .pythonCore, .pythonAdvanced, .pythonStdlib, .pythonSystems: return .python
         case .csharpCore, .csharpAdvanced: return .csharp
         case .sqlCore, .sqlAdvanced: return .sql
         }
@@ -86,7 +88,11 @@ public enum CurriculumTrack: String, CaseIterable, Identifiable, Codable {
         case .pythonCore:
             return language == .russian ? "Python Core" : "Python Core"
         case .pythonAdvanced:
-            return language == .russian ? "Python ООП & Продвинутый" : "Python OOP & Advanced"
+            return language == .russian ? "Python ООП" : "Python OOP"
+        case .pythonStdlib:
+            return language == .russian ? "Python Stdlib" : "Python Stdlib"
+        case .pythonSystems:
+            return language == .russian ? "Python Concurrency" : "Python Concurrency"
         case .csharpCore:
             return language == .russian ? "C# Core & ООП" : "C# Core & OOP"
         case .csharpAdvanced:
@@ -104,6 +110,8 @@ public enum CurriculumTrack: String, CaseIterable, Identifiable, Codable {
         case .swiftUI: return "macwindow.on.rectangle"
         case .pythonCore: return "chevron.left.forwardslash.chevron.right"
         case .pythonAdvanced: return "cube.transparent"
+        case .pythonStdlib: return "shippingbox"
+        case .pythonSystems: return "bolt.badge.clock"
         case .csharpCore: return "number"
         case .csharpAdvanced: return "arrow.triangle.branch"
         case .sqlCore: return "cylinder.split.1x2"
@@ -139,13 +147,22 @@ public enum LessonCategory: String, CaseIterable, Identifiable, Codable {
     case pythonCollections = "python_collections"
     case pythonFunctions = "python_functions"
     
-    // MARK: - Track 4: Python Advanced
+    // MARK: - Track 4: Python Advanced (OOP)
     case pythonOOP = "python_oop"
     case pythonDunder = "python_dunder"
+    case pythonMetaprogramming = "python_metaprogramming"
+    
+    // MARK: - Track 5: Python Stdlib
+    case pythonAdvancedCollections = "python_adv_collections"
     case pythonGenerators = "python_generators"
     case pythonDecorators = "python_decorators"
+    case pythonIOAndFiles = "python_io_files"
+    
+    // MARK: - Track 6: Python Systems & Concurrency
+    case pythonExceptions = "python_exceptions"
     case pythonAsync = "python_async"
-    case pythonAdvanced = "python_advanced"
+    case pythonConcurrency = "python_concurrency"
+    case pythonTestingAndPerf = "python_testing_perf"
     
     // MARK: - Track 5: C# Core
     case csharpBasics = "csharp_basics"
@@ -190,8 +207,16 @@ public enum LessonCategory: String, CaseIterable, Identifiable, Codable {
             return .pythonCore
             
         // Python Advanced
-        case .pythonOOP, .pythonDunder, .pythonGenerators, .pythonDecorators, .pythonAsync, .pythonAdvanced:
+        case .pythonOOP, .pythonDunder, .pythonMetaprogramming:
             return .pythonAdvanced
+            
+        // Python Stdlib
+        case .pythonAdvancedCollections, .pythonGenerators, .pythonDecorators, .pythonIOAndFiles:
+            return .pythonStdlib
+            
+        // Python Systems
+        case .pythonExceptions, .pythonAsync, .pythonConcurrency, .pythonTestingAndPerf:
+            return .pythonSystems
             
         // C# Core
         case .csharpBasics, .csharpOOP, .csharpInterfaces:
@@ -259,19 +284,33 @@ public enum LessonCategory: String, CaseIterable, Identifiable, Codable {
         case .pythonFunctions:
             return language == .russian ? "4. Функции, *args/**kwargs и Лямбды" : "4. Functions, Args & Lambdas"
             
-        // Python Advanced
+        // Python Advanced (OOP)
         case .pythonOOP:
             return language == .russian ? "5. Классы, __init__ и Наследование" : "5. OOP, Classes & Inheritance"
         case .pythonDunder:
             return language == .russian ? "6. Магические Методы (Dunder) и Протоколы" : "6. Magic Methods (Dunder) & Protocols"
+        case .pythonMetaprogramming:
+            return language == .russian ? "7. Дескрипторы, Слоты и Метаклассы" : "7. Descriptors, Slots & Metaclasses"
+            
+        // Python Stdlib
+        case .pythonAdvancedCollections:
+            return language == .russian ? "8. collections, itertools и heapq" : "8. collections, itertools & heapq"
         case .pythonGenerators:
-            return language == .russian ? "7. Генераторы, Итераторы и Contextlib" : "7. Generators, Iterators & Context"
+            return language == .russian ? "9. Генераторы, Итераторы и Contextlib" : "9. Generators, Iterators & Context"
         case .pythonDecorators:
-            return language == .russian ? "8. Декораторы и Обработка Ошибок" : "8. Decorators & Exceptions"
+            return language == .russian ? "10. Декораторы и Кеширование functools" : "10. Decorators & functools"
+        case .pythonIOAndFiles:
+            return language == .russian ? "11. Файлы pathlib, JSON и Regex" : "11. pathlib, JSON & Regex"
+            
+        // Python Systems
+        case .pythonExceptions:
+            return language == .russian ? "12. Иерархия Исключений и Логирование" : "12. Exceptions & Logging"
         case .pythonAsync:
-            return language == .russian ? "9. Asyncio, Event Loop и Архитектура GIL" : "9. Asyncio, Event Loop & GIL"
-        case .pythonAdvanced:
-            return language == .russian ? "10. Метаклассы и Оптимизация" : "10. Metaclasses & Optimization"
+            return language == .russian ? "13. Asyncio, Event Loop и Задачи" : "13. Asyncio, Event Loop & Tasks"
+        case .pythonConcurrency:
+            return language == .russian ? "14. GIL, Threading и Multiprocessing" : "14. GIL, Threading & Multiprocessing"
+        case .pythonTestingAndPerf:
+            return language == .russian ? "15. Тестирование unittest, cProfile и dis" : "15. Testing, Profiling & Bytecode"
             
         // C# Core
         case .csharpBasics:
@@ -335,10 +374,15 @@ public enum LessonCategory: String, CaseIterable, Identifiable, Codable {
         case .pythonFunctions: return "function"
         case .pythonOOP: return "cube.transparent"
         case .pythonDunder: return "sparkles"
+        case .pythonMetaprogramming: return "gearshape.2"
+        case .pythonAdvancedCollections: return "shippingbox"
         case .pythonGenerators: return "arrow.triangle.2.circlepath"
         case .pythonDecorators: return "slider.horizontal.3"
+        case .pythonIOAndFiles: return "doc.text"
+        case .pythonExceptions: return "exclamationmark.triangle"
         case .pythonAsync: return "bolt.badge.clock"
-        case .pythonAdvanced: return "cpu"
+        case .pythonConcurrency: return "cpu"
+        case .pythonTestingAndPerf: return "speedometer"
             
         // C#
         case .csharpBasics: return "number"

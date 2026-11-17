@@ -4723,39 +4723,31 @@ struct CleanAppTemplate: App {
                 category: .pythonBasics,
                 titleRU: "Синтаксис Python 3.12, Отступы и PEP 8",
                 titleEN: "Python 3.12 Syntax, Indentation & PEP 8",
-                summaryRU: "Фундамент языка Python: отступы как семантика блоков кода, комментарии, стиль PEP 8 и функция print().",
-                summaryEN: "Python foundations: indentation-based blocks, comments, PEP 8 standards, and the print() function.",
+                summaryRU: "Фундамент языка Python: отступы как семантика блоков, стиль PEP 8, комментарии и функция print().",
+                summaryEN: "Python fundamentals: indentation semantics, PEP 8 code style, and print() function.",
                 contentMarkdownRU: ##"""
 ### Философия Python и Отступы (PEP 8)
-В Python отступы (ровно 4 пробела) определяют структуру вложенности кода, заменяя фигурные скобки `{ }` из C/Swift:
-
+В Python отступы (4 пробела) определяют границы блоков кода вместо фигурных скобок `{ }`:
 ```python
 age = 20
 if age >= 18:
     print("Совершеннолетний")
-    print("Доступ разрешен")
+    print("Доступ открыт")
 ```
-
 ### Динамическая типизация
-Переменная — это метка-указатель на объект в динамической памяти:
+Имена переменных ссылаются на объекты в куче:
 ```python
-x = 42         # int
-x = "Python"   # теперь str
-print(type(x)) # <class 'str'>
+x = 100       # int
+x = "Строка"  # str
 ```
 """##,
                 contentMarkdownEN: ##"""
-### Python Philosophy & Indentation
-Python uses 4-space indentation for code blocks instead of curly braces:
-```python
-if True:
-    print("Hello, Python 3.12!")
-```
+### Indentation Semantics
+Python enforces clean visual hierarchy using 4 spaces per indentation level.
 """##,
                 codeSnippet: ##"""
-# Приветствие в Python
-user_name = "Александр"
-print(f"Добро пожаловать в Python 3.12, {user_name}!")
+user = "Разработчик"
+print(f"Привет, {user}! Добро пожаловать в Python 3.12")
 """##,
                 xpReward: 30
             ),
@@ -4764,30 +4756,27 @@ print(f"Добро пожаловать в Python 3.12, {user_name}!")
                 category: .pythonBasics,
                 titleRU: "Числа, Деление //, Степень ** и модуль math",
                 titleEN: "Numbers, Integer Division, Power & math",
-                summaryRU: "Целые числа int произвольной точности, вещественные float, целочисленное деление //, остаток % и возведение в степень **.",
-                summaryEN: "Arbitrary precision integers, IEEE-754 floats, integer division //, modulo %, and power **.",
+                summaryRU: "Целые числа int произвольной точности, float IEEE-754, деление //, остаток % и модуль math.",
+                summaryEN: "Arbitrary-precision integers, IEEE-754 floats, floor division, modulo, and math module.",
                 contentMarkdownRU: ##"""
 ### Арифметика в Python
-- Обычное деление `/` всегда возвращает `float` (даже `4 / 2 == 2.0`).
+- Деление `/` всегда возвращает `float`.
 - Целочисленное деление `//` отбрасывает дробную часть.
-- Оператор `%` вычисляет остаток от деления.
-- Оператор `**` возводит в степень: `2 ** 10 == 1024`.
-
+- Оператор `%` возвращает остаток от деления.
+- Оператор `**` возводит в степень.
 ```python
-x = 17 // 3  # 5
-rem = 17 % 3 # 2
-sq = 5 ** 2  # 25
+print(17 // 3) # 5
+print(17 % 3)  # 2
+print(2 ** 10) # 1024
 ```
 """##,
                 contentMarkdownEN: ##"""
-### Python Arithmetic Operators
-Division `/` always returns a float. Floor division `//` discards the fractional part.
+### Arithmetic in Python
+Use `//` for floor division, `%` for remainder, and `**` for exponentiation.
 """##,
                 codeSnippet: ##"""
-# Вычисление гипотенузы
-a, b = 3, 4
-c = (a**2 + b**2) ** 0.5
-print(f"Гипотенуза треугольника со сторонами {a} и {b} равна {c}")
+a, b = 7, 3
+print(f"Целое: {a // b}, Остаток: {a % b}, Степень: {b ** 3}")
 """##,
                 xpReward: 35
             ),
@@ -4796,32 +4785,30 @@ print(f"Гипотенуза треугольника со сторонами {a
                 category: .pythonBasics,
                 titleRU: "Строки, Срезы [::] и f-strings",
                 titleEN: "Strings, Slicing [::] & f-strings",
-                summaryRU: "Неизменяемые строки str: форматирование f-строк, методы split/join/strip и срезы [start:stop:step].",
-                summaryEN: "Immutable str objects: modern f-strings, split/join/strip methods, and [start:stop:step] slicing.",
+                summaryRU: "Неизменяемый тип str, интернирование, срезы [start:stop:step], методы строк и f-строки.",
+                summaryEN: "Immutable str objects, string interning, slicing syntax, methods, and f-strings.",
                 contentMarkdownRU: ##"""
 ### Срезы строк (Slicing)
-Синтаксис среза: `string[start:stop:step]`
+`string[start:stop:step]`
 ```python
 s = "Python3"
-print(s[0:2])   # "Py"
-print(s[::-1])  # "3nohtyP" (разворот строки)
+print(s[0:2])  # "Py"
+print(s[::-1]) # "3nohtyP" (разворот)
 ```
-
-### f-строки (PEP 498)
+### f-строки
 ```python
 name = "Alice"
-score = 98.456
-print(f"Студент {name}: {score:.2f} баллов")
+score = 99.456
+print(f"Студент {name}: {score:.1f}")
 ```
 """##,
                 contentMarkdownEN: ##"""
-### Slicing & f-strings
-Extract substrings cleanly with slicing syntax `[start:stop:step]`.
+### String Manipulation
+Slicing allows fast substring extraction and reversing with step -1.
 """##,
                 codeSnippet: ##"""
-text = "hello world"
-reversed_text = text[::-1]
-print(f"Оригинал: {text} | Разворот: {reversed_text}")
+s = "swiftlearn"
+print(f"Оригинал: {s} | Разворот: {s[::-1]}")
 """##,
                 xpReward: 35
             ),
@@ -4830,28 +4817,77 @@ print(f"Оригинал: {text} | Разворот: {reversed_text}")
                 category: .pythonBasics,
                 titleRU: "Булева Логика, and/or/not и Truthiness",
                 titleEN: "Boolean Logic, and/or/not & Truthiness",
-                summaryRU: "Тип bool (True/False), логические связки and, or, not, и концепция 'истинности' пустых объектов.",
-                summaryEN: "bool types, short-circuit evaluation with and/or/not, and object truthiness.",
+                summaryRU: "Тип bool, короткое замыкание (short-circuit), и истинность пустых структур.",
+                summaryEN: "bool types, short-circuit boolean evaluation, and truthiness of empty collections.",
                 contentMarkdownRU: ##"""
-### Truthiness в Python
-В Python любые пустые коллекции (`[]`, `{}`, `set()`, `""`), число `0`, `0.0` и значение `None` считаются ложными (`False`) в логическом контексте:
-
+### Truthiness
+Пустые коллекции (`[]`, `{}`, `""`), число `0` и `None` вычисляются как `False`:
 ```python
-items = []
-if not items:
-    print("Список пуст!")
+data = []
+if not data:
+    print("Коллекция пуста")
 ```
 """##,
                 contentMarkdownEN: ##"""
 ### Truth Value Testing
-Empty sequences and numbers equal to zero evaluate to False in boolean contexts.
+Empty sequences evaluate to False in boolean statements.
 """##,
                 codeSnippet: ##"""
-val = ""
-if not val:
-    print("Строка пустая (Falsy)")
-else:
-    print("Строка заполнена (Truthy)")
+items = ["Python"]
+print("Есть элементы" if items else "Пусто")
+"""##,
+                xpReward: 30
+            ),
+            Lesson(
+                id: "py_bytes_bytearray",
+                category: .pythonBasics,
+                titleRU: "Байтовые Строки bytes и Изменяемый bytearray",
+                titleEN: "Byte Strings (bytes) & Mutable bytearray",
+                summaryRU: "Работа с бинарными данными: неизменяемый bytes, изменяемый массив байтов bytearray и кодеки.",
+                summaryEN: "Binary representations: immutable bytes, mutable bytearray, and encoding/decoding.",
+                contentMarkdownRU: ##"""
+### bytes vs str
+`str` — это символы Unicode, `bytes` — это сырые байты (0-255):
+```python
+b = b"Hello"
+raw = "Привет".encode("utf-8")
+text = raw.decode("utf-8")
+```
+"""##,
+                contentMarkdownEN: ##"""
+### Binary Data
+Distinguish between human text strings and raw network/file bytes.
+"""##,
+                codeSnippet: ##"""
+b = "Data".encode("ascii")
+print(f"Байты: {b}, длина: {len(b)}")
+"""##,
+                xpReward: 35
+            ),
+            Lesson(
+                id: "py_bitwise_ops",
+                category: .pythonBasics,
+                titleRU: "Битовые Операции (&, |, ^, ~, <<, >>)",
+                titleEN: "Bitwise Operations (&, |, ^, ~, <<, >>)",
+                summaryRU: "Низкоуровневая побитовая логика: сдвиги влево/вправо, маски флагов и побитовое XOR.",
+                summaryEN: "Low-level bitwise manipulation: shifts, bitmasks, AND, OR, and XOR.",
+                contentMarkdownRU: ##"""
+### Битовые операторы
+- `&` (AND), `|` (OR), `^` (XOR), `~` (NOT)
+- `<<` (сдвиг влево), `>>` (сдвиг вправо)
+```python
+flags = 0b0101
+mask = 0b0001
+is_active = bool(flags & mask)
+```
+"""##,
+                contentMarkdownEN: ##"""
+### Bitwise Logic
+Manipulate individual bits for performance and binary protocol parsing.
+"""##,
+                codeSnippet: ##"""
+x = 4 # 0b100
+print(f"x << 1: {x << 1} (умножение на 2)")
 """##,
                 xpReward: 35
             ),
@@ -4860,105 +4896,137 @@ else:
                 category: .pythonControlFlow,
                 titleRU: "Ветвление if, elif, else и Тернарный Оператор",
                 titleEN: "Conditionals: if, elif, else & Ternary",
-                summaryRU: "Множественные условия с elif, вложенные проверки и компактный тернарный оператор x if cond else y.",
-                summaryEN: "Chained conditionals with elif and one-line ternary expressions x if cond else y.",
+                summaryRU: "Логические развилки, вложенные проверки и тернарный оператор x if cond else y.",
+                summaryEN: "Branching with if/elif/else and concise ternary expressions.",
                 contentMarkdownRU: ##"""
-### Синтаксис if-elif-else
-```python
-score = 85
-if score >= 90:
-    grade = "A"
-elif score >= 80:
-    grade = "B"
-else:
-    grade = "C"
-```
-
 ### Тернарный оператор
 ```python
-status = "Взрослый" if age >= 18 else "Несовершеннолетний"
+status = "Совершеннолетний" if age >= 18 else "Ребенок"
 ```
 """##,
                 contentMarkdownEN: ##"""
-### Conditional Branching
-Use `if`, `elif`, and `else` to control program execution flow.
+### Conditionals
+Direct code flow based on logical criteria.
 """##,
                 codeSnippet: ##"""
-age = 22
-status = "Доступ разрешен" if age >= 18 else "Отказ"
-print(status)
+temp = 25
+weather = "Тепло" if temp > 20 else "Прохладно"
+print(f"Погода: {weather}")
 """##,
                 xpReward: 35
             ),
             Lesson(
-                id: "py_loops_while_for",
+                id: "py_loops_while_break",
                 category: .pythonControlFlow,
-                titleRU: "Циклы while, for .. in, range и enumerate",
-                titleEN: "Loops: while, for .. in, range & enumerate",
-                summaryRU: "Итерация по последовательностям: генератор диапазона range, счетчик enumerate, параллельный обход zip и break/continue.",
-                summaryEN: "Iteration patterns: range(), enumerate() indexing, zip() pairing, and loop control.",
+                titleRU: "Цикл while, break, continue и блок else",
+                titleEN: "while Loop, break, continue & else Clause",
+                summaryRU: "Циклы с предусловием, досрочный выход break, переход continue и блок else при исчерпании.",
+                summaryEN: "Indefinite iteration with while, loop control, and the loop-else pattern.",
                 contentMarkdownRU: ##"""
-### range и enumerate
+### Блок else в циклах
+Выполняется, если цикл завершился **естественно**, без вызова `break`:
 ```python
-# Итерация с индексом
-fruits = ["яблоко", "банан", "груша"]
-for idx, fruit in enumerate(fruits, start=1):
-    print(f"{idx}: {fruit}")
-```
-
-### zip для параллельного обхода
-```python
-names = ["Аня", "Борис"]
-ages = [25, 30]
-for name, age in zip(names, ages):
-    print(f"{name} -> {age}")
+i = 0
+while i < 3:
+    i += 1
+else:
+    print("Цикл завершен штатно")
 ```
 """##,
                 contentMarkdownEN: ##"""
-### Iterating Sequences
-Use `range()` for counting and `enumerate()` for index-value pairs.
+### Loop Else
+The else block executes only if the loop terminates normally without break.
 """##,
                 codeSnippet: ##"""
-total = 0
-for i in range(1, 11):
-    total += i
-print(f"Сумма чисел от 1 до 10: {total}")
+n = 3
+while n > 0:
+    print(n)
+    n -= 1
 """##,
-                xpReward: 40
+                xpReward: 35
+            ),
+            Lesson(
+                id: "py_loops_for_range",
+                category: .pythonControlFlow,
+                titleRU: "Цикл for .. in, range и счетчик enumerate",
+                titleEN: "for Loops, range Sequence & enumerate Indexing",
+                summaryRU: "Итерация по последовательностям, диапазон range(start, stop, step) и нумерация через enumerate.",
+                summaryEN: "Sequence iteration, range generators, and 0-based/1-based indexing with enumerate.",
+                contentMarkdownRU: ##"""
+### range и enumerate
+```python
+fruits = ["яблоко", "банан", "апельсин"]
+for idx, item in enumerate(fruits, start=1):
+    print(f"{idx}. {item}")
+```
+"""##,
+                contentMarkdownEN: ##"""
+### Iteration with Index
+Use `enumerate()` to retrieve index and value pairs cleanly.
+"""##,
+                codeSnippet: ##"""
+for i in range(1, 4):
+    print(f"Шаг #{i}")
+"""##,
+                xpReward: 35
+            ),
+            Lesson(
+                id: "py_zip_parallel",
+                category: .pythonControlFlow,
+                titleRU: "Функция zip() и Параллельный Обход",
+                titleEN: "Parallel Iteration with zip() & zip_longest()",
+                summaryRU: "Объединение нескольких последовательностей в кортежи пар, распаковка zip(*matrix).",
+                summaryEN: "Pairing multiple sequences into tuples with zip and matrix transposition.",
+                contentMarkdownRU: ##"""
+### zip в действии
+```python
+names = ["Алиса", "Боб"]
+scores = [95, 87]
+for name, score in zip(names, scores):
+    print(f"{name}: {score}")
+```
+"""##,
+                contentMarkdownEN: ##"""
+### Parallel Iteration
+Iterate through multiple iterables simultaneously.
+"""##,
+                codeSnippet: ##"""
+keys = ["a", "b"]
+vals = [1, 2]
+mapping = dict(zip(keys, vals))
+print(mapping)
+"""##,
+                xpReward: 35
             ),
             Lesson(
                 id: "py_match_case_patterns",
                 category: .pythonControlFlow,
                 titleRU: "Сопоставление с Образцом match .. case",
                 titleEN: "Pattern Matching: match .. case",
-                summaryRU: "Структурное сопоставление с образцом (Structural Pattern Matching, Python 3.10+): деструктуризация, guards и wildcard _.",
-                summaryEN: "Python 3.10+ pattern matching: sequence destructuring, guards, and wildcard handling.",
+                summaryRU: "Структурный pattern matching (Python 3.10+): позиционные паттерны, guards и деструктуризация.",
+                summaryEN: "Structural pattern matching with patterns, guards, and wildcard handling.",
                 contentMarkdownRU: ##"""
-### Структурный match .. case
+### Синтаксис match .. case
 ```python
-command = ["move", 10, 20]
-match command:
-    case ["move", x, y]:
-        print(f"Перемещение в ({x}, {y})")
-    case ["quit"]:
-        print("Выход")
+point = (0, 5)
+match point:
+    case (0, 0):
+        print("Начало координат")
+    case (0, y):
+        print(f"На оси Y: {y}")
     case _:
-        print("Неизвестная команда")
+        print("Другая точка")
 ```
 """##,
                 contentMarkdownEN: ##"""
-### Structural Pattern Matching
-Python 3.10 introduced `match` / `case` for expressive branching.
+### Pattern Matching
+Expressive control flow introduced in Python 3.10.
 """##,
                 codeSnippet: ##"""
-code = 200
-match code:
-    case 200:
-        print("OK: Успех")
-    case 404:
-        print("Not Found: Не найдено")
-    case _:
-        print("Другой статус")
+cmd = "start"
+match cmd:
+    case "start": print("Запуск")
+    case _: print("Неизвестно")
 """##,
                 xpReward: 40
             ),
@@ -4966,53 +5034,52 @@ match code:
                 id: "py_lists_methods",
                 category: .pythonCollections,
                 titleRU: "Динамические Списки (list): Методы и Срезы",
-                titleEN: "Lists (list): Methods, Mutability & Slicing",
-                summaryRU: "Главная коллекция Python: append, extend, pop, insert, remove, inplace-сортировка sort() и функция sorted().",
-                summaryEN: "Mutable list sequences: append, extend, pop, insert, sorting, and slicing semantics.",
+                titleEN: "Lists: Methods, Mutability & Slicing",
+                summaryRU: "Упорядоченные изменяемые массивы: append, pop, extend, insert, inplace-сортировка sort().",
+                summaryEN: "Mutable ordered sequences: amortized O(1) appending, popping, and sorting.",
                 contentMarkdownRU: ##"""
-### Операции со списками
+### Списки
 ```python
-nums = [3, 1, 4, 1, 5]
-nums.append(9)       # Добавление в конец
-nums.pop()           # Удаление с конца
-nums.sort()          # Сортировка на месте
-print(nums)
+nums = [3, 1, 4]
+nums.append(1)
+nums.sort()
+print(nums) # [1, 1, 3, 4]
 ```
 """##,
                 contentMarkdownEN: ##"""
-### Working with Lists
-Lists are ordered, mutable collections of arbitrary objects.
+### Python Lists
+Dynamic arrays with fast random access by index.
 """##,
                 codeSnippet: ##"""
-numbers = [10, 50, 20, 40, 30]
-numbers.sort()
-print(f"Отсортированный список: {numbers}")
+lst = [5, 2, 8]
+lst.sort()
+print(f"Сортировка: {lst}")
 """##,
-                xpReward: 40
+                xpReward: 35
             ),
             Lesson(
                 id: "py_tuples_unpacking",
                 category: .pythonCollections,
                 titleRU: "Кортежи (tuple) и Распаковка Переменных",
                 titleEN: "Tuples (tuple) & Star Unpacking",
-                summaryRU: "Неизменяемые кортежи tuple, защита данных от мутаций, использование как ключей словарей и расширенная распаковка *rest.",
-                summaryEN: "Immutable tuples, dictionary key validity, and extended star unpacking syntax a, *rest, b = tuple.",
+                summaryRU: "Неизменяемые кортежи, хэшируемость для словарей и распаковка first, *rest, last = items.",
+                summaryEN: "Immutable sequences, dictionary key validity, and starred unpacking.",
                 contentMarkdownRU: ##"""
-### Кортежи и Распаковка
+### Распаковка кортежей
 ```python
-point = (10, 20, 30, 40)
-first, *middle, last = point
-# first = 10, middle = [20, 30], last = 40
+coords = (10, 20, 30, 40)
+first, *middle, last = coords
+# middle: [20, 30]
 ```
 """##,
                 contentMarkdownEN: ##"""
-### Tuples & Unpacking
-Tuples are immutable sequences often used for fixed records and multiple return values.
+### Immutable Tuples
+Tuples protect structured records against unexpected mutation.
 """##,
                 codeSnippet: ##"""
-data = ("Сергей", 28, "Москва")
-name, age, city = data
-print(f"Имя: {name}, Возраст: {age}, Город: {city}")
+x, y = 10, 20
+x, y = y, x # Своп значений
+print(f"x={x}, y={y}")
 """##,
                 xpReward: 35
             ),
@@ -5020,28 +5087,23 @@ print(f"Имя: {name}, Возраст: {age}, Город: {city}")
                 id: "py_dicts_hashmaps",
                 category: .pythonCollections,
                 titleRU: "Словари (dict): Хэш-таблицы и Поиск O(1)",
-                titleEN: "Dictionaries (dict): Hash Maps & O(1) Lookup",
-                summaryRU: "Ассоциативные массивы ключ-значение: метод .get() с дефолтом, обход keys(), values(), items() и объединение словарей через |.",
-                summaryEN: "Fast hash tables: safe access with .get(), key-value iterations, and dictionary union with |.",
+                titleEN: "Dictionaries (dict): Hash Tables & Fast Lookup",
+                summaryRU: "Ассоциативные массивы: компактная память CPython, безопасный .get(), keys, values, items.",
+                summaryEN: "Fast key-value hash maps with O(1) average lookup and insertion.",
                 contentMarkdownRU: ##"""
-### Словари в Python
+### Словари
 ```python
-user = {"name": "Иван", "role": "admin"}
-# Безопасное чтение
-email = user.get("email", "unknown@domain.com")
-
-# Обход пар
-for key, val in user.items():
-    print(f"{key} -> {val}")
+user = {"name": "Дмитрий", "role": "admin"}
+print(user.get("age", 0)) # Безопасное чтение
 ```
 """##,
                 contentMarkdownEN: ##"""
-### Python Dictionaries
-Fast key-value mappings powered by optimized hash tables.
+### Hash Map Storage
+Fast key-value lookup relying on immutable hashable keys.
 """##,
                 codeSnippet: ##"""
-capitals = {"Россия": "Москва", "Франция": "Париж", "Япония": "Токио"}
-print(f"Столица Франции: {capitals.get('Франция')}")
+d = {"lang": "Python", "ver": 3.12}
+print(f"Язык: {d['lang']}")
 """##,
                 xpReward: 40
             ),
@@ -5050,86 +5112,75 @@ print(f"Столица Франции: {capitals.get('Франция')}")
                 category: .pythonCollections,
                 titleRU: "Множества (set): Уникальность и Теория Множеств",
                 titleEN: "Sets (set): Uniqueness & Math Operations",
-                summaryRU: "Коллекции уникальных хэшируемых элементов: объединение |, пересечение &, разность - и быстрая проверка in за O(1).",
-                summaryEN: "Unique collections: mathematical unions |, intersections &, differences -, and O(1) membership testing.",
+                summaryRU: "Хэш-коллекции уникальных значений: объединение |, пересечение &, разность - и frozenset.",
+                summaryEN: "Unordered collections of unique elements with set-theoretic operations.",
                 contentMarkdownRU: ##"""
-### Операции над множествами
+### Множества
 ```python
-a = {1, 2, 3, 4}
-b = {3, 4, 5, 6}
-print(a | b) # Объединение: {1, 2, 3, 4, 5, 6}
-print(a & b) # Пересечение: {3, 4}
-print(a - b) # Разность: {1, 2}
+s1 = {1, 2, 3}
+s2 = {2, 3, 4}
+print(s1 & s2) # Пересечение: {2, 3}
 ```
 """##,
                 contentMarkdownEN: ##"""
-### Mathematical Sets
-Sets contain unique elements and support rapid membership checks.
+### Set Arithmetic
+Find intersections, unions, and symmetric differences in O(N).
 """##,
                 codeSnippet: ##"""
-raw_tags = ["swift", "python", "swift", "csharp", "python"]
-unique_tags = list(set(raw_tags))
-print(f"Уникальные теги: {unique_tags}")
+vals = [1, 2, 2, 3, 3]
+print(f"Уникальные: {set(vals)}")
 """##,
                 xpReward: 35
             ),
             Lesson(
                 id: "py_comprehensions_power",
                 category: .pythonCollections,
-                titleRU: "List, Dict & Set Comprehensions",
-                titleEN: "List, Dict & Set Comprehensions",
-                summaryRU: "Идиоматичный лаконичный синтаксис создания коллекций: фильтрация if, вложенные генераторы и оптимизация скорости CPython.",
-                summaryEN: "Declarative collection construction with list, dictionary, and set comprehensions.",
+                titleRU: "List, Dict и Set Comprehensions",
+                titleEN: "Comprehensions: List, Dict & Set Generation",
+                summaryRU: "Декларативное создание коллекций в одну строку: фильтрация if, вложенные циклы.",
+                summaryEN: "Declarative and expressive collection construction in a single statement.",
                 contentMarkdownRU: ##"""
-### Comprehensions в действии
+### Генераторы коллекций
 ```python
-# List comprehension
-squares = [x**2 for x in range(10) if x % 2 == 0]
-
-# Dict comprehension
-word_lens = {w: len(w) for w in ["apple", "banana", "kiwi"]}
+evens = [x**2 for x in range(10) if x % 2 == 0]
+lookup = {x: x*10 for x in range(3)}
 ```
 """##,
                 contentMarkdownEN: ##"""
 ### Expressive Comprehensions
-Build transformed and filtered collections in a single concise line.
+Transform data efficiently without manual accumulator loops.
 """##,
                 codeSnippet: ##"""
-numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-even_squares = [n**2 for n in numbers if n % 2 == 0]
-print(f"Квадраты четных: {even_squares}")
+sq = [x*x for x in [1, 2, 3]]
+print(sq)
 """##,
-                xpReward: 45
+                xpReward: 40
             ),
             Lesson(
                 id: "py_functions_defaults",
                 category: .pythonFunctions,
                 titleRU: "Функции: Аргументы по Умолчанию и Возврат",
-                titleEN: "Functions: Default Arguments & Return",
-                summaryRU: "Объявление def, позиционные и именованные аргументы, ловушка изменяемых значений по умолчанию (mutable default argument trap).",
-                summaryEN: "Function definitions: positional vs keyword arguments and avoiding the mutable default trap.",
+                titleEN: "Functions: Default Arguments & Mutability Trap",
+                summaryRU: "Объявление def, возвращаемые значения и опасность изменяемых аргументов по умолчанию.",
+                summaryEN: "Function parameters, return values, and avoiding mutable default traps.",
                 contentMarkdownRU: ##"""
-### Аргументы по умолчанию
-> Осторожно: никогда не используйте изменяемые типы (`[]`, `{}`) как значения по умолчанию! Используйте `None`:
-
+### Ловушка аргументов по умолчанию
+> Никогда не пишите `def f(arg=[])`. Используйте `None`:
 ```python
-def add_item(item, target_list=None):
-    if target_list is None:
-        target_list = []
-    target_list.append(item)
-    return target_list
+def add_item(item, lst=None):
+    if lst is None: lst = []
+    lst.append(item)
+    return lst
 ```
 """##,
                 contentMarkdownEN: ##"""
-### Functions & Defaults
-Define functions with `def` and supply sensible default parameters.
+### Mutable Default Trap
+Default argument expressions are evaluated once at function definition time.
 """##,
                 codeSnippet: ##"""
-def greet(name, prefix="Привет"):
-    return f"{prefix}, {name}!"
-
-print(greet("Дмитрий"))
-print(greet("Алексей", prefix="Здравствуйте"))
+def greet(name, greeting="Привет"):
+    return f"{greeting}, {name}!"
+print(greet("Анна"))
 """##,
                 xpReward: 35
             ),
@@ -5137,124 +5188,107 @@ print(greet("Алексей", prefix="Здравствуйте"))
                 id: "py_args_kwargs_unpack",
                 category: .pythonFunctions,
                 titleRU: "Вариативные Аргументы: *args и **kwargs",
-                titleEN: "Arbitrary Arguments: *args & **kwargs",
-                summaryRU: "Упаковка позиционных аргументов в tuple (*args) и именованных в dict (**kwargs), проброс аргументов в другие функции.",
-                summaryEN: "Packing variable positional arguments into *args and keyword arguments into **kwargs.",
+                titleEN: "Variadic Arguments: *args & **kwargs",
+                summaryRU: "Прием произвольного числа позиционных и именованных параметров, распаковка при вызове.",
+                summaryEN: "Accept arbitrary positional and keyword parameters with tuple/dict packing.",
                 contentMarkdownRU: ##"""
 ### *args и **kwargs
 ```python
-def make_request(url, *params, **headers):
-    print(f"URL: {url}")
-    print(f"Позиционные параметры: {params}")
-    print(f"Заголовки: {headers}")
+def log_event(event, *details, **metadata):
+    print(event, details, metadata)
 ```
 """##,
                 contentMarkdownEN: ##"""
-### Variable Arguments
-Use `*args` to accept any number of positional arguments and `**kwargs` for keywords.
+### Parameter Packing
+Pass variable arguments cleanly across abstraction layers.
 """##,
                 codeSnippet: ##"""
-def calculate_sum(*numbers):
-    return sum(numbers)
-
-print(f"Сумма: {calculate_sum(10, 20, 30, 40)}")
+def total(*nums):
+    return sum(nums)
+print(f"Сумма: {total(1, 2, 3, 4)}")
 """##,
                 xpReward: 40
             ),
             Lesson(
                 id: "py_lambda_scopes",
                 category: .pythonFunctions,
-                titleRU: "Лямбда-функции, Замыкания и Области Видимости",
+                titleRU: "Лямбда-функции, Замыкания, global и nonlocal",
                 titleEN: "Lambdas, Closures, global & nonlocal",
-                summaryRU: "Анонимные однострочные функции lambda, захват контекста в замыканиях и управление переменными через nonlocal и global.",
-                summaryEN: "Anonymous lambda expressions, lexical closures, and the nonlocal keyword.",
+                summaryRU: "Анонимные функции lambda, лексические замыкания и управление областями видимости LEGB.",
+                summaryEN: "One-line lambda functions, closure scopes, and the LEGB resolution rule.",
                 contentMarkdownRU: ##"""
-### Лямбды и Сортировка
+### Замыкания и nonlocal
 ```python
-users = [("Иван", 25), ("Ольга", 21), ("Петр", 30)]
-users.sort(key=lambda u: u[1]) # Сортировка по возрасту
-```
-
-### Замыкания (Closures)
-```python
-def make_multiplier(n):
-    def multiplier(x):
-        return x * n
-    return multiplier
-
-double = make_multiplier(2)
-print(double(5)) # 10
+def make_counter():
+    count = 0
+    def inc():
+        nonlocal count
+        count += 1
+        return count
+    return inc
 ```
 """##,
                 contentMarkdownEN: ##"""
-### Lambdas & Closures
-Lightweight anonymous functions with `lambda` and state encapsulation via closures.
+### Closures & Scopes
+Inner functions retain access to enclosing local scope variables.
 """##,
                 codeSnippet: ##"""
-pairs = [(1, "b"), (2, "a"), (3, "c")]
-sorted_pairs = sorted(pairs, key=lambda p: p[1])
-print(f"Отсортировано по букве: {sorted_pairs}")
+square = lambda x: x * x
+print(f"Квадрат: {square(5)}")
 """##,
-                xpReward: 45
+                xpReward: 40
             ),
             Lesson(
                 id: "py_type_hints_typing",
                 category: .pythonFunctions,
                 titleRU: "Аннотации Типов: PEP 484 и модуль typing",
                 titleEN: "Type Hints: PEP 484 & typing Module",
-                summaryRU: "Современная статическая типизация: Optional, Union, List, Dict, Callable, статический анализ mypy и самодокументируемый код.",
-                summaryEN: "Modern type hints: typing primitives, static type checking with mypy, and clean APIs.",
+                summaryRU: "Статические подсказки типов: Union, Optional, Callable, синтаксис X | Y в Python 3.10+.",
+                summaryEN: "Static type annotations for code documentation and mypy verification.",
                 contentMarkdownRU: ##"""
 ### Type Hints в Python 3.12
 ```python
-def process_user(name: str, age: int | None = None) -> dict[str, str | int]:
-    return {"name": name, "age": age if age is not None else 0}
+def find_user(user_id: int) -> str | None:
+    return "Alex" if user_id == 1 else None
 ```
 """##,
                 contentMarkdownEN: ##"""
 ### Type Annotations
-Clarify intent and enable IDE autocompletion with Python 3.12 type hints.
+Clarify parameter expectations and return types.
 """##,
                 codeSnippet: ##"""
-def add_tax(amount: float, tax_rate: float = 0.20) -> float:
-    return amount * (1.0 + tax_rate)
-
-print(f"Сумма с НДС: {add_tax(1000.0):.2f}")
+def double(x: int) -> int:
+    return x * 2
+print(double(10))
 """##,
-                xpReward: 40
+                xpReward: 35
             ),
             Lesson(
                 id: "py_oop_classes_init",
                 category: .pythonOOP,
                 titleRU: "Классы, Экземпляры и Конструктор __init__",
                 titleEN: "Classes, Instances & __init__ Constructor",
-                summaryRU: "Объектная модель Python: определение class, ссылка self, инициализация атрибутов и инкапсуляция состояния.",
-                summaryEN: "Object-oriented model: class definitions, self references, instance initialization in __init__.",
+                summaryRU: "Объектная модель Python: определение class, ссылка self, инициализация атрибутов экземпляра.",
+                summaryEN: "Class blueprint definition, self reference, and instance state initialization.",
                 contentMarkdownRU: ##"""
-### Определение Класса
+### Классы в Python
 ```python
-class BankAccount:
-    def __init__(self, owner: str, balance: float = 0.0):
-        self.owner = owner
-        self.balance = balance
-        
-    def deposit(self, amount: float):
-        if amount > 0:
-            self.balance += amount
+class User:
+    def __init__(self, name: str, age: int):
+        self.name = name
+        self.age = age
 ```
 """##,
                 contentMarkdownEN: ##"""
-### Classes and Instances
-Build stateful objects with attributes and bound methods.
+### Classes and State
+Encapsulate attributes and behavior inside class instances.
 """##,
                 codeSnippet: ##"""
-class Person:
-    def __init__(self, name, age):
-        self.name = name
-        self.age = age
-
-p = Person("Елена", 24)
-print(f"{p.name}, возраст: {p.age}")
+class Car:
+    def __init__(self, brand):
+        self.brand = brand
+c = Car("Tesla")
+print(c.brand)
 """##,
                 xpReward: 40
             ),
@@ -5263,73 +5297,55 @@ print(f"{p.name}, возраст: {p.age}")
                 category: .pythonOOP,
                 titleRU: "Инкапсуляция, Приватные Поля и @property",
                 titleEN: "Encapsulation, Private Attributes & @property",
-                summaryRU: "Конвенция _protected, сокрытие имен __private (name mangling), питонические геттеры и сеттеры через декоратор @property.",
-                summaryEN: "Attributes privacy conventions, name mangling with double underscore, and @property getters/setters.",
+                summaryRU: "Конвенции именования (_protected, __private name mangling), вычисляемые свойства @property.",
+                summaryEN: "Controlling attribute access, name mangling, and property getters/setters.",
                 contentMarkdownRU: ##"""
 ### Свойства (@property)
 ```python
-class Temperature:
-    def __init__(self, celsius: float):
-        self._celsius = celsius
-        
+class Circle:
+    def __init__(self, r): self.r = r
     @property
-    def fahrenheit(self) -> float:
-        return (self._celsius * 9/5) + 32
-        
-    @fahrenheit.setter
-    def fahrenheit(self, value: float):
-        self._celsius = (value - 32) * 5/9
+    def area(self): return 3.14159 * self.r**2
 ```
 """##,
                 contentMarkdownEN: ##"""
-### @property Decorator
-Control attribute reading and writing without breaking backward compatibility.
+### @property Getters
+Expose methods with attribute syntax cleanly.
 """##,
                 codeSnippet: ##"""
-class Rectangle:
-    def __init__(self, w, h):
-        self.w = w
-        self.h = h
+class Box:
+    def __init__(self, s): self.s = s
     @property
-    def area(self):
-        return self.w * self.h
-
-r = Rectangle(10, 5)
-print(f"Площадь прямоугольника: {r.area}")
+    def volume(self): return self.s ** 3
+print(Box(2).volume)
 """##,
-                xpReward: 45
+                xpReward: 40
             ),
             Lesson(
                 id: "py_oop_classmethod_static",
                 category: .pythonOOP,
                 titleRU: "Методы Класса @classmethod и @staticmethod",
-                titleEN: "Class Methods @classmethod & @staticmethod",
-                summaryRU: "Альтернативные фабричные конструкторы через cls (@classmethod) и независимые утилиты без доступа к состоянию (@staticmethod).",
-                summaryEN: "Alternative constructors with @classmethod (cls) and utility functions with @staticmethod.",
+                titleEN: "Class Methods (@classmethod) & @staticmethod",
+                summaryRU: "Фабричные конструкторы через cls (@classmethod) и статические вспомогательные функции.",
+                summaryEN: "Alternative constructors with classmethod and decoupled utilities with staticmethod.",
                 contentMarkdownRU: ##"""
-### @classmethod как фабрика
+### @classmethod
 ```python
-class Date:
-    def __init__(self, year, month, day):
-        self.year, self.month, self.day = year, month, day
-        
+class Point:
+    def __init__(self, x, y): self.x, self.y = x, y
     @classmethod
-    def from_string(cls, date_str: str):
-        y, m, d = map(int, date_str.split("-"))
-        return cls(y, m, d)
+    def origin(cls): return cls(0, 0)
 ```
 """##,
                 contentMarkdownEN: ##"""
-### Class and Static Methods
-Differentiate between instance, class, and static methods.
+### Class vs Static
+Differentiate methods needing class reference (cls) vs none.
 """##,
                 codeSnippet: ##"""
-class MathUtils:
+class Converter:
     @staticmethod
-    def is_even(num):
-        return num % 2 == 0
-
-print(f"Число 4 четное? {MathUtils.is_even(4)}")
+    def km_to_m(km): return km * 1000
+print(Converter.km_to_m(5))
 """##,
                 xpReward: 40
             ),
@@ -5337,37 +5353,28 @@ print(f"Число 4 четное? {MathUtils.is_even(4)}")
                 id: "py_oop_inheritance_mro",
                 category: .pythonOOP,
                 titleRU: "Наследование, super() и Алгоритм MRO",
-                titleEN: "Inheritance, super() & C3 MRO Algorithm",
-                summaryRU: "Расширение поведения базовых классов, вызов super(), множественное наследование и порядок поиска методов (Method Resolution Order).",
-                summaryEN: "Class inheritance hierarchies, super() resolution, and C3 Linearization (MRO).",
+                titleEN: "Inheritance, super() & C3 MRO Linearization",
+                summaryRU: "Расширение поведения классов, делегирование super(), множественное наследование и MRO.",
+                summaryEN: "Inheritance hierarchies, super() method resolution, and the C3 linearization algorithm.",
                 contentMarkdownRU: ##"""
 ### super() и MRO
 ```python
-class Animal:
-    def speak(self):
-        return "Звук"
-
-class Dog(Animal):
-    def speak(self):
-        base = super().speak()
-        return f"{base}: Гав!"
-
-# Порядок поиска методов:
-print(Dog.mro())
+class Parent:
+    def greet(self): return "Привет"
+class Child(Parent):
+    def greet(self): return super().greet() + " от потомка"
 ```
 """##,
                 contentMarkdownEN: ##"""
-### Inheritance & super()
-Reuse code and extend behavior across hierarchical classes.
+### Method Resolution Order
+Python resolves multiple inheritance predictably using C3 linearization.
 """##,
                 codeSnippet: ##"""
-class Animal:
-    def sound(self): return "..."
-
-class Cat(Animal):
-    def sound(self): return "Мяу"
-
-print(Cat().sound())
+class Base:
+    def f(self): return "Base"
+class Sub(Base):
+    def f(self): return super().f() + "+Sub"
+print(Sub().f())
 """##,
                 xpReward: 45
             ),
@@ -5376,33 +5383,54 @@ print(Cat().sound())
                 category: .pythonOOP,
                 titleRU: "Датаклассы (@dataclass) и Иммутабельность",
                 titleEN: "Data Classes (@dataclass) & Immutability",
-                summaryRU: "Модуль dataclasses (PEP 557): автоматическая генерация __init__, __repr__, __eq__, поддержка frozen=True и дефолтных значений.",
-                summaryEN: "Modern dataclasses: boilerplate elimination, automatic equality/repr, and frozen immutability.",
+                summaryRU: "Модуль dataclasses: устранение шаблонного кода, frozen=True, автогенерация __repr__ и __eq__.",
+                summaryEN: "Boilerplate elimination, value equality, and immutable frozen data holders.",
                 contentMarkdownRU: ##"""
 ### Датаклассы
 ```python
 from dataclasses import dataclass
-
 @dataclass(frozen=True)
-class UserDTO:
-    id: int
-    name: str
-    email: str
-    is_active: bool = True
+class Coordinate:
+    lat: float
+    lon: float
 ```
 """##,
                 contentMarkdownEN: ##"""
-### Data Classes
-Eliminate boilerplate code when writing data holder objects.
+### Clean Data Holders
+Declarative class generation for pure data structures.
 """##,
                 codeSnippet: ##"""
-class Point:
-    def __init__(self, x, y):
-        self.x, self.y = x, y
-    def __repr__(self):
-        return f"Point({self.x}, {self.y})"
-
-print(Point(10, 20))
+class SimpleDTO:
+    def __init__(self, id, val): self.id, self.val = id, val
+    def __repr__(self): return f"DTO({self.id}, {self.val})"
+print(SimpleDTO(1, "Data"))
+"""##,
+                xpReward: 40
+            ),
+            Lesson(
+                id: "py_oop_abstract_abc",
+                category: .pythonOOP,
+                titleRU: "Абстрактные Базовые Классы (модуль abc)",
+                titleEN: "Abstract Base Classes (abc Module) & Interfaces",
+                summaryRU: "Проектирование строгих интерфейсов: модуль abc, декоратор @abstractmethod и контракты.",
+                summaryEN: "Enforcing interface contracts and preventing instantiation of incomplete bases.",
+                contentMarkdownRU: ##"""
+### Модуль abc
+```python
+from abc import ABC, abstractmethod
+class Shape(ABC):
+    @abstractmethod
+    def area(self) -> float: pass
+```
+"""##,
+                contentMarkdownEN: ##"""
+### Abstract Base Classes
+Define structural contracts subclasses must implement.
+"""##,
+                codeSnippet: ##"""
+class Interface:
+    def execute(self): raise NotImplementedError
+print("Интерфейс определен")
 """##,
                 xpReward: 45
             ),
@@ -5411,33 +5439,26 @@ print(Point(10, 20))
                 category: .pythonDunder,
                 titleRU: "Магические Методы: __str__ и __repr__",
                 titleEN: "Dunder Methods: __str__ vs __repr__",
-                summaryRU: "Два строковых представления: __repr__ для разработчиков (однозначный код) и __str__ для пользователя (читаемый текст).",
-                summaryEN: "Readable user output with __str__ and unambiguous debug representation with __repr__.",
+                summaryRU: "Два строковых представления: __repr__ для отладки разработчиком и __str__ для пользователя.",
+                summaryEN: "Differentiating user-friendly string conversion from unambiguous debug representation.",
                 contentMarkdownRU: ##"""
-### __repr__ против __str__
+### __str__ vs __repr__
 ```python
-class Product:
-    def __init__(self, title, price):
-        self.title = title
-        self.price = price
-        
-    def __repr__(self):
-        return f"Product({self.title!r}, {self.price})"
-        
-    def __str__(self):
-        return f"{self.title} за {self.price} руб."
+class Money:
+    def __init__(self, amt): self.amt = amt
+    def __repr__(self): return f"Money({self.amt})"
+    def __str__(self): return f"{self.amt} руб."
 ```
 """##,
                 contentMarkdownEN: ##"""
-### String Representation
-Implement `__repr__` for debugging and `__str__` for human-facing output.
+### String Protocols
+Implement __repr__ so eval(repr(obj)) can recreate identical state when possible.
 """##,
                 codeSnippet: ##"""
-class Item:
-    def __init__(self, name): self.name = name
-    def __str__(self): return f"Item: {self.name}"
-
-print(str(Item('Книга')))
+class Tag:
+    def __init__(self, t): self.t = t
+    def __str__(self): return f"#{self.t}"
+print(str(Tag('python')))
 """##,
                 xpReward: 40
             ),
@@ -5446,175 +5467,442 @@ print(str(Item('Книга')))
                 category: .pythonDunder,
                 titleRU: "Перегрузка Операторов: __add__, __eq__, __lt__",
                 titleEN: "Operator Overloading: __add__, __eq__, __lt__",
-                summaryRU: "Арифметические (+, -, *) и сравнительные (==, <, >) dunder-методы для интеграции пользовательских типов в синтаксис языка.",
-                summaryEN: "Overloading math and comparison operators for intuitive custom object behavior.",
+                summaryRU: "Интеграция типов в синтаксис языка: арифметические dunder-методы и сортировка __lt__.",
+                summaryEN: "Overloading arithmetic and comparison operators for natural syntax integration.",
                 contentMarkdownRU: ##"""
-### Сложение объектов через __add__
+### Перегрузка операторов
 ```python
 class Vector:
-    def __init__(self, x, y):
-        self.x, self.y = x, y
-        
+    def __init__(self, x, y): self.x, self.y = x, y
     def __add__(self, other):
         return Vector(self.x + other.x, self.y + other.y)
-        
-    def __eq__(self, other):
-        return self.x == other.x and self.y == other.y
 ```
 """##,
                 contentMarkdownEN: ##"""
-### Custom Operators
-Allow custom types to be added, compared, and sorted naturally.
+### Custom Arithmetic
+Allow custom domain objects to be added and compared directly.
 """##,
                 codeSnippet: ##"""
-class Number:
-    def __init__(self, val): self.val = val
-    def __add__(self, other): return Number(self.val + other.val)
-
-n = Number(10) + Number(20)
-print(f"Результат сложения: {n.val}")
+class Val:
+    def __init__(self, v): self.v = v
+    def __add__(self, o): return Val(self.v + o.v)
+res = Val(5) + Val(10)
+print(res.v)
 """##,
                 xpReward: 45
             ),
             Lesson(
                 id: "py_dunder_container_proto",
                 category: .pythonDunder,
-                titleRU: "Протокол Контейнера: __len__ и __getitem__",
-                titleEN: "Container Protocol: __len__ & __getitem__",
-                summaryRU: "Создание собственных коллекций: поддержка len() через __len__, квадратных скобок obj[idx] через __getitem__ и срезов.",
-                summaryEN: "Building custom collections implementing len() and indexing syntax obj[key].",
+                titleRU: "Протокол Контейнеров: __len__, __getitem__",
+                titleEN: "Container Protocol: __len__, __getitem__, __contains__",
+                summaryRU: "Создание собственных коллекций: поддержка len(), индексации obj[k] и оператора in.",
+                summaryEN: "Emulating standard sequences and mappings with length and bracket subscripting.",
                 contentMarkdownRU: ##"""
-### Протокол последовательности
+### Протокол контейнера
 ```python
-class Playlist:
-    def __init__(self, songs):
-        self._songs = list(songs)
-        
-    def __len__(self):
-        return len(self._songs)
-        
-    def __getitem__(self, index):
-        return self._songs[index]
+class Deck:
+    def __init__(self): self.cards = [1, 2, 3]
+    def __len__(self): return len(self.cards)
+    def __getitem__(self, idx): return self.cards[idx]
 ```
 """##,
                 contentMarkdownEN: ##"""
-### Emulating Sequences
-Enable indexing and length queries on custom objects.
+### Container Emulation
+Enable sequence indexing and iteration on custom objects.
 """##,
                 codeSnippet: ##"""
-class Bag:
-    def __init__(self, items): self.items = items
-    def __len__(self): return len(self.items)
-
-bag = Bag([1, 2, 3])
-print(f"Количество элементов: {len(bag)}")
+class MiniList:
+    def __init__(self, d): self.d = d
+    def __len__(self): return len(self.d)
+print(len(MiniList([1, 2])))
 """##,
                 xpReward: 45
+            ),
+            Lesson(
+                id: "py_dunder_call_callable",
+                category: .pythonDunder,
+                titleRU: "Вызываемые Объекты: Метод __call__",
+                titleEN: "Callable Objects: Implementing __call__",
+                summaryRU: "Превращение экземпляров классов в вызываемые функции со скрытым состоянием.",
+                summaryEN: "Making instances behave like callable functions with internal state retention.",
+                contentMarkdownRU: ##"""
+### Метод __call__
+```python
+class Multiplier:
+    def __init__(self, factor): self.factor = factor
+    def __call__(self, x): return x * self.factor
+double = Multiplier(2)
+print(double(5)) # 10
+```
+"""##,
+                contentMarkdownEN: ##"""
+### Callable Instances
+Store state across function invocations cleanly.
+"""##,
+                codeSnippet: ##"""
+class Greeter:
+    def __init__(self, w): self.w = w
+    def __call__(self, n): return f"{self.w}, {n}!"
+g = Greeter("Hello")
+print(g("World"))
+"""##,
+                xpReward: 40
+            ),
+            Lesson(
+                id: "py_descriptors_protocol",
+                category: .pythonMetaprogramming,
+                titleRU: "Протокол Дескрипторов: __get__, __set__",
+                titleEN: "Descriptor Protocol: __get__, __set__ & __set_name__",
+                summaryRU: "Механизм под капотом @property, методов и ORM: Data vs Non-data дескрипторы.",
+                summaryEN: "Low-level attribute access control: building custom properties and ORM fields.",
+                contentMarkdownRU: ##"""
+### Дескриптор
+```python
+class PositiveNumber:
+    def __set_name__(self, owner, name): self.name = name
+    def __get__(self, obj, objtype=None): return obj.__dict__.get(self.name, 0)
+    def __set__(self, obj, val):
+        if val < 0: raise ValueError("Отрицательное число")
+        obj.__dict__[self.name] = val
+```
+"""##,
+                contentMarkdownEN: ##"""
+### The Descriptor Protocol
+Powers properties, bound methods, classmethods, and ORM columns.
+"""##,
+                codeSnippet: ##"""
+print("Дескриптор управляет доступом к атрибутам")
+"""##,
+                xpReward: 50
+            ),
+            Lesson(
+                id: "py_slots_memory_opt",
+                category: .pythonMetaprogramming,
+                titleRU: "Оптимизация Памяти: Атрибут __slots__",
+                titleEN: "Memory Optimization with __slots__",
+                summaryRU: "Устранение словаря экземпляра __dict__, сокращение расхода RAM на 60% и ускорение доступа.",
+                summaryEN: "Suppressing instance __dict__ overhead for memory optimization in millions of objects.",
+                contentMarkdownRU: ##"""
+### __slots__
+```python
+class Node:
+    __slots__ = ("val", "next")
+    def __init__(self, val):
+        self.val = val
+        self.next = None
+```
+"""##,
+                contentMarkdownEN: ##"""
+### Memory Efficiency
+Save significant memory allocations when instantiating millions of objects.
+"""##,
+                codeSnippet: ##"""
+class PointSlots:
+    __slots__ = ('x', 'y')
+    def __init__(self, x, y): self.x, self.y = x, y
+p = PointSlots(1, 2)
+print(p.x, p.y)
+"""##,
+                xpReward: 45
+            ),
+            Lesson(
+                id: "py_metaclasses_new",
+                category: .pythonMetaprogramming,
+                titleRU: "Метаклассы и Метод __init_subclass__",
+                titleEN: "Metaclasses (type) & __init_subclass__ (PEP 487)",
+                summaryRU: "Классы как объекты: создание классов через type(), валидация структуры в __init_subclass__.",
+                summaryEN: "Classes as runtime objects: customization with type and lightweight __init_subclass__.",
+                contentMarkdownRU: ##"""
+### __init_subclass__ (PEP 487)
+```python
+class PluginBase:
+    registry = []
+    def __init_subclass__(cls, **kwargs):
+        super().__init_subclass__(**kwargs)
+        cls.registry.append(cls)
+```
+"""##,
+                contentMarkdownEN: ##"""
+### Class Construction Hooks
+Intercept subclass creation without heavy metaclass syntax.
+"""##,
+                codeSnippet: ##"""
+print("Метапрограммирование позволяет автоматизировать реестры классов")
+"""##,
+                xpReward: 50
+            ),
+            Lesson(
+                id: "py_dynamic_attributes",
+                category: .pythonMetaprogramming,
+                titleRU: "Динамический Доступ: __getattr__ и __getattribute__",
+                titleEN: "Dynamic Attributes: __getattr__ vs __getattribute__",
+                summaryRU: "Перехват обращений к отсутствующим полям, создание прокси-объектов и встроенные getattr/setattr.",
+                summaryEN: "Intercepting attribute lookups, building transparent proxies, and reflection.",
+                contentMarkdownRU: ##"""
+### __getattr__
+Вызывается **только** если атрибут не найден в объекте:
+```python
+class DynamicBox:
+    def __getattr__(self, name):
+        return f"Поле {name} отсутствует, но обработано динамически"
+```
+"""##,
+                contentMarkdownEN: ##"""
+### Attribute Trapping
+Safely handle missing attributes or build dynamic API wrappers.
+"""##,
+                codeSnippet: ##"""
+class DictObj:
+    def __init__(self, d): self.d = d
+    def __getattr__(self, k): return self.d.get(k)
+o = DictObj({"env": "prod"})
+print(o.env)
+"""##,
+                xpReward: 45
+            ),
+            Lesson(
+                id: "py_collections_defaultdict",
+                category: .pythonAdvancedCollections,
+                titleRU: "Модуль collections: defaultdict",
+                titleEN: "collections Module: defaultdict Pattern",
+                summaryRU: "Автоматическая инициализация отсутствующих ключей через фабрику типов (list, int, set).",
+                summaryEN: "Eliminating KeyError exceptions with factory-initialized dictionary defaults.",
+                contentMarkdownRU: ##"""
+### defaultdict
+```python
+from collections import defaultdict
+grouped = defaultdict(list)
+grouped["admins"].append("Alex")
+```
+"""##,
+                contentMarkdownEN: ##"""
+### Automatic Key Initialization
+Group elements into lists without verbose if-key-not-in checks.
+"""##,
+                codeSnippet: ##"""
+from collections import defaultdict
+counts = defaultdict(int)
+counts['views'] += 1
+print(counts['views'])
+"""##,
+                xpReward: 40
+            ),
+            Lesson(
+                id: "py_collections_counter",
+                category: .pythonAdvancedCollections,
+                titleRU: "Модуль collections: Counter и Подсчет Частот",
+                titleEN: "collections.Counter: Frequencies & Multiset Math",
+                summaryRU: "Эффективный подсчет повторяющихся элементов, метод most_common() и сложение счетчиков.",
+                summaryEN: "Rapid frequency distribution counting, most_common() queries, and multiset arithmetic.",
+                contentMarkdownRU: ##"""
+### Counter
+```python
+from collections import Counter
+words = ["яблоко", "банан", "яблоко"]
+c = Counter(words)
+print(c.most_common(1)) # [('яблоко', 2)]
+```
+"""##,
+                contentMarkdownEN: ##"""
+### Frequency Counting
+Count hashable objects cleanly with the Counter multiset.
+"""##,
+                codeSnippet: ##"""
+from collections import Counter
+c = Counter("abracadabra")
+print(c['a'])
+"""##,
+                xpReward: 40
+            ),
+            Lesson(
+                id: "py_collections_deque",
+                category: .pythonAdvancedCollections,
+                titleRU: "Двусторонняя Очередь collections.deque",
+                titleEN: "Double-Ended Queue: collections.deque",
+                summaryRU: "Кольцевой буфер O(1) для добавления и извлечения с обоих концов (appendleft, popleft).",
+                summaryEN: "O(1) append and pop operations on both ends for high-performance queues and buffers.",
+                contentMarkdownRU: ##"""
+### deque
+```python
+from collections import deque
+q = deque(maxlen=3) # Скользящее окно
+q.append(1); q.append(2); q.append(3); q.append(4)
+print(q) # deque([2, 3, 4], maxlen=3)
+```
+"""##,
+                contentMarkdownEN: ##"""
+### Fast FIFO Queues
+Avoid O(N) list pop(0) penalties using ring buffers.
+"""##,
+                codeSnippet: ##"""
+from collections import deque
+d = deque([1, 2])
+d.appendleft(0)
+print(list(d))
+"""##,
+                xpReward: 45
+            ),
+            Lesson(
+                id: "py_itertools_magic",
+                category: .pythonAdvancedCollections,
+                titleRU: "Модуль itertools: Бесконечные и Комбинаторные Итераторы",
+                titleEN: "itertools Module: Infinite & Combinatoric Iterators",
+                summaryRU: "Генераторы цепочек chain, декартово произведение product, permutations, combinations.",
+                summaryEN: "Memory-efficient iterator algebra: cycle, count, chain, product, and combinations.",
+                contentMarkdownRU: ##"""
+### itertools
+```python
+import itertools
+pairs = list(itertools.combinations(["A", "B", "C"], 2))
+# [('A', 'B'), ('A', 'C'), ('B', 'C')]
+```
+"""##,
+                contentMarkdownEN: ##"""
+### Iterator Building Blocks
+Compose complex sequences with zero intermediate array allocation.
+"""##,
+                codeSnippet: ##"""
+import itertools
+chained = list(itertools.chain([1, 2], [3, 4]))
+print(chained)
+"""##,
+                xpReward: 45
+            ),
+            Lesson(
+                id: "py_heapq_priority",
+                category: .pythonAdvancedCollections,
+                titleRU: "Модуль heapq: Двоичная Куча и Приоритеты",
+                titleEN: "heapq Module: Min-Heap & Priority Queues",
+                summaryRU: "Структура данных Двоичная Куча (Min-Heap): heappush, heappop, nlargest за O(log N).",
+                summaryEN: "Logarithmic priority queue operations with standard binary min-heaps.",
+                contentMarkdownRU: ##"""
+### heapq
+```python
+import heapq
+data = [10, 1, 5, 2]
+heapq.heapify(data)
+smallest = heapq.heappop(data) # 1
+```
+"""##,
+                contentMarkdownEN: ##"""
+### Binary Min-Heaps
+Efficiently retrieve top elements and maintain priority orders.
+"""##,
+                codeSnippet: ##"""
+import heapq
+h = [5, 2, 8]
+heapq.heapify(h)
+print(heapq.heappop(h))
+"""##,
+                xpReward: 45
+            ),
+            Lesson(
+                id: "py_bisect_binary_search",
+                category: .pythonAdvancedCollections,
+                titleRU: "Модуль bisect: Бинарный Поиск в Списках",
+                titleEN: "bisect Module: Binary Search in Sorted Lists",
+                summaryRU: "Быстрый поиск точки вставки за O(log N): bisect_left, insort_left и интервалы оценок.",
+                summaryEN: "Logarithmic bisection algorithms for maintaining sorted sequences efficiently.",
+                contentMarkdownRU: ##"""
+### bisect
+```python
+import bisect
+scores = [60, 70, 80, 90]
+pos = bisect.bisect(scores, 75) # индекс 2
+```
+"""##,
+                contentMarkdownEN: ##"""
+### Binary Search
+Find insertion points in pre-sorted lists without scanning.
+"""##,
+                codeSnippet: ##"""
+import bisect
+arr = [10, 20, 30]
+print(f"Индекс вставки 15: {bisect.bisect_left(arr, 15)}")
+"""##,
+                xpReward: 40
             ),
             Lesson(
                 id: "py_iterators_protocol",
                 category: .pythonGenerators,
                 titleRU: "Итераторы: iter(), next() и StopIteration",
-                titleEN: "Iterators: iter(), next() & StopIteration",
-                summaryRU: "Механизм цикла for под капотом: протокол итератора (__iter__ и __next__), ленивые вычисления и исчерпание итератора.",
-                summaryEN: "Under the hood of loops: the iterator protocol, lazy evaluation, and StopIteration.",
+                titleEN: "Iterator Protocol: iter(), next() & StopIteration",
+                summaryRU: "Низкоуровневый цикл for: метод __iter__ возвращает итератор, метод __next__ выбрасывает StopIteration.",
+                summaryEN: "Under the hood of iteration: consumer and producer contracts.",
                 contentMarkdownRU: ##"""
-### Протокол Итератора
+### Итератор
 ```python
-class Countdown:
-    def __init__(self, start):
-        self.current = start
-        
-    def __iter__(self):
-        return self
-        
-    def __next__(self):
-        if self.current <= 0:
-            raise StopIteration
-        self.current -= 1
-        return self.current + 1
+nums = [1, 2]
+it = iter(nums)
+print(next(it)) # 1
+print(next(it)) # 2
+# next(it) вызовет StopIteration
 ```
 """##,
                 contentMarkdownEN: ##"""
-### The Iterator Protocol
-Make custom types iterable using `__iter__` and `__next__`.
+### Iteration Mechanics
+Custom iterators implement __iter__ and __next__.
 """##,
                 codeSnippet: ##"""
-nums = [10, 20]
-it = iter(nums)
-print(next(it))
+it = iter([42])
 print(next(it))
 """##,
-                xpReward: 45
+                xpReward: 40
             ),
             Lesson(
                 id: "py_generators_yield",
                 category: .pythonGenerators,
-                titleRU: "Генераторы: Ключевое Слово yield и Память",
-                titleEN: "Generators: yield Keyword & Memory Savings",
-                summaryRU: "Потоковая обработка неограниченных последовательностей: функции с yield, пауза состояния выполнения и generator expressions.",
-                summaryEN: "Stream massive datasets with zero memory footprint using yield functions.",
+                titleRU: "Генераторы: Ключевое Слово yield и Сопрограммы",
+                titleEN: "Generators: yield & Coroutine Delegation (yield from)",
+                summaryRU: "Ленивые последовательности: функции с yield, экономия памяти и делегирование yield from.",
+                summaryEN: "Lazy data streaming, pausing execution frames, and delegating subgenerators with yield from.",
                 contentMarkdownRU: ##"""
-### Генераторы с yield
+### yield from
 ```python
-def fibonacci(limit):
-    a, b = 0, 1
-    while a < limit:
-        yield a
-        a, b = b, a + b
-
-for num in fibonacci(50):
-    print(num, end=" ")
+def sub_gen():
+    yield 1
+    yield 2
+def main_gen():
+    yield from sub_gen()
+    yield 3
 ```
 """##,
                 contentMarkdownEN: ##"""
-### Generator Functions
-`yield` pauses execution and yields values one at a time on demand.
+### Streaming with Generators
+Process gigabytes of logs or streams in constant memory footprint.
 """##,
                 codeSnippet: ##"""
-def count_up(n):
-    for i in range(1, n + 1):
-        yield i
-
-for x in count_up(3):
-    print(x)
+def numbers():
+    yield 1; yield 2
+print(list(numbers()))
 """##,
-                xpReward: 50
+                xpReward: 45
             ),
             Lesson(
                 id: "py_context_managers_with",
                 category: .pythonGenerators,
                 titleRU: "Менеджеры Контекста: Оператор with и __exit__",
-                titleEN: "Context Managers: with Statement & __exit__",
-                summaryRU: "Гарантированное освобождение ресурсов (файлы, сокеты, блокировки): методы __enter__/__exit__ и декоратор @contextmanager.",
-                summaryEN: "Deterministic resource management: with statements, __enter__/__exit__, and contextlib.",
+                titleEN: "Context Managers: with Statement & @contextmanager",
+                summaryRU: "Гарантированная очистка ресурсов, перехват исключений в __exit__ и генераторный @contextmanager.",
+                summaryEN: "Deterministic resource management using the with protocol and contextlib.",
                 contentMarkdownRU: ##"""
-### Менеджер контекста
+### @contextmanager
 ```python
-class Timer:
-    def __enter__(self):
-        print("Старт задачи...")
-        return self
-        
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        print("Завершение задачи и очистка ресурсов.")
-        return False
+from contextlib import contextmanager
+@contextmanager
+def open_tag(tag):
+    print(f"<{tag}>")
+    yield
+    print(f"</{tag}>")
 ```
 """##,
                 contentMarkdownEN: ##"""
-### Resource Safety with `with`
-Ensure cleanup even when unexpected exceptions occur.
+### Deterministic Cleanup
+Safely release database transactions, locks, and file handles.
 """##,
                 codeSnippet: ##"""
-class ContextExample:
-    def __enter__(self):
-        print("Вход в контекст")
-        return self
-    def __exit__(self, a, b, c):
-        print("Выход из контекста")
-
-with ContextExample():
-    print("Выполнение внутри")
+print("Менеджер контекста гарантирует очистку")
 """##,
                 xpReward: 45
             ),
@@ -5623,77 +5911,256 @@ with ContextExample():
                 category: .pythonDecorators,
                 titleRU: "Декораторы Функций и functools.wraps",
                 titleEN: "Function Decorators & functools.wraps",
-                summaryRU: "Паттерн Декоратор в Python: функции высшего порядка, синтаксический сахар @, замер времени и логирование вызовов.",
-                summaryEN: "First-class decorators: wrapping callables, caching, logging, and preserving metadata with wraps.",
+                summaryRU: "Функции высшего порядка, синтаксический сахар @ и сохранение сигнатуры/документации через wraps.",
+                summaryEN: "Wrapping callables cleanly while preserving name, docstrings, and signature via wraps.",
                 contentMarkdownRU: ##"""
-### Создание декоратора
+### Декоратор с wraps
 ```python
 from functools import wraps
-
-def logger(func):
-    @wraps(func)
+def logger(fn):
+    @wraps(fn)
     def wrapper(*args, **kwargs):
-        print(f"Вызов {func.__name__}...")
-        result = func(*args, **kwargs)
-        print("Готово!")
-        return result
+        print(f"Вызов {fn.__name__}")
+        return fn(*args, **kwargs)
     return wrapper
-
-@logger
-def compute(x):
-    return x * 2
 ```
 """##,
                 contentMarkdownEN: ##"""
-### Python Decorators
-Modify function behavior dynamically with clean `@decorator` syntax.
+### Transparent Wrappers
+Extend function behavior without mutating the original implementation.
 """##,
                 codeSnippet: ##"""
-def simple_decorator(fn):
-    def wrapper():
-        print("До вызова")
-        fn()
-        print("После вызова")
-    return wrapper
-
-@simple_decorator
-def greet():
-    print("Привет мир!")
-
-greet()
+def dec(fn):
+    def w(): return fn() * 2
+    return w
+@dec
+def num(): return 5
+print(num())
+"""##,
+                xpReward: 45
+            ),
+            Lesson(
+                id: "py_decorators_factories",
+                category: .pythonDecorators,
+                titleRU: "Декораторы с Аргументами (Фабрики Декораторов)",
+                titleEN: "Decorator Factories: Decorators with Arguments",
+                summaryRU: "Трехуровневые замыкания: передача параметров в декоратор (@repeat(num=3)) и декорирование классов.",
+                summaryEN: "Three-level closure architectures for configurable parameterized decorators.",
+                contentMarkdownRU: ##"""
+### Декоратор с аргументами
+```python
+def repeat(times):
+    def decorator(fn):
+        def wrapper(*args, **kwargs):
+            for _ in range(times):
+                res = fn(*args, **kwargs)
+            return res
+        return wrapper
+    return decorator
+```
+"""##,
+                contentMarkdownEN: ##"""
+### Parameterized Decorators
+Configure decorator behavior per function call site.
+"""##,
+                codeSnippet: ##"""
+print("Фабрика декораторов создает настроенную обертку")
 """##,
                 xpReward: 50
             ),
             Lesson(
-                id: "py_exceptions_hierarchy",
+                id: "py_functools_cache",
                 category: .pythonDecorators,
-                titleRU: "Обработка Ошибок: try, except, else и finally",
-                titleEN: "Exception Handling: try, except, else & finally",
-                summaryRU: "Надежная обработка сбоев: перехват конкретных типов ошибок, блок else (при успехе), блок finally (всегда) и raise ... from.",
-                summaryEN: "Robust error handling with try/except/else/finally, re-raising, and exception chaining.",
+                titleRU: "Модуль functools: lru_cache, cache и partial",
+                titleEN: "functools Module: lru_cache, cache & partial",
+                summaryRU: "Мемоизация вычислений `@lru_cache`, бесконечный `@cache` и фиксация аргументов через `partial`.",
+                summaryEN: "Automatic memoization caching and partial argument application for functional programming.",
                 contentMarkdownRU: ##"""
-### Структура try-except-else-finally
+### lru_cache
 ```python
-try:
-    val = int("123")
-except ValueError as e:
-    print(f"Ошибка парсинга: {e}")
-else:
-    print(f"Успешно получено: {val}")
-finally:
-    print("Блок очистки выполнен всегда.")
+from functools import lru_cache, partial
+@lru_cache(maxsize=128)
+def fib(n):
+    if n < 2: return n
+    return fib(n-1) + fib(n-2)
 ```
 """##,
                 contentMarkdownEN: ##"""
-### Error Handling Flow
-Handle anticipated exceptions gracefully and clean up state in `finally`.
+### Memoization
+Dramatically accelerate recursive and expensive deterministic functions.
+"""##,
+                codeSnippet: ##"""
+from functools import partial
+add5 = partial(lambda a, b: a + b, 5)
+print(add5(10))
+"""##,
+                xpReward: 45
+            ),
+            Lesson(
+                id: "py_pathlib_files",
+                category: .pythonIOAndFiles,
+                titleRU: "Работа с Файлами: Объектный Модуль pathlib.Path",
+                titleEN: "File I/O: Object-Oriented pathlib.Path",
+                summaryRU: "Кроссплатформенная работа с файловой системой: оператор /, чтение read_text(), glob и mkdir.",
+                summaryEN: "Modern object-oriented file paths, directory traversal, and safe atomic writes.",
+                contentMarkdownRU: ##"""
+### pathlib.Path
+```python
+from pathlib import Path
+p = Path("data") / "logs" / "app.log"
+p.parent.mkdir(parents=True, exist_ok=True)
+p.write_text("Лог записан", encoding="utf-8")
+```
+"""##,
+                contentMarkdownEN: ##"""
+### Object-Oriented Paths
+Replace legacy os.path string concatenations with intuitive slash syntax.
+"""##,
+                codeSnippet: ##"""
+from pathlib import Path
+p = Path("test.txt")
+print(p.suffix)
+"""##,
+                xpReward: 40
+            ),
+            Lesson(
+                id: "py_json_serialization",
+                category: .pythonIOAndFiles,
+                titleRU: "Сериализация JSON: dumps, loads и Custom Encoders",
+                titleEN: "JSON Serialization: dumps, loads & Custom Encoders",
+                summaryRU: "Парсинг и экспорт JSON, обработка дат и кастомных классов через параметр default в json.dumps.",
+                summaryEN: "Serializing native objects to JSON and decoding nested structures.",
+                contentMarkdownRU: ##"""
+### json.dumps и Custom Encoder
+```python
+import json
+data = {"user": "Alex", "active": True}
+json_str = json.dumps(data, indent=2)
+parsed = json.loads(json_str)
+```
+"""##,
+                contentMarkdownEN: ##"""
+### Structured JSON
+Work with REST API payloads and configuration files seamlessly.
+"""##,
+                codeSnippet: ##"""
+import json
+raw = '{"x": 10}'
+d = json.loads(raw)
+print(d['x'])
+"""##,
+                xpReward: 40
+            ),
+            Lesson(
+                id: "py_regex_re",
+                category: .pythonIOAndFiles,
+                titleRU: "Регулярные Выражения: Модуль re",
+                titleEN: "Regular Expressions: re Module & Pattern Matching",
+                summaryRU: "Сложные текстовые шаблоны: re.search, re.findall, re.sub, именованные группы (?P<name>...).",
+                summaryEN: "Text pattern search, matching, extraction, and substitution with regular expressions.",
+                contentMarkdownRU: ##"""
+### Модуль re
+```python
+import re
+text = "Email: user@example.com"
+match = re.search(r"([\w.]+)@([\w.]+)", text)
+if match:
+    print(match.group(1)) # user
+```
+"""##,
+                contentMarkdownEN: ##"""
+### Regular Expressions
+Parse and validate structured string formats.
+"""##,
+                codeSnippet: ##"""
+import re
+nums = re.findall(r"\d+", "Заказ 45 на сумму 1200")
+print(nums)
+"""##,
+                xpReward: 45
+            ),
+            Lesson(
+                id: "py_exceptions_hierarchy",
+                category: .pythonExceptions,
+                titleRU: "Иерархия Исключений: try, except, else и finally",
+                titleEN: "Exception Hierarchy: try, except, else & finally",
+                summaryRU: "Иерархия классов BaseException/Exception, блоки else и finally, цепочки raise ... from e.",
+                summaryEN: "Structured error handling, clean resource release in finally, and exception chaining.",
+                contentMarkdownRU: ##"""
+### Исключения
+```python
+try:
+    x = int("abc")
+except ValueError as e:
+    print(f"Ошибка: {e}")
+else:
+    print("Успешно")
+finally:
+    print("Очистка")
+```
+"""##,
+                contentMarkdownEN: ##"""
+### Exception Hierarchy
+Catch specific subclasses to prevent swallowing unintended system interrupts.
 """##,
                 codeSnippet: ##"""
 try:
-    res = 10 / 2
-    print(f"Результат: {res}")
+    1 / 1
+    print("Успех")
 except ZeroDivisionError:
-    print("Деление на ноль запрещено")
+    pass
+"""##,
+                xpReward: 35
+            ),
+            Lesson(
+                id: "py_custom_exceptions",
+                category: .pythonExceptions,
+                titleRU: "Пользовательские Классы Исключений",
+                titleEN: "Custom Exception Classes & Domain Errors",
+                summaryRU: "Создание собственных доменных исключений, наследование от Exception и атрибуты ошибок.",
+                summaryEN: "Building clear domain error types with structured diagnostic attributes.",
+                contentMarkdownRU: ##"""
+### Пользовательское исключение
+```python
+class InsufficientFundsError(Exception):
+    def __init__(self, required, available):
+        super().__init__(f"Требуется {required}, доступно {available}")
+        self.required = required
+        self.available = available
+```
+"""##,
+                contentMarkdownEN: ##"""
+### Domain Exceptions
+Express business logic failures as distinct typed exceptions.
+"""##,
+                codeSnippet: ##"""
+class AppError(Exception): pass
+print("Кастомная ошибка готова к вызову")
+"""##,
+                xpReward: 40
+            ),
+            Lesson(
+                id: "py_logging_production",
+                category: .pythonExceptions,
+                titleRU: "Промышленное Логирование: Модуль logging",
+                titleEN: "Production Logging: logging Module & Handlers",
+                summaryRU: "Иерархия логгеров getLogger(), уровни DEBUG..CRITICAL, FileHandler, Formatter и StreamHandler.",
+                summaryEN: "Configuring robust loggers, formatters, and stream/file outputs for production observability.",
+                contentMarkdownRU: ##"""
+### Модуль logging
+```python
+import logging
+logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
+logging.info("Сервер запущен")
+```
+"""##,
+                contentMarkdownEN: ##"""
+### Logging Standards
+Replace unformatted print statements with production-grade loggers.
+"""##,
+                codeSnippet: ##"""
+import logging
+logging.warning("Внимание: тестовое предупреждение")
 """##,
                 xpReward: 40
             ),
@@ -5701,55 +6168,274 @@ except ZeroDivisionError:
                 id: "py_asyncio_eventloop",
                 category: .pythonAsync,
                 titleRU: "Асинхронность: async/await, Tasks и Event Loop",
-                titleEN: "Asynchronous Python: async/await & Event Loop",
-                summaryRU: "Кооперативная многозадачность: корутины async def, ожидание await, запуск задач через asyncio.gather() и модуль asyncio.",
-                summaryEN: "Non-blocking cooperative concurrency: async/await primitives, Tasks, and the event loop.",
+                titleEN: "Asynchronous Python: async/await, Tasks & Event Loop",
+                summaryRU: "Кооперативная многозадачность: корутины async def, ключевое слово await и запуск через asyncio.run().",
+                summaryEN: "Cooperative concurrency with async/await coroutines executed by the single-threaded event loop.",
                 contentMarkdownRU: ##"""
-### Корутины и asyncio
+### async / await
 ```python
 import asyncio
-
-async def fetch_user(user_id: int):
-    await asyncio.sleep(0.1) # Неблокирующая пауза
-    return {"id": user_id, "name": f"User_{user_id}"}
+async def fetch_data():
+    await asyncio.sleep(0.01) # Неблокирующий сон
+    return 42
 
 async def main():
-    u1, u2 = await asyncio.gather(fetch_user(1), fetch_user(2))
-    print(u1, u2)
+    result = await fetch_data()
+    print(result)
 ```
 """##,
                 contentMarkdownEN: ##"""
-### Modern Asyncio
-Handle thousands of concurrent I/O operations with single-threaded cooperative multitasking.
+### Non-blocking Async
+Handle thousands of concurrent sockets without creating operating system threads.
 """##,
                 codeSnippet: ##"""
-async def get_data():
-    return 42
-
-print("Асинхронная корутина готова к выполнению")
+print("asyncio обеспечивает кооперативную многозадачность")
+"""##,
+                xpReward: 50
+            ),
+            Lesson(
+                id: "py_asyncio_gather_tasks",
+                category: .pythonAsync,
+                titleRU: "Параллельное Исполнение: asyncio.gather и Tasks",
+                titleEN: "Concurrent Execution: asyncio.gather & Background Tasks",
+                summaryRU: "Запуск группы корутин параллельно с asyncio.gather, создание фоновых задач create_task.",
+                summaryEN: "Running groups of coroutines concurrently and handling cancellation and timeouts.",
+                contentMarkdownRU: ##"""
+### asyncio.gather
+```python
+import asyncio
+async def task(n):
+    return n * 2
+async def main():
+    r1, r2 = await asyncio.gather(task(10), task(20))
+    print(r1, r2)
+```
+"""##,
+                contentMarkdownEN: ##"""
+### Gathering Tasks
+Fan-out concurrent network requests and aggregate results efficiently.
+"""##,
+                codeSnippet: ##"""
+print("asyncio.gather объединяет результаты параллельных корутин")
+"""##,
+                xpReward: 50
+            ),
+            Lesson(
+                id: "py_asyncio_primitives",
+                category: .pythonAsync,
+                titleRU: "Асинхронные Примитивы: Queue, Lock и Semaphore",
+                titleEN: "Async Synchronization: Queue, Lock & Semaphore",
+                summaryRU: "Безопасная коммуникация между корутинами: неблокирующая очередь asyncio.Queue и ограничения скорости.",
+                summaryEN: "Safe communication and rate-limiting across async coroutines.",
+                contentMarkdownRU: ##"""
+### asyncio.Queue
+```python
+import asyncio
+queue = asyncio.Queue()
+async def producer():
+    await queue.put("Message")
+async def consumer():
+    msg = await queue.get()
+```
+"""##,
+                contentMarkdownEN: ##"""
+### Async Queues
+Coordinate producer-consumer pipelines in async architectures.
+"""##,
+                codeSnippet: ##"""
+print("asyncio.Queue координирует передачу данных между корутинами")
 """##,
                 xpReward: 50
             ),
             Lesson(
                 id: "py_gil_architecture",
-                category: .pythonAsync,
-                titleRU: "Архитектура CPython: GIL, Threads и Processes",
-                titleEN: "CPython Internals: GIL, Threading & Multiprocessing",
-                summaryRU: "Внутреннее устройство CPython: Global Interpreter Lock (GIL), потоки threading для I/O-bound задач и multiprocessing для CPU-bound задач.",
-                summaryEN: "CPython internals: understanding the Global Interpreter Lock, threading for I/O and multiprocessing for CPU.",
+                category: .pythonConcurrency,
+                titleRU: "Архитектура CPython: Global Interpreter Lock (GIL)",
+                titleEN: "CPython Internals: Global Interpreter Lock (GIL)",
+                summaryRU: "Зачем нужен GIL: потокобезопасность управления памятью (Reference Counting) и влияние на CPU-bound задачи.",
+                summaryEN: "Deep dive into the GIL: why it exists, memory reference safety, and impact on CPU vs I/O.",
                 contentMarkdownRU: ##"""
-### GIL и Многозадачность
-- **GIL (Global Interpreter Lock)**: гарантирует, что только один поток исполняет байткод Python в единицу времени.
-- **I/O-Bound задачи** (сеть, файлы, БД): отлично подходят для `asyncio` и `threading`.
-- **CPU-Bound задачи** (машинное обучение, расчеты): требуют `multiprocessing` для задействования всех ядер процессора.
+### CPython GIL
+- **GIL** предотвращает одновременное выполнение байткода на нескольких ядрах в одном процессе.
+- Для **I/O-bound** задач (сеть, диски) потоки освобождают GIL во время ожидания.
+- Для **CPU-bound** задач (вычисления) необходимо использовать `multiprocessing`.
+```python
+import sys
+# sys._is_gil_enabled() в Python 3.13+ экспериментальном
+```
 """##,
                 contentMarkdownEN: ##"""
-### Global Interpreter Lock (GIL)
-Learn when to choose threading versus multiprocessing based on workload profile.
+### The GIL Mechanism
+Understand when threads give up the GIL during system calls and I/O.
 """##,
                 codeSnippet: ##"""
 import sys
-print(f"Версия Python: {sys.version.split()[0]} | Платформа: {sys.platform}")
+print(f"Платформа CPython: {sys.version}")
+"""##,
+                xpReward: 50
+            ),
+            Lesson(
+                id: "py_threading_locks",
+                category: .pythonConcurrency,
+                titleRU: "Модуль threading: Потоки и Примитивы Блокировки",
+                titleEN: "threading Module: OS Threads & Race Conditions",
+                summaryRU: "Запуск потоков ОС через threading.Thread, взаимное исключение Lock, RLock и предотвращение Deadlock.",
+                summaryEN: "Creating OS threads, mutual exclusion locks, race condition prevention, and reentrant locks.",
+                contentMarkdownRU: ##"""
+### threading.Lock
+```python
+import threading
+lock = threading.Lock()
+counter = 0
+def increment():
+    global counter
+    with lock:
+        counter += 1
+```
+"""##,
+                contentMarkdownEN: ##"""
+### Thread Synchronization
+Protect shared state from concurrent race conditions with locks.
+"""##,
+                codeSnippet: ##"""
+import threading
+t = threading.Thread(target=lambda: None)
+t.start(); t.join()
+print("Поток выполнен")
+"""##,
+                xpReward: 45
+            ),
+            Lesson(
+                id: "py_multiprocessing_pools",
+                category: .pythonConcurrency,
+                titleRU: "Модуль multiprocessing: Обход GIL на Всех Ядрах",
+                titleEN: "multiprocessing Module: Bypassing the GIL on Multiple Cores",
+                summaryRU: "Параллельные процессы с изолированной памятью: multiprocessing.Process, пулы Pool.map и IPC Queue.",
+                summaryEN: "True CPU parallelism by spawning isolated OS processes with inter-process communication.",
+                contentMarkdownRU: ##"""
+### multiprocessing.Pool
+```python
+from multiprocessing import Pool
+def square(x): return x * x
+# with Pool() as p:
+#     results = p.map(square, [1, 2, 3, 4])
+```
+"""##,
+                contentMarkdownEN: ##"""
+### Multi-Core Parallelism
+Bypass the GIL completely by distributing compute intensive jobs across cores.
+"""##,
+                codeSnippet: ##"""
+print("multiprocessing запускает независимые процессы Python")
+"""##,
+                xpReward: 50
+            ),
+            Lesson(
+                id: "py_concurrent_futures",
+                category: .pythonConcurrency,
+                titleRU: "Высокоуровневый Модуль concurrent.futures",
+                titleEN: "High-Level Concurrency: concurrent.futures",
+                summaryRU: "Унифицированный интерфейс: ThreadPoolExecutor и ProcessPoolExecutor, методы submit() и as_completed().",
+                summaryEN: "Modern execution pools: switching seamlessly between thread pools and process pools.",
+                contentMarkdownRU: ##"""
+### ThreadPoolExecutor
+```python
+from concurrent.futures import ThreadPoolExecutor
+def work(n): return n * 10
+with ThreadPoolExecutor(max_workers=4) as executor:
+    results = list(executor.map(work, [1, 2, 3]))
+```
+"""##,
+                contentMarkdownEN: ##"""
+### Unified Executors
+Manage thread and process worker pools with clean context managers.
+"""##,
+                codeSnippet: ##"""
+print("concurrent.futures предоставляет удобный пул исполнителей")
+"""##,
+                xpReward: 45
+            ),
+            Lesson(
+                id: "py_unittest_mock",
+                category: .pythonTestingAndPerf,
+                titleRU: "Модульное Тестирование: unittest и MagicMock",
+                titleEN: "Unit Testing: unittest Framework & MagicMock",
+                summaryRU: "Написание надежных тестов: TestCase, assertions (assertEqual, assertRaises) и мокирование с unittest.mock.",
+                summaryEN: "Standard testing conventions: unit test cases, test fixtures, and mock isolation.",
+                contentMarkdownRU: ##"""
+### unittest
+```python
+import unittest
+class TestMath(unittest.TestCase):
+    def test_add(self):
+        self.assertEqual(2 + 2, 4)
+```
+"""##,
+                contentMarkdownEN: ##"""
+### Unit Testing
+Write isolated test suites verifying software contracts.
+"""##,
+                codeSnippet: ##"""
+import unittest
+tc = unittest.TestCase()
+tc.assertEqual(10, 10)
+print("Тест пройден")
+"""##,
+                xpReward: 40
+            ),
+            Lesson(
+                id: "py_profiling_timeit",
+                category: .pythonTestingAndPerf,
+                titleRU: "Профилирование Производительности: timeit и cProfile",
+                titleEN: "Performance Profiling: timeit & cProfile",
+                summaryRU: "Точный замер времени микро-бенчмарков через timeit и анализ узких мест выполнения с cProfile.",
+                summaryEN: "Benchmarking small snippets with timeit and profiling function call bottlenecks with cProfile.",
+                contentMarkdownRU: ##"""
+### timeit
+```python
+import timeit
+elapsed = timeit.timeit("[x for x in range(100)]", number=10000)
+print(f"Время выполнения: {elapsed:.4f} сек")
+```
+"""##,
+                contentMarkdownEN: ##"""
+### Micro-Benchmarking
+Measure algorithmic speed accurately without manual timestamps.
+"""##,
+                codeSnippet: ##"""
+import timeit
+t = timeit.timeit("sum([1, 2, 3])", number=1000)
+print(f"Время: {t:.5f}s")
+"""##,
+                xpReward: 45
+            ),
+            Lesson(
+                id: "py_dis_bytecode",
+                category: .pythonTestingAndPerf,
+                titleRU: "Как Работает CPython: Байткод и Модуль dis",
+                titleEN: "CPython Internals: Bytecode & dis Module",
+                summaryRU: "Дизассемблирование байткода CPython, стековая виртуальная машина, инструкции LOAD_FAST и BINARY_OP.",
+                summaryEN: "Disassembling compiled Python bytecode to understand the stack virtual machine.",
+                contentMarkdownRU: ##"""
+### Модуль dis
+```python
+import dis
+def compute(a, b):
+    return a + b
+dis.dis(compute)
+# 0 LOAD_FAST 0 (a)
+# 2 LOAD_FAST 1 (b)
+# 4 BINARY_OP 0 (+)
+# 8 RETURN_VALUE
+```
+"""##,
+                contentMarkdownEN: ##"""
+### Python Bytecode
+Inspect the virtual machine instructions executed by the CPython interpreter.
+"""##,
+                codeSnippet: ##"""
+import dis
+dis.dis(compile("a = 1 + 2", "<string>", "exec"))
 """##,
                 xpReward: 50
             ),
