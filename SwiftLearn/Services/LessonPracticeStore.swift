@@ -686,8 +686,8 @@ def sum_positive(numbers):
         )
 
         // MARK: - C# Challenges
-        customChallenges["cs_basics_types"] = LessonPracticeChallenge(
-            id: "practice_cs_basics_types",
+        customChallenges["cs_top_level_clr"] = LessonPracticeChallenge(
+            id: "practice_cs_top_level_clr",
             language: .csharp,
             titleRU: "Практика: Вычисления в C#",
             titleEN: "Practice: C# Computations",
@@ -712,8 +712,66 @@ public static double ConvertCelsiusToFahrenheit(double c) {
             hintsEN: ["Use `(c * 9.0 / 5.0) + 32.0`."]
         )
 
-        customChallenges["cs_linq_queries"] = LessonPracticeChallenge(
-            id: "practice_cs_linq_queries",
+        customChallenges["cs_variables_var"] = LessonPracticeChallenge(
+            id: "practice_cs_variables_var",
+            language: .csharp,
+            titleRU: "Практика: Расчет скидки",
+            titleEN: "Practice: Discount Calculator",
+            taskPromptRU: "Реализуйте метод `CalculateDiscount(decimal price, int percent)`, возвращающий финальную цену после вычета скидки: `price - (price * percent / 100m)`.",
+            taskPromptEN: "Implement `CalculateDiscount(decimal price, int percent)` returning `price - (price * percent / 100m)`.",
+            starterCode: ##"""
+public static decimal CalculateDiscount(decimal price, int percent) {
+    // Ваша реализация
+    return 0m;
+}
+"""##,
+            solutionCode: ##"""
+public static decimal CalculateDiscount(decimal price, int percent) {
+    return price - (price * percent / 100m);
+}
+"""##,
+            testCases: [
+                TaskTestCase(title: "Скидка 10% от 1000", inputDescription: "CalculateDiscount(1000m, 10)", expectedOutput: "900.0", validationCode: "CalculateDiscount(1000m, 10) == 900.0m"),
+                TaskTestCase(title: "Скидка 50% от 500", inputDescription: "CalculateDiscount(500m, 50)", expectedOutput: "250.0", validationCode: "CalculateDiscount(500m, 50) == 250.0m")
+            ],
+            hintsRU: ["Используйте `price - (price * percent / 100m)`."],
+            hintsEN: ["Formula: `price - (price * percent / 100m)`."]
+        )
+
+        customChallenges["cs_pattern_matching_switch"] = LessonPracticeChallenge(
+            id: "practice_cs_pattern_matching_switch",
+            language: .csharp,
+            titleRU: "Практика: Оценка результата",
+            titleEN: "Practice: Score Classification",
+            taskPromptRU: "Реализуйте метод `ClassifyScore(int score)`, который возвращает `\"A\"` при score >= 90, `\"B\"` при score >= 75, `\"C\"` при score >= 60 и `\"F\"` в остальных случаях.",
+            taskPromptEN: "Implement `ClassifyScore(int score)` returning `\"A\"` if >= 90, `\"B\"` if >= 75, `\"C\"` if >= 60, and `\"F\"` otherwise.",
+            starterCode: ##"""
+public static string ClassifyScore(int score) {
+    // Ваша реализация
+    return "";
+}
+"""##,
+            solutionCode: ##"""
+public static string ClassifyScore(int score) {
+    return score switch {
+        >= 90 => "A",
+        >= 75 => "B",
+        >= 60 => "C",
+        _ => "F"
+    };
+}
+"""##,
+            testCases: [
+                TaskTestCase(title: "Балл 95", inputDescription: "ClassifyScore(95)", expectedOutput: "A", validationCode: "ClassifyScore(95) == \"A\""),
+                TaskTestCase(title: "Балл 78", inputDescription: "ClassifyScore(78)", expectedOutput: "B", validationCode: "ClassifyScore(78) == \"B\""),
+                TaskTestCase(title: "Балл 50", inputDescription: "ClassifyScore(50)", expectedOutput: "F", validationCode: "ClassifyScore(50) == \"F\"")
+            ],
+            hintsRU: ["Используйте switch expression с `score switch { >= 90 => \"A\", ... }`."],
+            hintsEN: ["Use switch expression `score switch { >= 90 => \"A\", ... }`."]
+        )
+
+        customChallenges["cs_linq_filtering_projection"] = LessonPracticeChallenge(
+            id: "practice_cs_linq_filtering_projection",
             language: .csharp,
             titleRU: "Практика: Фильтрация в C#",
             titleEN: "Practice: C# Filtering",

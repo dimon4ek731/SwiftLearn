@@ -156,9 +156,13 @@ public struct CurriculumView: View {
         case .pythonSystems:
             cardSubtitle = lang.localized("Системный Python: исключения, asyncio, Event Loop, архитектура GIL и профилирование.", "Systems Python: exceptions, asyncio, Event Loop, GIL architecture, and profiling.")
         case .csharpCore:
-            cardSubtitle = lang.localized("Платформа .NET 8, строгая типизация C# 12, классы, свойства и интерфейсы.", ".NET 8 platform, C# 12 static typing, classes, properties, and interfaces.")
+            cardSubtitle = lang.localized("Платформа .NET 8, C# 12: CLR, top-level statements, struct vs class, pattern matching и Span<T>.", ".NET 8 platform, C# 12: CLR, top-level statements, struct vs class, pattern matching, and Span<T>.")
+        case .csharpOOP:
+            cardSubtitle = lang.localized("ООП: классы, первичные конструкторы, наследование, интерфейсы, records и [Flags] enums.", "OOP: classes, primary constructors, inheritance, interfaces, immutable records, and [Flags] enums.")
+        case .csharpCollections:
+            cardSubtitle = lang.localized("Дженерики (where T), коллекции List/Dict, Func/Action, события и глубокие запросы LINQ.", "Generics (where T), List/Dict collections, Func/Action, events, and deep LINQ queries.")
         case .csharpAdvanced:
-            cardSubtitle = lang.localized("Обобщения (generics), LINQ-запросы, records и асинхронное программирование (async/await).", "Generics, LINQ queries, immutable records, and async/await programming.")
+            cardSubtitle = lang.localized("Асинхронность Task/async/await, многопоточность lock/Semaphore, DI и сборщик мусора GC.", "Async Task/async/await, multithreading lock/Semaphore, Dependency Injection, and GC.")
         case .sqlCore:
             cardSubtitle = lang.localized("Реляционная модель, выборка SELECT, фильтрация WHERE, агрегации и группировка GROUP BY.", "Relational model, SELECT queries, WHERE filtering, aggregations, and GROUP BY.")
         case .sqlAdvanced:

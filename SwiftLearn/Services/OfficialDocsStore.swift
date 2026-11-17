@@ -1493,6 +1493,76 @@ var topScores = scores.Where(s => s >= 80).OrderByDescending(s => s);
             ),
 
             OfficialDocTopic(
+                id: "cs_doc_types_records",
+                language: .csharp,
+                section: .languageGuide,
+                chapterNumber: 3,
+                titleEN: "Types: Classes, Structs, and Records",
+                titleRU: "Система типов: Классы, Структуры и Записи",
+                summaryEN: "Official Microsoft guide to reference types, value types, and modern immutable records.",
+                summaryRU: "Официальное руководство Microsoft по ссылочным и значимым типам, а также неизменяемым типам record.",
+                webSlug: "fundamentals/types/",
+                contentMarkdownEN: ##"""
+# Types in C#
+
+C# is a strongly-typed language. Every variable and constant has a type, as does every expression that evaluates to a value.
+
+## Categories of Types
+1. **Value Types**: Includes `int`, `double`, `bool`, `struct`, and `enum`. Stored on the stack or inline in their containing type.
+2. **Reference Types**: Includes `class`, `record class`, `interface`, and `delegate`. Stored on the managed heap.
+3. **Records**: Types with built-in value-based equality behavior and non-destructive mutation (`with`).
+"""##,
+                contentMarkdownRU: ##"""
+# Типы данных в C#
+
+C# — строго типизированный язык. Каждая переменная, константа и выражение имеют строго определенный тип.
+
+## Категории типов
+1. **Значимые типы (Value Types)**: `int`, `double`, `bool`, структуры `struct` и перечисления `enum`.
+2. **Ссылочные типы (Reference Types)**: классы `class`, интерфейсы `interface` и делегаты. Размещаются в управляемой куче CLR.
+3. **Записи (Records)**: типы данных с автоматическим сравнением по значению полей и поддержкой синтаксиса `with`.
+"""##
+            ),
+
+            OfficialDocTopic(
+                id: "cs_doc_async",
+                language: .csharp,
+                section: .languageReference,
+                chapterNumber: 4,
+                titleEN: "Asynchronous Programming with async and await",
+                titleRU: "Асинхронное программирование с async и await",
+                summaryEN: "Official specification on Task-based Asynchronous Pattern (TAP) and state machines.",
+                summaryRU: "Официальная спецификация асинхронного паттерна Task (TAP) и конечных автоматов.",
+                webSlug: "asynchronous-programming/",
+                contentMarkdownEN: ##"""
+# Asynchronous Programming in C#
+
+The Task-based Asynchronous Pattern (TAP) provides an abstraction over asynchronous operations. You use the `async` and `await` keywords to write asynchronous code that looks almost identical to synchronous code.
+
+```csharp
+public async Task<int> FetchDataLengthAsync(string url) {
+    using var client = new HttpClient();
+    string content = await client.GetStringAsync(url);
+    return content.Length;
+}
+```
+"""##,
+                contentMarkdownRU: ##"""
+# Асинхронное программирование в C#
+
+Шаблон TAP (Task-based Asynchronous Pattern) предоставляет высокоуровневую абстракцию над операциями ввода-вывода. С помощью ключевых слов `async` и `await` вы пишете чистый асинхронный код без блокировок потока.
+
+```csharp
+public async Task<int> FetchDataLengthAsync(string url) {
+    using var client = new HttpClient();
+    string content = await client.GetStringAsync(url);
+    return content.Length;
+}
+```
+"""##
+            ),
+
+            OfficialDocTopic(
                 id: "sql_doc_intro",
                 language: .sql,
                 section: .welcome,

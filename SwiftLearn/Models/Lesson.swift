@@ -62,6 +62,8 @@ public enum CurriculumTrack: String, CaseIterable, Identifiable, Codable {
     
     // C# Tracks
     case csharpCore = "csharp_core"
+    case csharpOOP = "csharp_oop"
+    case csharpCollections = "csharp_collections"
     case csharpAdvanced = "csharp_advanced"
     
     // SQL Tracks
@@ -74,7 +76,7 @@ public enum CurriculumTrack: String, CaseIterable, Identifiable, Codable {
         switch self {
         case .swiftCore, .swiftUI: return .swift
         case .pythonCore, .pythonAdvanced, .pythonStdlib, .pythonSystems: return .python
-        case .csharpCore, .csharpAdvanced: return .csharp
+        case .csharpCore, .csharpOOP, .csharpCollections, .csharpAdvanced: return .csharp
         case .sqlCore, .sqlAdvanced: return .sql
         }
     }
@@ -94,9 +96,13 @@ public enum CurriculumTrack: String, CaseIterable, Identifiable, Codable {
         case .pythonSystems:
             return language == .russian ? "Python Concurrency" : "Python Concurrency"
         case .csharpCore:
-            return language == .russian ? "C# Core & ООП" : "C# Core & OOP"
+            return language == .russian ? "C# Core & Типы" : "C# Core & Types"
+        case .csharpOOP:
+            return language == .russian ? "C# ООП & Records" : "C# OOP & Records"
+        case .csharpCollections:
+            return language == .russian ? "C# Коллекции & LINQ" : "C# Collections & LINQ"
         case .csharpAdvanced:
-            return language == .russian ? "C# LINQ & Асинхронность" : "C# LINQ & Async"
+            return language == .russian ? "C# Concurrency & .NET" : "C# Concurrency & .NET"
         case .sqlCore:
             return language == .russian ? "SQL Запросы & DDL" : "SQL Queries & DDL"
         case .sqlAdvanced:
@@ -113,7 +119,9 @@ public enum CurriculumTrack: String, CaseIterable, Identifiable, Codable {
         case .pythonStdlib: return "shippingbox"
         case .pythonSystems: return "bolt.badge.clock"
         case .csharpCore: return "curlybraces"
-        case .csharpAdvanced: return "arrow.triangle.branch"
+        case .csharpOOP: return "shippingbox"
+        case .csharpCollections: return "square.stack.3d.up"
+        case .csharpAdvanced: return "bolt.badge.clock"
         case .sqlCore: return "cylinder.split.1x2"
         case .sqlAdvanced: return "chart.bar.xaxis"
         }
@@ -166,12 +174,26 @@ public enum LessonCategory: String, CaseIterable, Identifiable, Codable {
     
     // MARK: - Track 5: C# Core
     case csharpBasics = "csharp_basics"
-    case csharpOOP = "csharp_oop"
-    case csharpInterfaces = "csharp_interfaces"
+    case csharpTypes = "csharp_types"
+    case csharpControlFlow = "csharp_control"
+    case csharpStringsAndSpans = "csharp_strings_spans"
     
-    // MARK: - Track 6: C# Advanced
+    // MARK: - Track 6: C# OOP
+    case csharpOOP = "csharp_oop"
+    case csharpInheritance = "csharp_inheritance"
+    case csharpInterfaces = "csharp_interfaces"
+    case csharpRecordsAndEnums = "csharp_records_enums"
+    
+    // MARK: - Track 7: C# Collections & LINQ
+    case csharpGenerics = "csharp_generics"
     case csharpCollections = "csharp_collections"
+    case csharpDelegatesEvents = "csharp_delegates_events"
     case csharpLINQ = "csharp_linq"
+    
+    // MARK: - Track 8: C# Systems & Concurrency
+    case csharpExceptions = "csharp_exceptions"
+    case csharpAsyncAwait = "csharp_async_await"
+    case csharpTPLThreading = "csharp_tpl_threading"
     case csharpModern = "csharp_modern"
     
     // MARK: - Track 7: SQL Core
@@ -219,11 +241,19 @@ public enum LessonCategory: String, CaseIterable, Identifiable, Codable {
             return .pythonSystems
             
         // C# Core
-        case .csharpBasics, .csharpOOP, .csharpInterfaces:
+        case .csharpBasics, .csharpTypes, .csharpControlFlow, .csharpStringsAndSpans:
             return .csharpCore
             
-        // C# Advanced
-        case .csharpCollections, .csharpLINQ, .csharpModern:
+        // C# OOP
+        case .csharpOOP, .csharpInheritance, .csharpInterfaces, .csharpRecordsAndEnums:
+            return .csharpOOP
+            
+        // C# Collections & LINQ
+        case .csharpGenerics, .csharpCollections, .csharpDelegatesEvents, .csharpLINQ:
+            return .csharpCollections
+            
+        // C# Systems & Concurrency
+        case .csharpExceptions, .csharpAsyncAwait, .csharpTPLThreading, .csharpModern:
             return .csharpAdvanced
             
         // SQL Core
@@ -314,19 +344,43 @@ public enum LessonCategory: String, CaseIterable, Identifiable, Codable {
             
         // C# Core
         case .csharpBasics:
-            return language == .russian ? "1. Основы C#, Типы и Управление" : "1. C# Basics, Types & Control Flow"
-        case .csharpOOP:
-            return language == .russian ? "2. Классы, Свойства и Структуры" : "2. Classes, Properties & Structs"
-        case .csharpInterfaces:
-            return language == .russian ? "3. Интерфейсы и Полиморфизм" : "3. Interfaces & Polymorphism"
+            return language == .russian ? "1. Синтаксис C# 12, CLR и Top-Level" : "1. C# 12 Syntax, CLR & Top-Level"
+        case .csharpTypes:
+            return language == .russian ? "2. Значимые (struct) и Ссылочные (class) Типы" : "2. Value Types (struct) & Reference (class)"
+        case .csharpControlFlow:
+            return language == .russian ? "3. Pattern Matching, switch и Управление" : "3. Pattern Matching, Switch & Control"
+        case .csharpStringsAndSpans:
+            return language == .russian ? "4. Строки, Raw Literals и Span<T>" : "4. Strings, Raw Literals & Span<T>"
             
-        // C# Advanced
+        // C# OOP
+        case .csharpOOP:
+            return language == .russian ? "5. Классы, Свойства и Первичные Конструкторы" : "5. Classes, Properties & Primary Ctors"
+        case .csharpInheritance:
+            return language == .russian ? "6. Наследование, virtual, override и sealed" : "6. Inheritance, Virtual, Override & Sealed"
+        case .csharpInterfaces:
+            return language == .russian ? "7. Интерфейсы и Default Interface Methods" : "7. Interfaces & Default Methods"
+        case .csharpRecordsAndEnums:
+            return language == .russian ? "8. Records, init-only Свойства и Enums [Flags]" : "8. Records, Init-only & Enums [Flags]"
+            
+        // C# Collections & LINQ
+        case .csharpGenerics:
+            return language == .russian ? "9. Дженерики и Constraints (where T)" : "9. Generics & Constraints (where T)"
         case .csharpCollections:
-            return language == .russian ? "4. Коллекции и Дженерики" : "4. Collections & Generics"
+            return language == .russian ? "10. Коллекции List<T>, Dict, HashSet и Queue" : "10. Collections List<T>, Dict, HashSet & Queue"
+        case .csharpDelegatesEvents:
+            return language == .russian ? "11. Делегаты, Func, Action, Лямбды и События" : "11. Delegates, Func/Action, Lambdas & Events"
         case .csharpLINQ:
-            return language == .russian ? "5. LINQ и Функциональные Запросы" : "5. LINQ & Functional Queries"
+            return language == .russian ? "12. LINQ: Where, Select, GroupBy, Join и Yield" : "12. LINQ: Where, Select, GroupBy, Join & Yield"
+            
+        // C# Systems & Concurrency
+        case .csharpExceptions:
+            return language == .russian ? "13. Исключения, Exception Filters when и IDisposable" : "13. Exceptions, Filters (when) & IDisposable"
+        case .csharpAsyncAwait:
+            return language == .russian ? "14. Асинхронность: Task, ValueTask и async/await" : "14. Async: Task, ValueTask & async/await"
+        case .csharpTPLThreading:
+            return language == .russian ? "15. Multithreading, lock, SemaphoreSlim и Parallel" : "15. Multithreading, Lock, Semaphore & Parallel"
         case .csharpModern:
-            return language == .russian ? "6. Records, Pattern Matching & Async" : "6. Records, Pattern Matching & Async"
+            return language == .russian ? "16. Dependency Injection, Reflection и GC" : "16. Dependency Injection, Reflection & GC"
             
         // SQL Core
         case .sqlBasics:
@@ -386,11 +440,21 @@ public enum LessonCategory: String, CaseIterable, Identifiable, Codable {
             
         // C#
         case .csharpBasics: return "curlybraces"
+        case .csharpTypes: return "square.2.layers.3d"
+        case .csharpControlFlow: return "arrow.triangle.branch"
+        case .csharpStringsAndSpans: return "text.quote"
         case .csharpOOP: return "shippingbox"
+        case .csharpInheritance: return "arrow.triangle.merge"
         case .csharpInterfaces: return "shield.lefthalf.filled"
+        case .csharpRecordsAndEnums: return "cube.transparent"
+        case .csharpGenerics: return "chevron.left.forwardslash.chevron.right"
         case .csharpCollections: return "square.stack.3d.up"
+        case .csharpDelegatesEvents: return "bolt.horizontal"
         case .csharpLINQ: return "line.3.horizontal.decrease.circle"
-        case .csharpModern: return "bolt.badge.clock"
+        case .csharpExceptions: return "exclamationmark.triangle"
+        case .csharpAsyncAwait: return "bolt.badge.clock"
+        case .csharpTPLThreading: return "cpu"
+        case .csharpModern: return "gearshape.2"
             
         // SQL
         case .sqlBasics: return "cylinder.split.1x2"

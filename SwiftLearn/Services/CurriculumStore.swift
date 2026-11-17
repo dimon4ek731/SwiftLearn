@@ -6440,311 +6440,2792 @@ dis.dis(compile("a = 1 + 2", "<string>", "exec"))
                 xpReward: 50
             ),
 
-            // ==========================================
-            // C# CORE & ADVANCED CURRICULUM
+                        // ==========================================
+            // C# 12 & .NET 8 INDUSTRIAL CURRICULUM (52 LESSONS)
             // ==========================================
             Lesson(
-                id: "cs_basics_types",
+                id: "cs_top_level_clr",
                 category: .csharpBasics,
-                titleRU: "Синтаксис C#, Типы Данных и Управление",
-                titleEN: "C# Syntax, Value Types & Control Flow",
-                summaryRU: "Основы языка C# 12 и .NET: строгая статическая типизация, var, ссылочные и значимые типы, switch expressions.",
-                summaryEN: "C# 12 & .NET fundamentals: static typing, var, value vs reference types, and switch expressions.",
-                contentMarkdownRU: """
-### Структура программы C#
-Начиная с C# 9 и .NET 6 поддерживаются **Top-Level Statements** (инструкции верхнего уровня без громоздкого `class Program` и `static void Main`):
+                titleRU: "Top-Level Statements, CLR и Архитектура .NET 8",
+                titleEN: "Top-Level Statements, CLR & .NET 8 Architecture",
+                summaryRU: "Внутренняя архитектура платформы .NET: Common Language Runtime, сборка IL-байткода, JIT-компиляция (RyuJIT) и инструкции верхнего уровня.",
+                summaryEN: "Architecture of .NET: Common Language Runtime, IL bytecode assembly, RyuJIT compilation, and top-level statements.",
+                contentMarkdownRU: ##"""
+### Архитектура платформы .NET 8 и Среда CLR
+
+Платформа **.NET 8** является современной высокопроизводительной кроссплатформенной средой выполнения. Процесс исполнения C# кода состоит из двух ключевых стадий:
+
+1. **Компилятор Roslyn (csc)** переводит исходный C# код в платформонезависимый промежуточный язык **CIL / IL (Common Intermediate Language)** и метаданные типов.
+2. **Среда CLR (Common Language Runtime)** выполняет IL-код, используя динамический компилятор **RyuJIT**, который преобразует IL в машинный код конкретного процессора (x64, ARM64) во время первого выполнения метода.
+3. В .NET 8 также поддерживается **Native AOT (Ahead-Of-Time)** компиляция напрямую в нативный машинный бинарник без JIT, обеспечивая мгновенный запуск и минимальное потребление RAM.
+
+### Инструкции верхнего уровня (Top-Level Statements)
+
+Начиная с C# 9 и .NET 6, файл точки входа `Program.cs` не требует обязательного объявления пространства имен `namespace`, класса `class Program` и статического метода `static void Main(string[] args)`:
 
 ```csharp
 using System;
 
-string greeting = "Привет, C# 12!";
-Console.WriteLine(greeting);
+Console.WriteLine("Добро пожаловать в C# 12 и .NET 8!");
+
+string runtimeVersion = Environment.Version.ToString();
+Console.WriteLine($"Версия .NET Среды: {runtimeVersion}");
 ```
 
-### Типы значений (Value Types) и Ссылочные типы (Reference Types)
-- **Значимые типы** (`struct`): хранятся на стеке (`int`, `double`, `bool`, `DateTime`).
-- **Ссылочные типы** (`class`): хранятся в куче (`string`, `object`, массивы, пользовательские классы).
+Компилятор автоматически оборачивает этот код в синтетический скрытый метод точки входа. Переменная `args` (массив аргументов командной строки) доступна неявно.
+"""##,
+                contentMarkdownEN: ##"""
+### .NET 8 Architecture & Common Language Runtime
 
-```csharp
-int counter = 42;
-double price = 99.99;
-bool isEnabled = true;
-var title = "Разработка на .NET"; // Неявная типизация компилятором
-```
+**.NET 8** is an enterprise-grade cross-platform runtime environment. Execution involves two distinct compilation phases:
 
-### Современный Switch Expression
-```csharp
-int status = 200;
-string message = status switch {
-    200 => "OK",
-    404 => "Not Found",
-    500 => "Server Error",
-    _ => "Unknown"
-};
-```
-""",
-                contentMarkdownEN: """
-### Top-Level Statements in C#
+1. **Roslyn Compiler (csc)** compiles source C# code into platform-agnostic **CIL / IL (Common Intermediate Language)** along with type metadata.
+2. **CLR (Common Language Runtime)** executes the IL code using **RyuJIT**, compiling IL into native CPU instructions on demand.
+3. **Native AOT (Ahead-Of-Time)** enables compiling directly to a standalone native binary without JIT overhead.
+
+### Top-Level Statements
+
+Top-level statements remove the boilerplate `class Program` and `static void Main`:
+
 ```csharp
 using System;
 
-string greeting = "Hello, C# 12!";
-Console.WriteLine(greeting);
+Console.WriteLine("Welcome to C# 12 and .NET 8!");
 ```
+"""##,
+                codeSnippet: ##"""
+using System;
 
-### Value Types vs Reference Types
-- Value types (`int`, `double`, `bool`, `struct`) live on the stack.
-- Reference types (`class`, `string`, arrays) live on the heap.
-
-```csharp
-var status = 200;
-string description = status switch {
-    200 => "OK",
-    _ => "Other"
-};
-```
-""",
-                codeSnippet: """
-int width = 10;
-int height = 20;
-int area = width * height;
-Console.WriteLine($"Rectangle Area: {area}");
-""",
+Console.WriteLine("C# 12 & .NET 8 CLR Runtime");
+string os = Environment.OSVersion.ToString();
+Console.WriteLine($"Operating System: {os}");
+"""##,
                 xpReward: 35
             ),
+
             Lesson(
-                id: "cs_oop_classes_props",
-                category: .csharpOOP,
-                titleRU: "Классы, Свойства { get; set; } и Инкапсуляция",
-                titleEN: "Classes, Properties { get; set; } & Encapsulation",
-                summaryRU: "Объектно-ориентированное программирование в C#: автоматические свойства, модификаторы доступа, конструкторы и ключевое слово this.",
-                summaryEN: "OOP in C#: auto-properties, access modifiers, constructors, and encapsulation.",
-                contentMarkdownRU: """
-### Классы и Автосвойства (Auto-Properties)
-В C# свойства заменяют рутинные геттеры и сеттеры:
+                id: "cs_variables_var",
+                category: .csharpBasics,
+                titleRU: "Переменные, Константы и Неявная типизация var",
+                titleEN: "Variables, Constants & Implicit Typing (var)",
+                summaryRU: "Статическая строгая типизация в C#: явное объявление, неявный вывод типов через var, константы const и модификатор readonly.",
+                summaryEN: "Static strong typing in C#: explicit types, compile-time inference with var, const, and readonly.",
+                contentMarkdownRU: ##"""
+### Статическая типизация и ключевое слово `var`
+
+C# — **строго типизированный** язык со статической проверкой типов во время компиляции. Ключевое слово `var` не делает переменную динамической — оно заставляет компилятор Roslyn **автоматически вывести точный тип** из правой части выражения:
 
 ```csharp
-public class User {
-    public string Name { get; set; }
-    public int Age { get; private set; } // Изменение только внутри класса
+int explicitNumber = 42;
+var inferredNumber = 42; // Тип строго выводится как System.Int32
 
-    public User(string name, int age) {
-        Name = name;
-        Age = age;
-    }
+var title = "SwiftLearn"; // System.String
+// title = 100; // Ошибка компиляции: Невозможно преобразовать int в string!
+```
 
-    public void CelebrateBirthday() {
-        Age++;
-    }
+### Константы `const` против полей `readonly`
+
+- **`const`**: значение вычисляется **на этапе компиляции**. Значение должно быть литералом или примитивным константным выражением. Константы встраиваются прямо в IL-байткод потребителей.
+- **`readonly`**: значение может быть вычислено **во время выполнения** (runtime) при инициализации или внутри конструктора объекта.
+
+```csharp
+public class ServerConfig {
+    public const int DefaultPort = 8080; // Compile-time константа
+    public readonly DateTime StartedAt = DateTime.UtcNow; // Runtime readonly
 }
 ```
 
-### Вычисляемые свойства (Expression-Bodied Members)
-```csharp
-public class Rectangle {
-    public double Width { get; set; }
-    public double Height { get; set; }
+### Значения по умолчанию (`default`)
+Каждый тип в C# имеет дефолтное состояние (`0` для чисел, `false` для `bool`, `null` для ссылочных типов). Получить его можно через `default` или `default(T)`.
+"""##,
+                contentMarkdownEN: ##"""
+### Static Typing and `var`
 
-    public double Area => Width * Height; // Вычисляемое свойство
-}
+C# is statically typed. The `var` keyword instructs the compiler to infer the type at compile-time:
+
+```csharp
+var count = 10; // System.Int32
+var message = "Hello"; // System.String
 ```
-""",
-                contentMarkdownEN: """
-### Auto-Implemented Properties
-```csharp
-public class Account {
-    public string Owner { get; set; }
-    public decimal Balance { get; private set; }
 
-    public Account(string owner, decimal balance) {
-        Owner = owner;
-        Balance = balance;
+### `const` vs `readonly`
+- `const`: compile-time constant embedded into IL.
+- `readonly`: runtime constant initialized inline or within a constructor.
+"""##,
+                codeSnippet: ##"""
+var score = 100;
+const double Pi = 3.1415926535;
+var isComplete = false;
+
+Console.WriteLine($"Score: {score}, Pi: {Pi}, Completed: {isComplete}");
+"""##,
+                xpReward: 35
+            ),
+
+            Lesson(
+                id: "cs_operators_arithmetic",
+                category: .csharpBasics,
+                titleRU: "Операторы, Приведение типов и checked/unchecked",
+                titleEN: "Operators, Type Casting & Checked/Unchecked Contexts",
+                summaryRU: "Арифметические и побитовые операции, безопасное и явное приведение типов, контроль целочисленного переполнения checked и unchecked.",
+                summaryEN: "Arithmetic and bitwise operators, type casting, and overflow handling with checked/unchecked blocks.",
+                contentMarkdownRU: ##"""
+### Арифметические операции и контроль переполнения
+
+В C# целочисленные операции по умолчанию выполняются в режиме `unchecked` для максимальной скорости (при превышении `int.MaxValue` происходит круговой сдвиг без ошибки).
+
+Когда требуется гарантировать отсутствие арифметического переполнения, используется контекст `checked`:
+
+```csharp
+int max = int.MaxValue;
+
+// Без checked: переполнение происходит молча (становится отрицательным)
+int overflowed = max + 1; // -2147483648
+
+// С checked: выбрасывается исключение OverflowException
+try {
+    checked {
+        int fatal = max + 1;
     }
+} catch (OverflowException) {
+    Console.WriteLine("Переполнение заблокировано!");
 }
 ```
-""",
-                codeSnippet: """
-public class Device {
-    public string Model { get; set; } = "iPhone";
-    public int Battery { get; set; } = 100;
+
+### Явное и неявное приведение (Casting)
+- **Неявное (Implicit)**: когда потеря данных невозможна (`int` ➔ `long`, `float` ➔ `double`).
+- **Явное (Explicit)**: при риске потери точности или переполнения, с использованием синтаксиса `(targetType)val`.
+"""##,
+                contentMarkdownEN: ##"""
+### Operators and Overflow Detection
+
+By default, integer arithmetic in C# wraps around (`unchecked`). The `checked` keyword throws an `OverflowException` on overflow:
+
+```csharp
+int max = int.MaxValue;
+checked {
+    // Throws OverflowException
+    int next = max + 1;
+}
+```
+"""##,
+                codeSnippet: ##"""
+int a = 15;
+int b = 4;
+int quotient = a / b;
+int remainder = a % b;
+
+Console.WriteLine($"15 / 4 = {quotient}, Remainder = {remainder}");
+"""##,
+                xpReward: 35
+            ),
+
+            Lesson(
+                id: "cs_value_vs_reference",
+                category: .csharpTypes,
+                titleRU: "Значимые типы (struct) против Ссылочных (class)",
+                titleEN: "Value Types (struct) vs Reference Types (class)",
+                summaryRU: "Стек и управляемая куча в CLR, семантика копирования по значению против копирования указателя, накладные расходы упаковки Boxing и Unboxing.",
+                summaryEN: "Stack vs Managed Heap in CLR, value copy semantics vs reference pointer copying, and boxing/unboxing overhead.",
+                contentMarkdownRU: ##"""
+### Модель памяти CLR: Стек (Stack) и Куча (Managed Heap)
+
+В C# все типы разделены на две фундаментальные категории:
+
+| Характеристика | Значимые типы (Value Types / `struct`) | Ссылочные типы (Reference Types / `class`) |
+| :--- | :--- | :--- |
+| **Примеры** | `int`, `double`, `bool`, `DateTime`, `struct` | `string`, `object`, массивы `T[]`, `class`, делегаты |
+| **Размещение** | В стеке (локальные) или внутри владельца | В управляемой куче (Managed Heap) |
+| **Копирование** | Копируется **само значение** байт в байт | Копируется **только адрес/ссылка** на объект в куче |
+| **Очистка** | Мгновенно при выходе из скоупа стека | Сборщиком мусора (Garbage Collector) |
+
+```csharp
+// Значимый тип:
+public struct Point {
+    public int X;
+    public int Y;
 }
 
-var d = new Device();
-Console.WriteLine($"{d.Model}: {d.Battery}%");
-""",
+Point p1 = new Point { X = 10, Y = 20 };
+Point p2 = p1; // Полная копия данных!
+p2.X = 99;
+Console.WriteLine(p1.X); // Выведет 10 (оригинал не изменился)
+
+// Ссылочный тип:
+public class Node {
+    public int Value;
+}
+
+Node n1 = new Node { Value = 10 };
+Node n2 = n1; // Скопирован только указатель в кучу!
+n2.Value = 99;
+Console.WriteLine(n1.Value); // Выведет 99 (оба указывают на один объект)
+```
+
+### Упаковка (Boxing) и Распаковка (Unboxing)
+- **Boxing**: преобразование значимого типа в `object` или интерфейс. CLR аллоцирует новый блок памяти в куче и копирует туда значение.
+- **Unboxing**: извлечение значимого типа из `object` с проверкой соответствия типов.
+Упаковка создает дополнительное давление на сборщик мусора (GC), поэтому дженерики (`List<int>` вместо `ArrayList`) являются критически важным решением.
+"""##,
+                contentMarkdownEN: ##"""
+### Memory Model: Structs vs Classes
+
+- **Value Types (`struct`)**: stored inline on the stack, copied by value.
+- **Reference Types (`class`)**: allocated on the managed heap, copied by reference pointer.
+
+Boxing wraps a value type in an object on the heap; unboxing extracts it.
+"""##,
+                codeSnippet: ##"""
+struct Vector2D {
+    public double X;
+    public double Y;
+}
+
+Vector2D v1 = new Vector2D { X = 3.0, Y = 4.0 };
+Vector2D v2 = v1; // Value copy
+v2.X = 10.0;
+
+Console.WriteLine($"v1.X: {v1.X}, v2.X: {v2.X}");
+"""##,
                 xpReward: 40
             ),
+
             Lesson(
-                id: "cs_interfaces_polymorphism",
-                category: .csharpInterfaces,
-                titleRU: "Интерфейсы (interface) и Полиморфизм",
-                titleEN: "Interfaces & Polymorphism in C#",
-                summaryRU: "Определение контрактов через interface, реализация нескольких интерфейсов, абстрактные классы и ключевые слова virtual / override.",
-                summaryEN: "Defining contracts with interface, multi-interface implementation, abstract classes, and virtual/override polymorphism.",
-                contentMarkdownRU: """
-### Интерфейсы (`interface`)
-Интерфейс задает контракт методов и свойств без их реализации (по конвенции C# имена начинаются с буквы `I`):
+                id: "cs_nullable_reference_types",
+                category: .csharpTypes,
+                titleRU: "Nullable Ссылочные Типы (NRT) и Null-Safety",
+                titleEN: "Nullable Reference Types (NRT) & Null Safety",
+                summaryRU: "Защита от NullReferenceException во время компиляции: директива #nullable enable, типы T?, операторы ?., ??, ??= и null-forgiving оператор !.",
+                summaryEN: "Compile-time prevention of NullReferenceException: #nullable enable, T? types, ?., ??, ??=, and null-forgiving !.",
+                contentMarkdownRU: ##"""
+### Null-Safety в современном C#
+
+Исторически `NullReferenceException` был одной из самых частых причин падения программ («ошибка на миллиард долларов»). Начиная с C# 8, компилятор поддерживает **Nullable Reference Types**:
 
 ```csharp
-public interface IPayable {
-    decimal CalculatePayment();
-}
+#nullable enable
 
-public class Freelancer : IPayable {
-    public decimal HourlyRate { get; set; }
-    public int HoursWorked { get; set; }
+string nonNullable = "SwiftLearn"; // Не может быть null!
+// nonNullable = null; // Предупреждение компилятора CS8600
 
-    public decimal CalculatePayment() {
-        return HourlyRate * HoursWorked;
-    }
-}
+string? nullableString = null; // Разрешено содержать null
 ```
 
-### Полиморфизм через `virtual` и `override`
+### Операторы работы с null
+
+1. **Null-Conditional `?.`**: безопасный вызов метода или свойства:
 ```csharp
-public class BaseLogger {
-    public virtual void Log(string msg) => Console.WriteLine($"[INFO]: {msg}");
-}
-
-public class ErrorLogger : BaseLogger {
-    public override void Log(string msg) => Console.WriteLine($"[ERROR]: {msg}");
-}
+int? length = nullableString?.Length; // Если null, вернет null без выброса исключения
 ```
-""",
-                contentMarkdownEN: """
-### Interfaces
+
+2. **Null-Coalescing `??`**: значение по умолчанию, если левый операнд равен `null`:
 ```csharp
-public interface IRepository<T> {
-    T GetById(int id);
-    void Save(T item);
-}
+string display = nullableString ?? "Значение по умолчанию";
 ```
-""",
-                codeSnippet: """
-public interface IShape {
-    double GetArea();
-}
 
-public class Square : IShape {
-    public double Side { get; set; }
-    public Square(double s) => Side = s;
-    public double GetArea() => Side * Side;
-}
+3. **Null-Coalescing Assignment `??=`**: присвоение значения только если переменная равна `null`:
+```csharp
+nullableString ??= "Инициализировано";
+```
 
-IShape shape = new Square(5);
-Console.WriteLine(shape.GetArea()); // 25
-""",
-                xpReward: 45
+4. **Null-Forgiving Operator `!`**: указание компилятору подавить предупреждение, когда разработчик на 100% уверен, что значение не равно `null`:
+```csharp
+string guaranteed = nullableString!;
+```
+"""##,
+                contentMarkdownEN: ##"""
+### Nullable Reference Types
+
+With `#nullable enable`, non-null references cannot hold `null`. Nullable references are explicitly annotated with `?`:
+
+```csharp
+string? name = null;
+string greeting = name ?? "Anonymous";
+Console.WriteLine(greeting);
+```
+"""##,
+                codeSnippet: ##"""
+string? input = null;
+string resolved = input ?? "Fallback Value";
+Console.WriteLine($"Resolved: {resolved}");
+
+input ??= "Assigned now";
+Console.WriteLine($"Input: {input}");
+"""##,
+                xpReward: 40
             ),
+
             Lesson(
-                id: "cs_collections_linq",
-                category: .csharpLINQ,
-                titleRU: "Коллекции List<T>, Dictionary и Запросы LINQ",
-                titleEN: "List<T>, Dictionary & LINQ Queries",
-                summaryRU: "Мощный декларативный язык запросов LINQ: методы Where, Select, OrderBy, FirstOrDefault, Any и агрегация данных.",
-                summaryEN: "Declarative data querying with LINQ: Where, Select, OrderBy, FirstOrDefault, Any, and grouping operations.",
-                contentMarkdownRU: """
-### Дженерик-коллекции: `List<T>` и `Dictionary<TKey, TValue>`
+                id: "cs_valuetuples",
+                category: .csharpTypes,
+                titleRU: "Кортежи ValueTuple и Деконструкция",
+                titleEN: "ValueTuples & Positional Deconstruction",
+                summaryRU: "Легковесные структуры ValueTuple, именование элементов, возврат нескольких значений из метода и синтаксис деконструкции через deconstruct.",
+                summaryEN: "Lightweight ValueTuples, named elements, multi-value method returns, and deconstruction syntax.",
+                contentMarkdownRU: ##"""
+### Кортежи `ValueTuple`
+
+В C# 7 появился тип `ValueTuple` — легковесная значимая структура, не требующая аллокаций в куче в отличие от устаревшего ссылочного `System.Tuple`.
+
 ```csharp
-var numbers = new List<int> { 5, 12, 8, 21, 3, 18 };
-var scores = new Dictionary<string, int> {
-    ["Alice"] = 95,
-    ["Bob"] = 80
+// Именованные кортежи:
+(int statusCode, string statusMessage, bool isOk) response = (200, "OK", true);
+
+Console.WriteLine($"Status: {response.statusCode}, Message: {response.statusMessage}");
+```
+
+### Возврат нескольких значений из функций
+Кортежи идеально подходят для возврата нескольких связанных значений без создания лишних DTO-классов:
+
+```csharp
+public static (double min, double max, double avg) CalculateStats(int[] numbers) {
+    double min = numbers[0];
+    double max = numbers[0];
+    double sum = 0;
+    foreach (var n in numbers) {
+        if (n < min) min = n;
+        if (n > max) max = n;
+        sum += n;
+    }
+    return (min, max, sum / numbers.Length);
+}
+```
+
+### Деконструкция кортежей
+```csharp
+var (low, high, mean) = CalculateStats([10, 20, 30, 40]);
+Console.WriteLine($"Min: {low}, Max: {high}, Avg: {mean}");
+
+// Отбрасывание ненужных значений через discard _:
+var (_, highest, _) = CalculateStats([10, 20, 30, 40]);
+```
+"""##,
+                contentMarkdownEN: ##"""
+### ValueTuples and Multi-Value Returns
+
+`ValueTuple` is an unboxed value type enabling clean multi-value returns:
+
+```csharp
+(int id, string role) GetUser() => (42, "Admin");
+var (userId, userRole) = GetUser();
+```
+"""##,
+                codeSnippet: ##"""
+(string Name, int Level) hero = ("Warrior", 45);
+var (heroName, heroLevel) = hero;
+
+Console.WriteLine($"Hero: {heroName}, Level: {heroLevel}");
+"""##,
+                xpReward: 35
+            ),
+
+            Lesson(
+                id: "cs_pattern_matching_switch",
+                category: .csharpControlFlow,
+                titleRU: "Современный Pattern Matching и switch expressions",
+                titleEN: "Pattern Matching & Modern switch Expressions",
+                summaryRU: "Декларативное сопоставление с шаблонами в C# 12: switch expressions, реляционные шаблоны >, <, логические связки and, or, not.",
+                summaryEN: "Declarative pattern matching: switch expressions, relational patterns, and logical combinators.",
+                contentMarkdownRU: ##"""
+### Switch Expressions в C#
+
+Традиционный `switch-case` с многострочными `break` заменен на лаконичные **switch expressions**:
+
+```csharp
+int httpStatus = 404;
+
+string message = httpStatus switch {
+    200 => "Успешно",
+    201 => "Создано",
+    400 => "Неверный запрос",
+    404 => "Не найдено",
+    500 => "Внутренняя ошибка сервера",
+    _ => "Неизвестный статус" // Шаблон по умолчанию (discard)
 };
 ```
 
-### Запросы LINQ (Language Integrated Query)
-LINQ позволяет фильтровать, трансформировать и сортировать коллекции так же просто, как в SQL:
+### Реляционные и логические шаблоны (`and`, `or`, `not`)
+C# позволяет сопоставлять диапазоны чисел напрямую без громоздких условий:
 
 ```csharp
-using System.Linq;
+string ClassifyTemperature(double temp) => temp switch {
+    < -20 => "Экстремальный мороз",
+    >= -20 and < 0 => "Мороз",
+    >= 0 and < 18 => "Прохладно",
+    >= 18 and <= 25 => "Комфортно",
+    > 25 and <= 35 => "Жарко",
+    > 35 => "Экстремальная жара",
+    _ => "Некорректное значение"
+};
 
-var numbers = new List<int> { 1, 2, 3, 4, 5, 6, 7, 8 };
-
-// Method Syntax
-var evenSquares = numbers
-    .Where(n => n % 2 == 0)
-    .Select(n => n * n)
-    .OrderByDescending(n => n)
-    .ToList();
-
-int maxEven = numbers.Where(n => n % 2 == 0).Max();
-bool hasLarge = numbers.Any(n => n > 100); // false
+// Проверка на null через not:
+if (message is not null) {
+    Console.WriteLine(message);
+}
 ```
-""",
-                contentMarkdownEN: """
-### LINQ Method Syntax
+"""##,
+                contentMarkdownEN: ##"""
+### Switch Expressions & Relational Patterns
+
+Modern pattern matching replaces legacy switch statements:
+
 ```csharp
-using System.Linq;
-
-var names = new List<string> { "Alice", "Bob", "Charlie" };
-var result = names.Where(n => n.Length > 3).Select(n => n.ToUpper());
+string GetTier(int points) => points switch {
+    >= 1000 => "Platinum",
+    >= 500 => "Gold",
+    >= 100 => "Silver",
+    _ => "Bronze"
+};
 ```
-""",
-                codeSnippet: """
-using System.Linq;
-var list = new int[] { 10, 45, 32, 88, 5 };
-var topScores = list.Where(x => x > 20).OrderBy(x => x).ToArray();
-Console.WriteLine(string.Join(", ", topScores));
-""",
+"""##,
+                codeSnippet: ##"""
+int score = 85;
+string grade = score switch {
+    >= 90 => "A",
+    >= 80 => "B",
+    >= 70 => "C",
+    _ => "F"
+};
+
+Console.WriteLine($"Score {score} -> Grade {grade}");
+"""##,
+                xpReward: 40
+            ),
+
+            Lesson(
+                id: "cs_property_and_list_patterns",
+                category: .csharpControlFlow,
+                titleRU: "Property Patterns, Positional & List Patterns",
+                titleEN: "Property, Positional & List Patterns",
+                summaryRU: "Глубокая инспекция объектов и коллекций: шаблоны свойств { Prop: pattern }, сопоставление списков и массивов [var head, .., var tail].",
+                summaryEN: "Deep object and collection matching: property patterns, positional patterns, and list patterns.",
+                contentMarkdownRU: ##"""
+### Property Patterns (Шаблоны свойств)
+
+Шаблоны свойств позволяют проверить внутренние поля и свойства объекта внутри сопоставления:
+
+```csharp
+public record Order(int Id, double Total, bool IsPriority, string Country);
+
+double CalculateShipping(Order order) => order switch {
+    { Total: > 10000, IsPriority: true } => 0.0, // Бесплатная экспресс-доставка
+    { Country: "RU", Total: > 3000 } => 250.0,
+    { Country: "RU" } => 500.0,
+    { Country: "US" or "DE" } => 1500.0,
+    _ => 3000.0
+};
+```
+
+### List Patterns (Сопоставление коллекций)
+Начиная с C# 11, поддерживается сопоставление массивов и списков:
+
+```csharp
+int[] numbers = [1, 2, 3, 4, 5];
+
+string description = numbers switch {
+    [] => "Пустая коллекция",
+    [var single] => $"Ровно один элемент: {single}",
+    [var first, var second] => $"Пара: {first} и {second}",
+    [var head, .., var tail] => $"Начало {head}, срез внутри, конец {tail}",
+    _ => "Другой шаблон"
+};
+```
+Срез `..` (slice pattern) сопоставляется с нулем или более промежуточных элементов.
+"""##,
+                contentMarkdownEN: ##"""
+### Property and List Patterns
+
+Property patterns inspect fields directly. List patterns match collection sequences:
+
+```csharp
+int[] data = [10, 20, 30];
+if (data is [var first, .., var last]) {
+    Console.WriteLine($"First: {first}, Last: {last}");
+}
+```
+"""##,
+                codeSnippet: ##"""
+int[] sequence = [100, 200, 300, 400];
+var matchResult = sequence switch {
+    [var first, .., var last] => $"Start: {first}, End: {last}",
+    _ => "Other"
+};
+
+Console.WriteLine(matchResult);
+"""##,
+                xpReward: 40
+            ),
+
+            Lesson(
+                id: "cs_loops_iteration",
+                category: .csharpControlFlow,
+                titleRU: "Циклы: foreach, for, while и duck-typed GetEnumerator",
+                titleEN: "Loops: foreach, for, while & Duck-Typed Enumeration",
+                summaryRU: "Итерационные конструкции в C#: производительность for vs foreach, контракт GetEnumerator без интерфейсов и прерывание break/continue.",
+                summaryEN: "Iteration constructs: for vs foreach performance, duck-typed GetEnumerator, and loop control.",
+                contentMarkdownRU: ##"""
+### Цикл `foreach` и механизм Enumeration
+
+В отличие от многих языков, в C# цикл `foreach` не обязательно требует реализации интерфейса `IEnumerable`. Компилятор использует **duck typing**: если тип имеет публичный метод `GetEnumerator()`, возвращающий объект с методом `MoveNext()` и свойством `Current`, `foreach` скомпилируется успешно!
+
+```csharp
+string[] languages = ["Swift", "Python", "C#", "SQL"];
+
+foreach (var lang in languages) {
+    if (lang == "SQL") continue; // Пропуск шага
+    Console.WriteLine($"Изучаем: {lang}");
+}
+```
+
+### Оптимизация массивов в `for` и `foreach`
+Для одномерных массивов `T[]` и `Span<T>` JIT-компилятор автоматически преобразует `foreach` в эффективный индексированный цикл `for` и выполняет оптимизацию **BCE (Bounds Check Elimination)** — убирая накладные расходы на проверку выхода за границы массива внутри цикла.
+"""##,
+                contentMarkdownEN: ##"""
+### Loops and Enumeration Mechanics
+
+The `foreach` loop relies on pattern-based duck typing (looking for a `GetEnumerator()` method). For arrays, RyuJIT eliminates bounds checks.
+"""##,
+                codeSnippet: ##"""
+int sum = 0;
+int[] numbers = [2, 4, 6, 8, 10];
+
+foreach (var n in numbers) {
+    sum += n;
+}
+
+Console.WriteLine($"Total sum: {sum}");
+"""##,
+                xpReward: 35
+            ),
+
+            Lesson(
+                id: "cs_string_interpolation",
+                category: .csharpStringsAndSpans,
+                titleRU: "Интерполяция строк, Форматирование и StringBuilder",
+                titleEN: "String Interpolation, Format Specifiers & StringBuilder",
+                summaryRU: "Неизменяемость строк System.String, эффективная сборка текста через StringBuilder, интерполяция $ и форматирование чисел и дат.",
+                summaryEN: "String immutability, high-performance text building with StringBuilder, and string interpolation formatting.",
+                contentMarkdownRU: ##"""
+### Строки в C# (`System.String`)
+
+Строки в C# являются **неизменяемыми (immutable)** ссылочными типами в куче. Любая модификация строки создает новый строковый объект в памяти.
+
+### Интерполяция и спецификаторы формата
+Символ `$` активирует строковую интерполяцию с поддержкой точного форматирования:
+
+```csharp
+double price = 1249.954;
+DateTime now = DateTime.UtcNow;
+
+Console.WriteLine($"Цена: {price:F2} руб."); // Округление до 2 знаков: 1249.95
+Console.WriteLine($"Процент: {0.85:P0}");    // 85 %
+Console.WriteLine($"Дата: {now:yyyy-MM-dd HH:mm:ss}");
+```
+
+### `StringBuilder` для сборки текста в циклах
+Когда текст формируется в цикле, оператор `+` приводит к O(N²) аллокациям в куче. Класс `System.Text.StringBuilder` использует внутренний буфер и выделяет память по мере необходимости:
+
+```csharp
+using System.Text;
+
+var sb = new StringBuilder();
+for (int i = 0; i < 100; i++) {
+    sb.Append(i).Append(", ");
+}
+string result = sb.ToString();
+```
+"""##,
+                contentMarkdownEN: ##"""
+### Strings & StringBuilder
+
+`System.String` is immutable. Repeated concatenations allocate heap objects. `StringBuilder` buffers mutations efficiently:
+
+```csharp
+var sb = new StringBuilder();
+sb.Append("Value: ").Append(42);
+Console.WriteLine(sb.ToString());
+```
+"""##,
+                codeSnippet: ##"""
+using System.Text;
+
+var builder = new StringBuilder();
+builder.Append("Report: ");
+builder.Append(100).Append(" items processed.");
+
+Console.WriteLine(builder.ToString());
+"""##,
+                xpReward: 35
+            ),
+
+            Lesson(
+                id: "cs_raw_string_literals",
+                category: .csharpStringsAndSpans,
+                titleRU: "Raw String Literals, escape-последовательности и UTF-8",
+                titleEN: "Raw String Literals & UTF-8 Literals",
+                summaryRU: "Многострочные литералы с тройными кавычками \"\"\", интерполяция вложенного JSON через $$ и литералы u8 в байтовом представлении.",
+                summaryEN: "Raw multi-line string literals with triple quotes, nested JSON interpolation with $$, and u8 byte literals.",
+                contentMarkdownRU: ##"""
+### Raw String Literals (C# 11+)
+
+Для вставки JSON, SQL или регулярных выражений раньше приходилось экранировать кавычки `\"` или использовать `@""`. В современном C# используются **сырые строковые литералы** с тремя и более кавычками `"""`:
+
+```csharp
+string json = """
+{
+    "service": "SwiftLearn",
+    "version": 12,
+    "active": true
+}
+""";
+```
+
+### Интерполяция внутри JSON ($$ синтаксис)
+Если внутри строки есть фигурные скобки (например, JSON-объект), количество знаков доллара $$ указывает, сколько скобок требуется для вычисления переменной:
+
+```csharp
+string user = "Dmitry";
+int age = 28;
+
+// Двойной доллар: {{user}} воспринимается как вычисляемое значение, а одиночные { } остаются текстом JSON!
+string userJson = $$"""
+{
+    "username": "{{user}}",
+    "userAge": {{age}}
+}
+""";
+```
+
+### UTF-8 литералы (`u8`)
+Постфикс `u8` создает `ReadOnlySpan<byte>` напрямую в сегменте данных без перекодирования в UTF-16:
+```csharp
+ReadOnlySpan<byte> utf8Bytes = "HTTP/1.1 200 OK"u8;
+```
+"""##,
+                contentMarkdownEN: ##"""
+### Raw String Literals & $$ Interpolation
+
+Raw string literals eliminate quote escaping. Using $$ specifies how many curly braces denote interpolation:
+
+```csharp
+string id = "101";
+string json = $$"""{ "id": "{{id}}" }""";
+Console.WriteLine(json);
+```
+"""##,
+                codeSnippet: ##"""
+string name = "SwiftLearn";
+string snippet = $$"""
+{
+    "appName": "{{name}}",
+    "status": "ready"
+}
+""";
+
+Console.WriteLine(snippet);
+"""##,
+                xpReward: 40
+            ),
+
+            Lesson(
+                id: "cs_spans_memory_basics",
+                category: .csharpStringsAndSpans,
+                titleRU: "Высокопроизводительная память: ReadOnlySpan<T> и Slice",
+                titleEN: "High-Performance Memory: ReadOnlySpan<T> & Slices",
+                summaryRU: "Стек-ориентированные типы ref struct, безопасные срезы памяти без аллокаций в куче через ReadOnlySpan<char> и метод Slice.",
+                summaryEN: "Stack-only ref struct types, zero-allocation memory slicing via ReadOnlySpan<T> and Slice.",
+                contentMarkdownRU: ##"""
+### Революция производительности: `Span<T>` и `ReadOnlySpan<T>`
+
+`Span<T>` — это специализированная **`ref struct`**, представляющая непрерывный срез произвольной памяти (массив на куче, буфер на стеке или неуправляемая память).
+
+Главное преимущество: **нулевые аллокации (Zero-Allocation)** при парсинге строк и массивов:
+
+```csharp
+string url = "https://swiftlearn.dev/api/v1/lessons";
+
+// Старый способ (Substring аллоцирует новую строку в куче):
+// string host = url.Substring(8, 14);
+
+// Современный способ (срез памяти без аллокаций):
+ReadOnlySpan<char> span = url.AsSpan();
+ReadOnlySpan<char> hostSpan = span.Slice(8, 14);
+
+Console.WriteLine(hostSpan.ToString()); // swiftlearn.dev
+```
+
+### Ограничения `ref struct`
+Поскольку `Span<T>` содержит указатель на стек, CLR запрещает:
+1. Помещать `Span<T>` в поля обычного класса (он не может попасть в кучу).
+2. Использовать `Span<T>` внутри асинхронных методов `async/await` через точки ожидания (так как конечный автомат асинхронности сохраняет состояние в куче).
+"""##,
+                contentMarkdownEN: ##"""
+### ReadOnlySpan<T> & Zero-Allocation Slicing
+
+`Span<T>` enables slicing contiguous memory without heap allocations. As a `ref struct`, it lives only on the execution stack:
+
+```csharp
+string text = "2026-11-18";
+ReadOnlySpan<char> year = text.AsSpan(0, 4);
+Console.WriteLine(year.ToString());
+```
+"""##,
+                codeSnippet: ##"""
+string log = "ERROR: Connection timed out";
+ReadOnlySpan<char> span = log.AsSpan();
+ReadOnlySpan<char> level = span.Slice(0, 5);
+
+Console.WriteLine($"Log level: {level.ToString()}");
+"""##,
                 xpReward: 45
             ),
+
             Lesson(
-                id: "cs_modern_async_records",
-                category: .csharpModern,
-                titleRU: "Records, Pattern Matching и Асинхронность (async/await)",
-                titleEN: "Records, Pattern Matching & Async (Task)",
-                summaryRU: "Современные возможности C# 12: неизменяемые типы record, позиционный синтаксис, асинхронные задачи Task и ключевые слова async/await.",
-                summaryEN: "Modern C# 12: immutable record types, positional syntax, pattern matching, and async/await with Task.",
-                contentMarkdownRU: """
-### Неизменяемые рекорды (`record`)
-Рекорды предоставляют встроенную семантику сравнения по значениям (value equality) и лаконичный синтаксис:
+                id: "cs_classes_encapsulation",
+                category: .csharpOOP,
+                titleRU: "Классы, Модификаторы Доступа и Инкапсуляция",
+                titleEN: "Classes, Access Modifiers & Encapsulation",
+                summaryRU: "Фундамент ООП в C#: состояние и поведение классов, сокрытие реализации, модификаторы public, private, protected, internal и file.",
+                summaryEN: "OOP foundations in C#: state and behavior, data hiding, and public/private/protected/internal/file modifiers.",
+                contentMarkdownRU: ##"""
+### Классы и Модификаторы доступа в C#
+
+Класс — это ссылочный тип, инкапсулирующий данные (поля) и операции над ними (методы).
+
+### 6 уровней доступа в C#
+1. **`public`**: доступен из любой сборки и кода.
+2. **`private`**: доступен только внутри данного класса или структуры.
+3. **`protected`**: доступен внутри класса и его классов-наследников.
+4. **`internal`**: доступен из любого кода **внутри той же сборки (.dll / .exe)**.
+5. **`protected internal`**: доступен в той же сборке ИЛИ из наследников в других сборках.
+6. **`file` (C# 11)**: ограничен областью видимости текущего исходного файла `.cs` (идеально для генераторов исходного кода Source Generators).
 
 ```csharp
-public record UserRecord(string Name, int Age);
+public class BankAccount {
+    private decimal _balance; // Инкапсулированное скрытое поле
 
-var u1 = new UserRecord("Иван", 25);
-var u2 = new UserRecord("Иван", 25);
-Console.WriteLine(u1 == u2); // True! Сравнение по свойствам
-```
+    public void Deposit(decimal amount) {
+        if (amount <= 0) throw new ArgumentOutOfRangeException(nameof(amount));
+        _balance += amount;
+    }
 
-### Асинхронность: `async` и `await`
-Модель асинхронности на основе задач (Task-based Asynchronous Pattern, TAP):
-
-```csharp
-using System.Threading.Tasks;
-using System.Net.Http;
-
-public async Task<string> DownloadWebPageAsync(string url) {
-    using var client = new HttpClient();
-    string content = await client.GetStringAsync(url);
-    return content;
+    public decimal GetBalance() => _balance;
 }
 ```
-""",
-                contentMarkdownEN: """
-### Records
+"""##,
+                contentMarkdownEN: ##"""
+### Classes and Encapsulation
+
+Encapsulation hides internal state behind validated methods:
+
 ```csharp
-public record Point(int X, int Y);
-var p1 = new Point(1, 2);
-var p2 = new Point(1, 2);
-Console.WriteLine(p1 == p2); // True
+public class Counter {
+    private int _count;
+    public void Increment() => _count++;
+    public int Value => _count;
+}
+```
+"""##,
+                codeSnippet: ##"""
+public class Account {
+    private decimal _balance = 1000m;
+    public decimal Balance => _balance;
+    public void Add(decimal amount) => _balance += amount;
+}
+
+var acc = new Account();
+acc.Add(250m);
+Console.WriteLine($"Balance: {acc.Balance}");
+"""##,
+                xpReward: 35
+            ),
+
+            Lesson(
+                id: "cs_properties_init",
+                category: .csharpOOP,
+                titleRU: "Автосвойства, Expression-Bodied члены и init-only",
+                titleEN: "Auto-Properties, Expression-Bodied Members & init",
+                summaryRU: "Свойства как замена геттеров/сеттеров: автосвойства get; set;, неизменяемость при создании get; init;, и синтаксис =>.",
+                summaryEN: "Properties in C#: auto-properties, init-only setters for post-creation immutability, and expression bodies.",
+                contentMarkdownRU: ##"""
+### Свойства в C#
+
+Свойства защищают данные класса, притворяясь полями при обращении (`obj.Prop = 5`), но компилируясь в методы `get_Prop()` и `set_Prop()`.
+
+### Автоматические свойства и `init-only`
+```csharp
+public class UserProfile {
+    // get; set; — чтение и запись
+    public string DisplayName { get; set; } = string.Empty;
+
+    // get; init; (C# 9+) — инициализируется ТОЛЬКО при создании объекта, затем неизменяемо:
+    public string UserId { get; init; } = Guid.NewGuid().ToString();
+
+    // Вычисляемое свойство (Expression-Bodied):
+    public bool IsAdmin => DisplayName == "Administrator";
+}
+
+var user = new UserProfile {
+    DisplayName = "Elena",
+    UserId = "usr_007" // Разрешено только в блоке инициализатора!
+};
+// user.UserId = "new_id"; // Ошибка компиляции: свойство init-only!
+```
+"""##,
+                contentMarkdownEN: ##"""
+### Auto-Properties and `init` Setters
+
+Properties expose clean accessors. `init` setters enforce immutability after construction:
+
+```csharp
+public class Device {
+    public string SerialNumber { get; init; } = "";
+}
+var dev = new Device { SerialNumber = "SN-9901" };
+```
+"""##,
+                codeSnippet: ##"""
+public class Product {
+    public string Title { get; init; } = "";
+    public decimal Price { get; set; }
+}
+
+var p = new Product { Title = "SwiftBook", Price = 49.99m };
+Console.WriteLine($"{p.Title} costs ${p.Price}");
+"""##,
+                xpReward: 35
+            ),
+
+            Lesson(
+                id: "cs_primary_constructors",
+                category: .csharpOOP,
+                titleRU: "Конструкторы и Primary Constructors (C# 12)",
+                titleEN: "Constructors & Primary Constructors (C# 12)",
+                summaryRU: "Инициализация объектов: классические конструкторы, цепочки вызова : this(), и синтаксис первичных конструкторов C# 12 для классов.",
+                summaryEN: "Object initialization: classic constructors, : this() chaining, and C# 12 primary constructors on classes.",
+                contentMarkdownRU: ##"""
+### Первичные конструкторы в C# 12 (Primary Constructors)
+
+В C# 12 синтаксис первичных конструкторов (ранее доступный только для `record`) был расширен на **все классы и структуры**. Параметры объявляются прямо в заголовке класса и доступны во всем теле класса:
+
+```csharp
+// Первичный конструктор C# 12:
+public class OrderService(ILogger logger, IDatabase db, int maxRetries = 3) {
+    public void ProcessOrder(int orderId) {
+        logger.Log($"Обработка заказа #{orderId} (макс. попыток: {maxRetries})");
+        db.Save(orderId);
+    }
+}
 ```
 
-### Async / Await
+Параметры первичного конструктора не создают автоматически публичные свойства в обычных классах (в отличие от `record`), а служат захваченными значениями конструктора, избавляя от бойлерплейта по объявлению приватных полей `private readonly ILogger _logger`.
+"""##,
+                contentMarkdownEN: ##"""
+### Primary Constructors in C# 12
+
+Declare constructor arguments directly in the class header:
+
 ```csharp
-public async Task<int> FetchDataAsync() {
-    await Task.Delay(100);
+public class Greeter(string greetingPrefix) {
+    public void Greet(string name) => Console.WriteLine($"{greetingPrefix}, {name}!");
+}
+```
+"""##,
+                codeSnippet: ##"""
+public class Calculator(int baseValue) {
+    public int Add(int x) => baseValue + x;
+}
+
+var calc = new Calculator(100);
+Console.WriteLine($"100 + 45 = {calc.Add(45)}");
+"""##,
+                xpReward: 40
+            ),
+
+            Lesson(
+                id: "cs_inheritance_polymorphism",
+                category: .csharpInheritance,
+                titleRU: "Наследование: virtual, override и base",
+                titleEN: "Inheritance: virtual, override & base",
+                summaryRU: "Одиночное наследование классов в C#, таблица виртуальных методов vtable, переопределение override и вызов базовой логики base.",
+                summaryEN: "Single inheritance in C#, virtual method dispatch, override, and calling base class implementations.",
+                contentMarkdownRU: ##"""
+### Наследование и динамический полиморфизм
+
+C# поддерживает одиночное наследование классов (`class Derived : Base`).
+
+Методы в C# по умолчанию являются **невиртуальными** (non-virtual). Для включения динамической диспетчеризации метод в базовом классе должен быть явно помечен как `virtual`, а в наследнике — как `override`:
+
+```csharp
+public class Notification {
+    public virtual void Send(string message) {
+        Console.WriteLine($"[Базовое уведомление]: {message}");
+    }
+}
+
+public class EmailNotification : Notification {
+    public override void Send(string message) {
+        base.Send(message); // Вызов реализации базового класса
+        Console.WriteLine($"Отправлен почтовый пакет SMTP: {message}");
+    }
+}
+
+Notification notif = new EmailNotification();
+notif.Send("Ваш код: 7421"); // Вызовет переопределенный метод EmailNotification!
+```
+"""##,
+                contentMarkdownEN: ##"""
+### Virtual Methods and Override
+
+Methods are non-virtual by default. Use `virtual` in the base class and `override` in derived classes:
+
+```csharp
+public class Animal {
+    public virtual string Speak() => "Sound";
+}
+public class Dog : Animal {
+    public override string Speak() => "Woof";
+}
+```
+"""##,
+                codeSnippet: ##"""
+public class Shape {
+    public virtual double Area() => 0.0;
+}
+public class Square(double side) : Shape {
+    public override double Area() => side * side;
+}
+
+Shape s = new Square(5.0);
+Console.WriteLine($"Square area: {s.Area()}");
+"""##,
+                xpReward: 40
+            ),
+
+            Lesson(
+                id: "cs_abstract_sealed",
+                category: .csharpInheritance,
+                titleRU: "Абстрактные классы (abstract) и Запечатанные типы (sealed)",
+                titleEN: "Abstract Classes & Sealed Modifiers",
+                summaryRU: "Каркасы логики через abstract class, обязательные к реализации члены, и запрет наследования sealed для безопасности и JIT-девиртуализации.",
+                summaryEN: "Template design with abstract classes and preventing derivation using sealed for security and JIT devirtualization.",
+                contentMarkdownRU: ##"""
+### Абстрактные классы (`abstract`)
+
+Абстрактный класс не может быть инстанциирован напрямую (`new AbstractClass()` запрещен). Он служит шаблоном для производных классов:
+
+```csharp
+public abstract class PaymentProcessor {
+    public abstract string Name { get; }
+    public abstract bool ProcessPayment(decimal amount);
+
+    public void PrintReceipt(decimal amount) {
+        Console.WriteLine($"Чек от {Name}: {amount:C2}");
+    }
+}
+```
+
+### Запечатанные классы (`sealed`)
+Ключевое слово `sealed` **запрещает наследование** от данного класса.
+Преимущества:
+1. Защита архитектуры от некорректного переопределения.
+2. **JIT-оптимизация (Devirtualization)**: зная, что у `sealed`-класса не может быть потомков, RyuJIT компилирует виртуальные вызовы в прямые вызовы функций, устраняя накладные расходы vtable.
+"""##,
+                contentMarkdownEN: ##"""
+### Abstract and Sealed Modifiers
+
+- `abstract`: defines an incomplete class template that cannot be instantiated.
+- `sealed`: prevents other classes from inheriting, enabling JIT devirtualization.
+"""##,
+                codeSnippet: ##"""
+public abstract class Animal {
+    public abstract string Sound();
+}
+public sealed class Cat : Animal {
+    public override string Sound() => "Meow";
+}
+
+Animal pet = new Cat();
+Console.WriteLine(pet.Sound());
+"""##,
+                xpReward: 40
+            ),
+
+            Lesson(
+                id: "cs_casting_is_as",
+                category: .csharpInheritance,
+                titleRU: "Приведение типов: операторы is, as и сопоставление типов",
+                titleEN: "Type Casting: is, as & Type Pattern Matching",
+                summaryRU: "Безопасное приведение ссылок: оператор is с объявлением переменной, безопасное приведение к null через as и исключение InvalidCastException.",
+                summaryEN: "Safe reference conversion: is pattern with declaration, non-throwing as operator, and cast safety.",
+                contentMarkdownRU: ##"""
+### Операторы `is` и `as`
+
+В иерархиях полиморфизма часто требуется проверить, принадлежит ли объект конкретному производному типу.
+
+```csharp
+object data = "SwiftLearn Developer";
+
+// 1. Оператор `as`: пытается привести тип, при неудаче возвращает null (не выбрасывает исключение):
+string? strVal = data as string;
+if (strVal != null) {
+    Console.WriteLine(strVal.Length);
+}
+
+// 2. Современный оператор `is` с объявлением переменной (Type Pattern):
+if (data is string text && text.Length > 0) {
+    Console.WriteLine($"Строка длиной {text.Length}: {text}");
+}
+```
+Оператор `is` предпочтительнее `as`, так как он работает и со значимыми типами (`if (val is int num)`), где `as` запрещен.
+"""##,
+                contentMarkdownEN: ##"""
+### Type Testing with `is` and `as`
+
+The modern `is` pattern checks type and declares a variable simultaneously:
+
+```csharp
+object obj = 42;
+if (obj is int val) {
+    Console.WriteLine($"Number: {val}");
+}
+```
+"""##,
+                codeSnippet: ##"""
+object input = 125.5;
+
+if (input is double number) {
+    Console.WriteLine($"Double detected: {number:F1}");
+} else {
+    Console.WriteLine("Other type");
+}
+"""##,
+                xpReward: 35
+            ),
+
+            Lesson(
+                id: "cs_interfaces_contracts",
+                category: .csharpInterfaces,
+                titleRU: "Интерфейсы: контракты и слабая связанность",
+                titleEN: "Interfaces: Contracts & Loose Coupling",
+                summaryRU: "Интерфейсы в C#: определение контрактов поведения, множественная реализация и инверсия зависимостей (Dependency Inversion).",
+                summaryEN: "Interfaces in C#: behavior contracts, multiple implementation, and the Dependency Inversion Principle.",
+                contentMarkdownRU: ##"""
+### Интерфейсы как архитектурный контракт
+
+Интерфейс задает набор методов, свойств и событий, которые класс обязан реализовать. По конвенции C# имена интерфейсов начинаются с префикса `I` (`IDisposable`, `IEnumerable`):
+
+```csharp
+public interface IMessageSender {
+    void SendMessage(string destination, string body);
+}
+
+public interface IHealthCheck {
+    bool IsHealthy();
+}
+
+// Класс может реализовывать несколько интерфейсов:
+public class EmailService : IMessageSender, IHealthCheck {
+    public void SendMessage(string destination, string body) {
+        Console.WriteLine($"Email -> {destination}: {body}");
+    }
+
+    public bool IsHealthy() => true;
+}
+```
+Интерфейсы обеспечивают **слабую связанность (loose coupling)** компонентов системы и возможность подмены реализации в unit-тестах с помощью mock-объектов.
+"""##,
+                contentMarkdownEN: ##"""
+### Interfaces & Multiple Implementation
+
+Classes can implement multiple interfaces:
+
+```csharp
+public interface IPrinter {
+    void Print(string text);
+}
+public class ConsolePrinter : IPrinter {
+    public void Print(string text) => Console.WriteLine(text);
+}
+```
+"""##,
+                codeSnippet: ##"""
+public interface IValidator {
+    bool Validate(string input);
+}
+public class NonEmptyValidator : IValidator {
+    public bool Validate(string input) => !string.IsNullOrWhiteSpace(input);
+}
+
+IValidator v = new NonEmptyValidator();
+Console.WriteLine($"Valid: {v.Validate("SwiftLearn")}");
+"""##,
+                xpReward: 40
+            ),
+
+            Lesson(
+                id: "cs_explicit_interface",
+                category: .csharpInterfaces,
+                titleRU: "Явная реализация интерфейсов (Explicit Implementation)",
+                titleEN: "Explicit Interface Implementation",
+                summaryRU: "Разрешение конфликтов одинаковых сигнатур в интерфейсах, сокрытие специфических методов из публичного API класса.",
+                summaryEN: "Resolving method signature collisions and hiding implementation details via explicit interface implementation.",
+                contentMarkdownRU: ##"""
+### Явная реализация интерфейса
+
+Если класс реализует два интерфейса с идентичной сигнатурой метода, либо метод интерфейса не должен быть виден напрямую через класс, используется **явная реализация**:
+
+```csharp
+public interface IEnglishDimensions {
+    double Length();
+}
+
+public interface IMetricDimensions {
+    double Length();
+}
+
+public class Box : IEnglishDimensions, IMetricDimensions {
+    // Явная реализация: имя интерфейса указывается перед методом:
+    double IEnglishDimensions.Length() => 30.0; // В дюймах
+    double IMetricDimensions.Length() => 76.2;  // В сантиметрах
+}
+
+Box box = new Box();
+// box.Length(); // Ошибка компиляции! Метод скрыт из публичного API Box
+
+// Вызов возможен только через приведение к соответствующему интерфейсу:
+IEnglishDimensions english = box;
+Console.WriteLine($"Inches: {english.Length()}");
+
+IMetricDimensions metric = box;
+Console.WriteLine($"Centimeters: {metric.Length()}");
+```
+"""##,
+                contentMarkdownEN: ##"""
+### Explicit Interface Implementation
+
+Prefix method names with interface identifiers to resolve collisions and hide members from the direct class API:
+
+```csharp
+public interface IWorker { void DoWork(); }
+public class Manager : IWorker {
+    void IWorker.DoWork() => Console.WriteLine("Working...");
+}
+```
+"""##,
+                codeSnippet: ##"""
+public interface IActionA { string Action(); }
+public interface IActionB { string Action(); }
+
+public class MultiService : IActionA, IActionB {
+    string IActionA.Action() => "Action A";
+    string IActionB.Action() => "Action B";
+}
+
+var s = new MultiService();
+Console.WriteLine(((IActionA)s).Action());
+"""##,
+                xpReward: 40
+            ),
+
+            Lesson(
+                id: "cs_default_interface_methods",
+                category: .csharpInterfaces,
+                titleRU: "Методы по умолчанию в интерфейсах (DIM)",
+                titleEN: "Default Interface Methods (DIM)",
+                summaryRU: "Эволюция API библиотек: добавление методов с телом по умолчанию в интерфейсы C# 8 без нарушения существующих реализаций.",
+                summaryEN: "API evolution: defining default implementations in interfaces without breaking existing consumers.",
+                contentMarkdownRU: ##"""
+### Default Interface Methods (C# 8+)
+
+Раньше добавление нового метода в интерфейс ломало все существующие классы, реализующие этот интерфейс. С появлением **DIM (Default Interface Methods)** в интерфейс можно поместить реализацию по умолчанию:
+
+```csharp
+public interface ILogger {
+    void Log(string message);
+
+    // Метод по умолчанию:
+    void LogWarning(string message) {
+        Log($"[ПРЕДУПРЕЖДЕНИЕ]: {message}");
+    }
+}
+
+public class SimpleConsoleLogger : ILogger {
+    // Реализуем только обязательный метод:
+    public void Log(string message) => Console.WriteLine(message);
+}
+
+ILogger logger = new SimpleConsoleLogger();
+logger.LogWarning("Память заполнена на 80%"); // Вызов метода по умолчанию
+```
+"""##,
+                contentMarkdownEN: ##"""
+### Default Interface Methods
+
+Interfaces can provide fallback implementations for new methods:
+
+```csharp
+public interface IGreeter {
+    void Greet(string name);
+    void GreetWorld() => Greet("World");
+}
+```
+"""##,
+                codeSnippet: ##"""
+public interface ILogger {
+    void Log(string text);
+    void LogInfo(string text) => Log($"[INFO] {text}");
+}
+public class OutputLogger : ILogger {
+    public void Log(string text) => Console.WriteLine(text);
+}
+
+ILogger l = new OutputLogger();
+l.LogInfo("System initialized");
+"""##,
+                xpReward: 40
+            ),
+
+            Lesson(
+                id: "cs_record_classes",
+                category: .csharpRecordsAndEnums,
+                titleRU: "Неизменяемые типы: record class и неразрушающая мутация with",
+                titleEN: "Immutable Records & with Expressions",
+                summaryRU: "Семантика записей record class: сравнение по значению полей, компиляторная генерация ToString и Equals, и клонирование через with.",
+                summaryEN: "Record classes: value-based equality, auto-generated equality and formatting, and non-destructive with mutation.",
+                contentMarkdownRU: ##"""
+### Записи (`record class`) в C#
+
+`record` — это ссылочный тип, спроектированный для неизменяемых моделей данных (DTO, события, сообщения).
+
+Ключевые отличия от обычного `class`:
+1. **Сравнение по значениям (Value Equality)**: два разных объекта `record` с одинаковыми полями считаются равными (`r1 == r2` вернет `true`).
+2. **Первичный конструктор и свойства `init`**: `public record User(int Id, string Name);` автоматически создает свойства и конструктор.
+3. **Неразрушающая мутация с `with`**: клонирование объекта с изменением отдельных свойств.
+
+```csharp
+public record GeoPoint(double Latitude, double Longitude);
+
+var p1 = new GeoPoint(55.75, 37.61);
+var p2 = new GeoPoint(55.75, 37.61);
+
+Console.WriteLine(p1 == p2); // true! Сравнение по полям!
+
+// Клонирование с изменением долготы:
+var p3 = p1 with { Longitude = 37.65 };
+Console.WriteLine(p3); // GeoPoint { Latitude = 55.75, Longitude = 37.65 }
+```
+"""##,
+                contentMarkdownEN: ##"""
+### Records and Non-Destructive Mutation
+
+Records provide value equality out-of-the-box and the `with` operator for cloning with changes:
+
+```csharp
+public record User(string Name, int Age);
+var u1 = new User("Alex", 30);
+var u2 = u1 with { Age = 31 };
+```
+"""##,
+                codeSnippet: ##"""
+public record Player(string Nickname, int Score);
+
+var p1 = new Player("Nova", 1500);
+var p2 = p1 with { Score = 1600 };
+
+Console.WriteLine($"Old: {p1.Score}, New: {p2.Score}");
+"""##,
+                xpReward: 40
+            ),
+
+            Lesson(
+                id: "cs_record_structs",
+                category: .csharpRecordsAndEnums,
+                titleRU: "record struct: Значимые типы с семантикой записей",
+                titleEN: "record struct: Value-Type Records",
+                summaryRU: "Значимые записи C# 10: размещение на стеке, исключение давления на GC, readonly record struct и сравнение с record class.",
+                summaryEN: "C# 10 record structs: stack-based value records, zero-GC pressure, readonly record struct, and class comparisons.",
+                contentMarkdownRU: ##"""
+### Значимые записи (`record struct`)
+
+В C# 10 появилась возможность создавать записи как структуры:
+
+```csharp
+// Мутабельная структура-запись (по умолчанию):
+public record struct Color(byte R, byte G, byte B);
+
+// Неизменяемая структура-запись (рекомендуемый паттерн):
+public readonly record struct Vector3D(float X, float Y, float Z);
+```
+
+### Когда использовать `record struct` вместо `record class`?
+- Когда объектов создаются миллионы в секунду (геометрия, физика, торговые котировки), и аллокации в куче перегружают сборщик мусора GC.
+- `readonly record struct` передается и копируется на стеке, реализуя при этом все удобства `record` (сравнение, `with`, форматирование).
+"""##,
+                contentMarkdownEN: ##"""
+### record struct Performance
+
+`readonly record struct` combines value type stack storage with record ergonomics, eliminating garbage collector allocations for micro-benchmarks.
+"""##,
+                codeSnippet: ##"""
+public readonly record struct Size2D(int Width, int Height);
+
+var s1 = new Size2D(1920, 1080);
+var s2 = s1 with { Height = 1200 };
+
+Console.WriteLine($"{s2.Width}x{s2.Height}");
+"""##,
+                xpReward: 40
+            ),
+
+            Lesson(
+                id: "cs_enums_flags",
+                category: .csharpRecordsAndEnums,
+                titleRU: "Перечисления (enum), базовые типы и битовые маски [Flags]",
+                titleEN: "Enums, Underlying Types & [Flags] Bitmasks",
+                summaryRU: "Типобезопасные перечисления enum, выбор лежащего в основе числового типа byte/int, атрибут [Flags] и побитовые операции.",
+                summaryEN: "Type-safe enums, byte/int underlying types, [Flags] attribute, and bitwise mask operations.",
+                contentMarkdownRU: ##"""
+### Перечисления (`enum`) и битовые флаги
+
+Перечисление связывает имена с целочисленными константами. По умолчанию базовым типом является `int`:
+
+```csharp
+public enum HttpStatus : ushort {
+    Ok = 200,
+    NotFound = 404,
+    InternalError = 500
+}
+```
+
+### Атрибут `[Flags]` для комбинирования прав доступа
+С помощью атрибута `[Flags]` перечисление превращается в битовую маску со степенями двойки:
+
+```csharp
+[Flags]
+public enum Permissions : byte {
+    None = 0,
+    Read = 1 << 0,    // 1 (0001)
+    Write = 1 << 1,   // 2 (0010)
+    Execute = 1 << 2, // 4 (0100)
+    Admin = Read | Write | Execute // 7 (0111)
+}
+
+Permissions myRights = Permissions.Read | Permissions.Write;
+
+// Проверка наличия флага:
+bool canWrite = myRights.HasFlag(Permissions.Write); // true
+bool canExecute = (myRights & Permissions.Execute) != 0; // false
+```
+"""##,
+                contentMarkdownEN: ##"""
+### Enums and [Flags] Bitmasks
+
+Bitwise enums allow multiple flags combined with bitwise OR `|`:
+
+```csharp
+[Flags]
+public enum FileAccess { Read = 1, Write = 2 }
+var access = FileAccess.Read | FileAccess.Write;
+```
+"""##,
+                codeSnippet: ##"""
+[Flags]
+public enum AccessLevel { Read = 1, Write = 2, Execute = 4 }
+
+var userAccess = AccessLevel.Read | AccessLevel.Write;
+Console.WriteLine($"Has write: {userAccess.HasFlag(AccessLevel.Write)}");
+"""##,
+                xpReward: 35
+            ),
+
+            Lesson(
+                id: "cs_generics_classes_methods",
+                category: .csharpGenerics,
+                titleRU: "Обобщения (Generics): Классы и Методы",
+                titleEN: "Generics: Generic Classes & Methods",
+                summaryRU: "Обобщенное программирование в C#: устранение упаковки Boxing, типобезопасность на этапе компиляции, обобщенные классы и методы.",
+                summaryEN: "Generic programming in C#: eliminating boxing overhead, compile-time type safety, generic classes and methods.",
+                contentMarkdownRU: ##"""
+### Зачем нужны Дженерики в .NET?
+
+До появления дженериков в .NET 2.0 коллекции хранили элементы как `object`. Это приводило к двум тяжелым проблемам:
+1. Постоянная упаковка/распаковка (boxing/unboxing) значимых типов (`int`, `struct`), снижавшая скорость в разы.
+2. Отсутствие проверки типов компилятором (в список можно было случайно положить и `int`, и `string`).
+
+Дженерики создают специализированный код под конкретный тип `T`:
+
+```csharp
+public class Result<T> {
+    public bool Success { get; }
+    public T Value { get; }
+    public string? ErrorMessage { get; }
+
+    public Result(T value) {
+        Success = true;
+        Value = value;
+    }
+
+    public Result(string error) {
+        Success = false;
+        Value = default!;
+        ErrorMessage = error;
+    }
+}
+
+// Обобщенный метод обмена значениями:
+public static void Swap<T>(ref T a, ref T b) {
+    T temp = a;
+    a = b;
+    b = temp;
+}
+```
+"""##,
+                contentMarkdownEN: ##"""
+### Generics Foundations
+
+Generics ensure compile-time type safety and zero-boxing performance:
+
+```csharp
+public class Container<T>(T item) {
+    public T Item { get; } = item;
+}
+```
+"""##,
+                codeSnippet: ##"""
+public class Box<T>(T content) {
+    public T Content => content;
+}
+
+var stringBox = new Box<string>("Secret Message");
+Console.WriteLine($"Box holds: {stringBox.Content}");
+"""##,
+                xpReward: 40
+            ),
+
+            Lesson(
+                id: "cs_generic_constraints",
+                category: .csharpGenerics,
+                titleRU: "Ограничения дженериков: where T : class, struct, new()",
+                titleEN: "Generic Constraints: where T : class, struct, new()",
+                summaryRU: "Сужение допустимых типов параметра T: ограничения ссылочных и значимых типов, интерфейсные контракты, конструктор по умолчанию new().",
+                summaryEN: "Constraining type parameter T: class/struct limits, interface contracts, and new() parameterless constructors.",
+                contentMarkdownRU: ##"""
+### Ограничения параметров типа (`where T : ...`)
+
+Если тип `T` ничем не ограничен, с ним можно работать только как с `System.Object`. Ограничения указывают компилятору свойства типа `T`:
+
+| Ограничение | Смысл |
+| :--- | :--- |
+| `where T : class` | `T` обязан быть ссылочным типом |
+| `where T : struct` | `T` обязан быть значимым типом (не nullable) |
+| `where T : notnull` | `T` не может быть `null` |
+| `where T : new()` | `T` обязан иметь публичный конструктор без параметров |
+| `where T : IEntity` | `T` обязан реализовывать интерфейс `IEntity` |
+| `where T : BaseClass` | `T` обязан наследоваться от `BaseClass` |
+
+```csharp
+public class EntityRepository<T> where T : class, IIdentifiable, new() {
+    public T CreateAndRegister(int id) {
+        T instance = new T(); // Разрешено благодаря new()!
+        instance.Id = id;     // Разрешено благодаря IIdentifiable!
+        return instance;
+    }
+}
+```
+"""##,
+                contentMarkdownEN: ##"""
+### Constraints on Type Parameters
+
+The `where` clause restricts which types can substitute `T`:
+
+```csharp
+public T Factory<T>() where T : new() => new T();
+```
+"""##,
+                codeSnippet: ##"""
+public static bool AreEqual<T>(T a, T b) where T : IEquatable<T> {
+    return a.Equals(b);
+}
+
+Console.WriteLine($"Match: {AreEqual(100, 100)}");
+"""##,
+                xpReward: 40
+            ),
+
+            Lesson(
+                id: "cs_covariance_contravariance",
+                category: .csharpGenerics,
+                titleRU: "Ковариантность (out) и Контравариантность (in)",
+                titleEN: "Covariance (out) & Contravariance (in)",
+                summaryRU: "Вариантность обобщенных интерфейсов и делегатов: сохранение направления приведения типов через out и обратное направление через in.",
+                summaryEN: "Variance in generic interfaces and delegates: preserving derivation directions via out and in keywords.",
+                contentMarkdownRU: ##"""
+### Вариантность дженериков в C#
+
+Если класс `Dog` наследуется от `Animal`, можно ли присвоить `IEnumerable<Dog>` переменной `IEnumerable<Animal>`?
+
+- **Ковариантность (`out T`)**: тип `T` выступает **только как результат (выходной параметр)**. Направление наследования сохраняется (`IEnumerable<Dog>` приводится к `IEnumerable<Animal>`):
+```csharp
+public interface IReadOnlyRepository<out T> {
+    T GetById(int id); // T только возвращается!
+}
+```
+
+- **Контравариантность (`in T`)**: тип `T` выступает **только как аргумент (входной параметр)**. Направление наследования инвертируется (`IComparer<Animal>` может использоваться там, где требуется `IComparer<Dog>`):
+```csharp
+public interface IConsumer<in T> {
+    void Consume(T item); // T только принимается!
+}
+```
+"""##,
+                contentMarkdownEN: ##"""
+### Covariance (`out`) and Contravariance (`in`)
+
+- `out`: Covariant, outputs only (`IEnumerable<out T>`).
+- `in`: Contravariant, inputs only (`IComparer<in T>`).
+"""##,
+                codeSnippet: ##"""
+IEnumerable<string> words = ["alpha", "beta"];
+IEnumerable<object> objects = words; // Covariance in action!
+
+Console.WriteLine($"Count: {objects.Count()}");
+"""##,
+                xpReward: 45
+            ),
+
+            Lesson(
+                id: "cs_collections_list",
+                category: .csharpCollections,
+                titleRU: "Динамический массив List<T>: Capacity, Count и Memory",
+                titleEN: "List<T> Internals: Capacity, Count & Allocations",
+                summaryRU: "Внутреннее устройство List<T> поверх плоского массива T[], стратегия удвоения Capacity, методы Add, RemoveAll, Find и оптимизация TrimExcess.",
+                summaryEN: "Internal architecture of List<T> over T[], capacity doubling strategy, mutations, and TrimExcess.",
+                contentMarkdownRU: ##"""
+### Внутреннее устройство `List<T>`
+
+`List<T>` — самая популярная коллекция в C#. Внутри неё расположен обычный массив `T[] _items` и целочисленный счетчик `int _size`.
+
+### Механика изменения размера
+1. При создании `new List<int>()` внутренний массив пуст.
+2. При добавлении первого элемента выделяется массив на 4 элемента.
+3. Когда `Count` достигает `Capacity`, создается **новый массив удвоенного размера** (`Capacity * 2`), и все элементы копируются туда через `Array.Copy()`.
+4. Старый массив отправляется на утилизацию в сборщик мусора GC.
+
+```csharp
+// Совет по оптимизации: всегда задавайте начальный Capacity, если примерный размер известен заранее:
+var list = new List<string>(capacity: 1000); // 0 переаллокаций при заполнении 1000 элементами!
+
+list.Add("Apple");
+list.AddRange(["Banana", "Cherry"]);
+list.RemoveAll(x => x.StartsWith("B"));
+```
+"""##,
+                contentMarkdownEN: ##"""
+### List<T> Memory Layout
+
+`List<T>` doubles its internal array when full. Pre-allocating `capacity` prevents unnecessary GC allocations.
+"""##,
+                codeSnippet: ##"""
+var cities = new List<string>(4) { "Tokyo", "London", "Paris" };
+cities.Add("Berlin");
+
+Console.WriteLine($"Count: {cities.Count}, Capacity: {cities.Capacity}");
+"""##,
+                xpReward: 35
+            ),
+
+            Lesson(
+                id: "cs_collections_dictionary",
+                category: .csharpCollections,
+                titleRU: "Словари Dictionary<TKey, TValue> и Хеширование",
+                titleEN: "Dictionary<TKey, TValue> & Hash Table Internals",
+                summaryRU: "Устройство хеш-таблицы в .NET: корзины (buckets), цепочки коллизий, поиск O(1) и правила реализации GetHashCode() и Equals().",
+                summaryEN: "Hash table architecture in .NET: buckets, collision chains, O(1) lookups, and overriding GetHashCode/Equals.",
+                contentMarkdownRU: ##"""
+### Устройство `Dictionary<TKey, TValue>`
+
+`Dictionary` в .NET реализован по алгоритму открытого хеширования с разделением на корзины (`buckets`) и массив записей (`Entry[] entries`).
+
+### Как работает поиск O(1)?
+1. У ключа вычисляется `key.GetHashCode()`.
+2. По хешу определяется индекс корзины: `bucketIndex = (hashCode & 0x7FFFFFFF) % buckets.Length`.
+3. В корзине хранится индекс первой записи в массиве `entries`.
+4. Если происходят коллизии (разные ключи попадают в одну корзину), они образуют односвязный список, по которому переходят, сравнивая ключи методом `Equals()`.
+
+```csharp
+var users = new Dictionary<string, int> {
+    ["Dmitry"] = 28,
+    ["Elena"] = 25
+};
+
+// Безопасное получение через TryGetValue (без выброса KeyNotFoundException):
+if (users.TryGetValue("Dmitry", out int age)) {
+    Console.WriteLine($"Возраст: {age}");
+}
+```
+"""##,
+                contentMarkdownEN: ##"""
+### Dictionary<TKey, TValue> Internals
+
+Uses a bucket array and entries table. Always use `TryGetValue` to safely read values without throwing `KeyNotFoundException`.
+"""##,
+                codeSnippet: ##"""
+var cache = new Dictionary<string, string> {
+    ["theme"] = "dark",
+    ["font"] = "JetBrains Mono"
+};
+
+if (cache.TryGetValue("theme", out var theme)) {
+    Console.WriteLine($"Active theme: {theme}");
+}
+"""##,
+                xpReward: 40
+            ),
+
+            Lesson(
+                id: "cs_collections_hashset_queue_stack",
+                category: .csharpCollections,
+                titleRU: "HashSet<T>, Queue<T> (FIFO) и Stack<T> (LIFO)",
+                titleEN: "HashSet<T>, Queue<T> & Stack<T>",
+                summaryRU: "Множества уникальных элементов HashSet<T>, математические операции пересечения и объединения, очереди Queue (FIFO) и стеки Stack (LIFO).",
+                summaryEN: "Unique element sets with HashSet<T>, set operations (Union, Intersect), queues (FIFO), and stacks (LIFO).",
+                contentMarkdownRU: ##"""
+### Специализированные коллекции .NET
+
+1. **`HashSet<T>`**: набор уникальных элементов с мгновенной проверкой наличия `Contains(item)` за O(1).
+   - `UnionWith(other)`: объединение множеств.
+   - `IntersectWith(other)`: пересечение множеств.
+   - `ExceptWith(other)`: разность множеств.
+
+2. **`Queue<T>` (FIFO — First In, First Out)**:
+   - `Enqueue(item)`: добавить в конец очереди.
+   - `Dequeue()`: извлечь первый добавленный элемент.
+   - `Peek()`: просмотреть без удаления.
+
+3. **`Stack<T>` (LIFO — Last In, First Out)**:
+   - `Push(item)`: положить на вершину стека.
+   - `Pop()`: снять с вершины стека.
+```csharp
+var tags = new HashSet<string> { "swift", "csharp", "dotnet" };
+tags.Add("swift"); // Не добавится, так как уже существует!
+```
+"""##,
+                contentMarkdownEN: ##"""
+### HashSet, Queue and Stack
+
+- `HashSet<T>`: unique sets, O(1) membership.
+- `Queue<T>`: FIFO queuing (`Enqueue`/`Dequeue`).
+- `Stack<T>`: LIFO ordering (`Push`/`Pop`).
+"""##,
+                codeSnippet: ##"""
+var queue = new Queue<string>();
+queue.Enqueue("Job 1");
+queue.Enqueue("Job 2");
+
+Console.WriteLine($"Processed: {queue.Dequeue()}");
+Console.WriteLine($"Next in line: {queue.Peek()}");
+"""##,
+                xpReward: 35
+            ),
+
+            Lesson(
+                id: "cs_delegates_basics",
+                category: .csharpDelegatesEvents,
+                titleRU: "Делегаты: сигнатуры методов первого класса",
+                titleEN: "Delegates: Type-Safe Function Pointers",
+                summaryRU: "Делегаты в C#: строго типизированные указатели на методы, цепочки вызовов MulticastDelegate с операторами += и -=.",
+                summaryEN: "C# delegates: type-safe function pointers, multicast invocation chains with += and -=.",
+                contentMarkdownRU: ##"""
+### Что такое делегат в C#?
+
+Делегат — это ссылочный тип, инкапсулирующий указатель на метод (или цепочку методов) с конкретной сигнатурой возвращаемого типа и параметров:
+
+```csharp
+// Объявление делегата:
+public delegate int BinaryOperation(int a, int b);
+
+public static int Add(int x, int y) => x + y;
+public static int Multiply(int x, int y) => x * y;
+
+BinaryOperation op = Add;
+Console.WriteLine(op(10, 5)); // 15
+
+op = Multiply;
+Console.WriteLine(op(10, 5)); // 50
+```
+
+### Многоадресные делегаты (Multicast)
+Делегаты поддерживают операторы `+=` и `-=`. При вызове делегата последовательно исполняются все зарегистрированные в нем методы:
+
+```csharp
+public delegate void Notifier(string text);
+
+Notifier n = msg => Console.WriteLine($"Console: {msg}");
+n += msg => Console.WriteLine($"File: {msg}");
+
+n("Запуск системы"); // Вызовет оба обработчика!
+```
+"""##,
+                contentMarkdownEN: ##"""
+### Delegates & Multicast Chains
+
+Delegates wrap methods as first-class objects. Multiple methods can subscribe with `+=`:
+
+```csharp
+delegate void Log(string msg);
+Log logger = m => Console.WriteLine(m);
+logger("Event recorded");
+```
+"""##,
+                codeSnippet: ##"""
+delegate int Transformer(int n);
+
+Transformer doubleIt = x => x * 2;
+Console.WriteLine($"Double 21 = {doubleIt(21)}");
+"""##,
+                xpReward: 35
+            ),
+
+            Lesson(
+                id: "cs_func_action_predicates",
+                category: .csharpDelegatesEvents,
+                titleRU: "Стандартные делегаты Func<T>, Action<T> и Predicate<T>",
+                titleEN: "Generic Delegates: Func, Action & Predicate",
+                summaryRU: "Встроенные универсальные делегаты платформы .NET: Func для возвращающих значений, Action для void-методов и лямбда-синтаксис.",
+                summaryEN: "Built-in generic delegates in .NET: Func for value returns, Action for void functions, and lambda syntax.",
+                contentMarkdownRU: ##"""
+### Стандартные делегаты .NET
+
+Вместо объявления собственных `delegate void ...` в современном C# всегда используют стандартные универсальные типы из пространства имен `System`:
+
+1. **`Action<...>`**: метод, возвращающий `void` (от 0 до 16 параметров):
+```csharp
+Action<string> print = msg => Console.WriteLine(msg);
+print("Hello .NET!");
+```
+
+2. **`Func<..., TResult>`**: метод, **возвращающий значение**. Последний параметр в списке дженериков всегда указывает тип результата:
+```csharp
+Func<int, int, int> multiply = (a, b) => a * b;
+int result = multiply(6, 7); // 42
+```
+
+3. **`Predicate<T>`**: аналог `Func<T, bool>`, проверяющий условие:
+```csharp
+Predicate<int> isEven = n => n % 2 == 0;
+```
+"""##,
+                contentMarkdownEN: ##"""
+### Func and Action Generic Delegates
+
+- `Action<T>`: returns `void`.
+- `Func<T, TResult>`: returns `TResult`.
+- `Predicate<T>`: returns `bool`.
+"""##,
+                codeSnippet: ##"""
+Func<int, int, int> add = (x, y) => x + y;
+Action<string> log = s => Console.WriteLine($"[LOG]: {s}");
+
+log($"Sum: {add(15, 25)}");
+"""##,
+                xpReward: 35
+            ),
+
+            Lesson(
+                id: "cs_closures_captures",
+                category: .csharpDelegatesEvents,
+                titleRU: "Замыкания (Closures) и Захват Переменных",
+                titleEN: "Closures & Variable Capture Pitfalls",
+                summaryRU: "Как компилятор реализует замыкания через display class, время жизни захваченных переменных и классическая ловушка цикла for.",
+                summaryEN: "Compiler-generated display classes for closures, captured variable lifecycles, and loop capture pitfalls.",
+                contentMarkdownRU: ##"""
+### Как работают замыкания в C#
+
+Когда лямбда-выражение обращается к переменным из внешнего скоупа, компилятор Roslyn генерирует скрытый служебный класс (часто называемый `<>c__DisplayClass`), переносит туда переменную как поле и создает метод:
+
+```csharp
+int factor = 10;
+Func<int, int> multiplier = n => n * factor; // factor захвачен!
+factor = 20;
+
+Console.WriteLine(multiplier(5)); // Выведет 100, а не 50! Захвачена сама переменная, а не её копия!
+```
+
+### Ловушка захвата в циклах
+В старых версиях C# цикл `for` захватывал общую переменную счетчика `i`:
+```csharp
+var actions = new List<Action>();
+for (int i = 0; i < 3; i++) {
+    int local = i; // Создаем локальную копию для каждого шага
+    actions.Add(() => Console.WriteLine(local));
+}
+foreach (var a in actions) a(); // Напечатает 0, 1, 2
+```
+"""##,
+                contentMarkdownEN: ##"""
+### Closures & Compiler Display Classes
+
+Lambdas capture variables by reference using a compiler-generated class. Mutating the variable updates subsequent closure invocations.
+"""##,
+                codeSnippet: ##"""
+int multiplier = 3;
+Func<int, int> triple = x => x * multiplier;
+
+Console.WriteLine($"3 * 7 = {triple(7)}");
+"""##,
+                xpReward: 40
+            ),
+
+            Lesson(
+                id: "cs_events_pattern",
+                category: .csharpDelegatesEvents,
+                titleRU: "События (events) и стандартный паттерн EventHandler<T>",
+                titleEN: "Events & the Standard EventHandler<T> Pattern",
+                summaryRU: "Инкапсуляция делегатов через ключевое слово event, предотвращение прямой перезаписи, и архитектурный паттерн EventHandler<TEventArgs>.",
+                summaryEN: "Delegate encapsulation with events, preventing external assignment, and the EventHandler<T> pattern.",
+                contentMarkdownRU: ##"""
+### Ключевое слово `event`
+
+Событие — это защищенная обертка над делегатом. Внешний код может **только подписываться (`+=`)** или **отписываться (`-=`)**, но не может напрямую перезаписать делегат (`event = null`) или вызвать его извне:
+
+```csharp
+public class OrderEventArgs : EventArgs {
+    public int OrderId { get; init; }
+}
+
+public class OrderProcessor {
+    // Стандартное событие .NET:
+    public event EventHandler<OrderEventArgs>? OrderCompleted;
+
+    public void Complete(int id) {
+        Console.WriteLine($"Заказ {id} завершен.");
+        // Потокобезопасный вызов через ?.:
+        OrderCompleted?.Invoke(this, new OrderEventArgs { OrderId = id });
+    }
+}
+
+var proc = new OrderProcessor();
+proc.OrderCompleted += (sender, args) => {
+    Console.WriteLine($"[Слушатель]: получен сигнал о заказе #{args.OrderId}");
+};
+proc.Complete(101);
+```
+"""##,
+                contentMarkdownEN: ##"""
+### Events & EventHandler<T>
+
+Events enforce subscription-only operations (`+=` / `-=`) preventing external invocations:
+
+```csharp
+public class Engine {
+    public event Action? Started;
+    public void Start() => Started?.Invoke();
+}
+```
+"""##,
+                codeSnippet: ##"""
+public class Clock {
+    public event Action? OnTick;
+    public void Tick() => OnTick?.Invoke();
+}
+
+var clock = new Clock();
+clock.OnTick += () => Console.WriteLine("Tick sound");
+clock.Tick();
+"""##,
+                xpReward: 40
+            ),
+
+            Lesson(
+                id: "cs_linq_deferred_execution",
+                category: .csharpLINQ,
+                titleRU: "Отложенное выполнение LINQ и генераторы yield return",
+                titleEN: "LINQ Deferred Execution & yield return",
+                summaryRU: "Ленивые вычисления в IEnumerable<T>, как работает yield return, разница между объявлением запроса и материализацией ToList().",
+                summaryEN: "Lazy evaluation in IEnumerable<T>, yield return state machines, and query execution vs ToList() materialization.",
+                contentMarkdownRU: ##"""
+### Отложенное выполнение (Deferred Execution)
+
+В LINQ методы запросов (`Where`, `Select`, `Take`) **не выполняют вычислений в момент их вызова**. Запрос представляет собой план выполнения (дерево итераторов), который запускается только когда коллекцию начинают перебирать (`foreach`, `ToList()`, `First()`):
+
+```csharp
+var numbers = new List<int> { 1, 2, 3, 4, 5 };
+
+// Запрос объявлен, но НИ ОДНО число еще не проверено:
+var query = numbers.Where(n => {
+    Console.WriteLine($"Фильтрация {n}");
+    return n > 2;
+});
+
+Console.WriteLine("Запрос объявлен.");
+// Только сейчас при вызове ToList() происходит фильтрация:
+var result = query.ToList();
+```
+
+### Генераторы `yield return`
+Ключевое слово `yield return` заставляет компилятор сгенерировать конечный автомат `IEnumerator<T>`:
+
+```csharp
+public static IEnumerable<int> Fibonacci() {
+    int current = 0, next = 1;
+    while (true) {
+        yield return current;
+        int sum = current + next;
+        current = next;
+        next = sum;
+    }
+}
+```
+"""##,
+                contentMarkdownEN: ##"""
+### Deferred Execution & yield return
+
+LINQ queries are lazily evaluated upon iteration:
+
+```csharp
+IEnumerable<int> Even(int max) {
+    for (int i = 0; i <= max; i += 2) yield return i;
+}
+```
+"""##,
+                codeSnippet: ##"""
+IEnumerable<int> GenerateNumbers() {
+    yield return 10;
+    yield return 20;
+    yield return 30;
+}
+
+foreach (var item in GenerateNumbers()) {
+    Console.WriteLine($"Item: {item}");
+}
+"""##,
+                xpReward: 40
+            ),
+
+            Lesson(
+                id: "cs_linq_filtering_projection",
+                category: .csharpLINQ,
+                titleRU: "Фильтрация и Проекция: Where, Select и SelectMany",
+                titleEN: "Filtering & Projection: Where, Select & SelectMany",
+                summaryRU: "Базовые операторы LINQ: отбор элементов Where, трансформация Select, и расплющивание вложенных коллекций SelectMany.",
+                summaryEN: "Core LINQ operators: Where filtering, Select transformations, and SelectMany collection flattening.",
+                contentMarkdownRU: ##"""
+### Операторы Where, Select и SelectMany
+
+- **`Where(predicate)`**: фильтрует коллекцию по условию.
+- **`Select(selector)`**: проецирует каждый элемент в новую форму или тип.
+- **`SelectMany(selector)`**: расплющивает (flatten) вложенные коллекции в единый плоский поток:
+
+```csharp
+public record Student(string Name, List<string> Courses);
+
+var students = new List<Student> {
+    new("Anna", ["C#", "SQL"]),
+    new("Boris", ["Python", "C#"])
+};
+
+// SelectMany собирает все курсы всех студентов в один список:
+var uniqueCourses = students
+    .SelectMany(s => s.Courses)
+    .Distinct()
+    .OrderBy(c => c)
+    .ToList();
+
+Console.WriteLine(string.Join(", ", uniqueCourses)); // C#, Python, SQL
+```
+"""##,
+                contentMarkdownEN: ##"""
+### Where, Select and SelectMany
+
+Use `Select` to transform each item, and `SelectMany` to flatten child collections:
+
+```csharp
+var numbers = new[] { 1, 2, 3, 4 };
+var squares = numbers.Where(n => n % 2 == 0).Select(n => n * n);
+```
+"""##,
+                codeSnippet: ##"""
+int[] nums = [1, 2, 3, 4, 5, 6];
+var evensSquared = nums.Where(n => n % 2 == 0).Select(n => n * n);
+
+Console.WriteLine(string.Join(", ", evensSquared));
+"""##,
+                xpReward: 35
+            ),
+
+            Lesson(
+                id: "cs_linq_grouping_aggregates",
+                category: .csharpLINQ,
+                titleRU: "Группировка и Агрегация: GroupBy, Aggregate, Sum, Average",
+                titleEN: "Grouping & Aggregations: GroupBy & Aggregate",
+                summaryRU: "Группировка элементов GroupBy, вычисление статистик Sum, Min, Max, Average и универсальный сверточный редуктор Aggregate.",
+                summaryEN: "GroupBy operations, statistical aggregates (Sum, Min, Max, Average), and fold reductions with Aggregate.",
+                contentMarkdownRU: ##"""
+### Агрегация и Группировка в LINQ
+
+```csharp
+public record Employee(string Name, string Department, decimal Salary);
+
+var staff = new List<Employee> {
+    new("Иван", "IT", 120000),
+    new("Ольга", "IT", 140000),
+    new("Сергей", "HR", 80000),
+    new("Мария", "HR", 95000)
+};
+
+// Группировка по отделам:
+var byDept = staff
+    .GroupBy(e => e.Department)
+    .Select(g => new {
+        Department = g.Key,
+        Count = g.Count(),
+        AvgSalary = g.Average(e => e.Salary),
+        TotalBudget = g.Sum(e => e.Salary)
+    });
+
+foreach (var d in byDept) {
+    Console.WriteLine($"{d.Department}: {d.Count} чел, средняя ЗП: {d.AvgSalary:C0}");
+}
+
+// Универсальный Aggregate (аналог reduce):
+int[] multipliers = [2, 3, 4];
+int product = multipliers.Aggregate(1, (acc, val) => acc * val); // 24
+```
+"""##,
+                contentMarkdownEN: ##"""
+### GroupBy and Aggregations
+
+GroupBy partitions sequences by key; Aggregate folds sequences into single scalar values.
+"""##,
+                codeSnippet: ##"""
+int[] numbers = [10, 20, 30, 40];
+double avg = numbers.Average();
+int sum = numbers.Sum();
+
+Console.WriteLine($"Sum: {sum}, Avg: {avg}");
+"""##,
+                xpReward: 40
+            ),
+
+            Lesson(
+                id: "cs_linq_joins_zip",
+                category: .csharpLINQ,
+                titleRU: "Связывание данных: Join, GroupJoin и Zip",
+                titleEN: "Relational LINQ: Join, GroupJoin & Zip",
+                summaryRU: "Реляционные операции в памяти: эквивалент SQL INNER JOIN через Join, левое соединение с GroupJoin и попарное слияние Zip.",
+                summaryEN: "Relational operations in memory: INNER JOIN via Join, outer joining with GroupJoin, and pairwise Zip.",
+                contentMarkdownRU: ##"""
+### Соединение коллекций: `Join`
+
+Оператор `Join` сопоставляет две коллекции по ключам аналогично SQL INNER JOIN:
+
+```csharp
+public record User(int Id, string Name);
+public record Order(int OrderId, int UserId, decimal Amount);
+
+var users = new List<User> { new(1, "Alice"), new(2, "Bob") };
+var orders = new List<Order> { new(101, 1, 450), new(102, 1, 900), new(103, 3, 200) };
+
+var userOrders = users.Join(
+    orders,
+    u => u.Id,          // Ключ первой коллекции
+    o => o.UserId,      // Ключ второй коллекции
+    (u, o) => new { u.Name, o.OrderId, o.Amount }
+);
+
+foreach (var row in userOrders) {
+    Console.WriteLine($"{row.Name} оформил заказ #{row.OrderId} на {row.Amount} руб.");
+}
+```
+
+### Попарное объединение `Zip`
+Метод `Zip` объединяет две последовательности по индексам:
+```csharp
+string[] letters = ["A", "B", "C"];
+int[] numbers = [1, 2, 3];
+
+var pairs = letters.Zip(numbers, (l, n) => $"{l}{n}"); // A1, B2, C3
+```
+"""##,
+                contentMarkdownEN: ##"""
+### Relational Joins & Zip
+
+Join matches collections by key. Zip pairs elements by index.
+"""##,
+                codeSnippet: ##"""
+string[] keys = ["id", "status"];
+string[] vals = ["101", "active"];
+
+var mapped = keys.Zip(vals, (k, v) => $"{k}={v}");
+Console.WriteLine(string.Join("&", mapped));
+"""##,
+                xpReward: 40
+            ),
+
+            Lesson(
+                id: "cs_exception_handling",
+                category: .csharpExceptions,
+                titleRU: "Иерархия исключений, try-catch-finally и throw",
+                titleEN: "Exceptions, try-catch-finally & Stack Unwinding",
+                summaryRU: "Иерархия System.Exception, правильный перехват конкретных типов, разница между rethrow через throw; и throw ex;, и гарантии finally.",
+                summaryEN: "System.Exception hierarchy, typed catches, rethrowing via throw; vs throw ex;, and finally guarantees.",
+                contentMarkdownRU: ##"""
+### Обработка исключений в .NET
+
+Все исключения наследуются от `System.Exception`. Порядок блоков `catch` критичен: от наиболее специфичных к общим:
+
+```csharp
+try {
+    string content = File.ReadAllText("missing.txt");
+} catch (FileNotFoundException ex) {
+    Console.WriteLine($"Файл отсутствует: {ex.FileName}");
+} catch (IOException ex) {
+    Console.WriteLine($"Ошибка ввода-вывода: {ex.Message}");
+} catch (Exception ex) {
+    Console.WriteLine($"Непредвиденная ошибка: {ex.Message}");
+} finally {
+    // Выполняется ВСЕГДА, даже если произошло исключение:
+    Console.WriteLine("Завершение операции.");
+}
+```
+
+### Критическая ошибка: `throw;` против `throw ex;`
+- **`throw;`** (ПРАВИЛЬНО): перевыбрасывает текущее исключение, **сохраняя оригинальный StackTrace** (точную строку, где произошла исходная ошибка).
+- **`throw ex;`** (АНТИПАТТЕРН): сбрасывает стек вызовов, перезаписывая его текущей строкой. Никогда так не делайте!
+"""##,
+                contentMarkdownEN: ##"""
+### Exception Hierarchy & Safe Rethrowing
+
+Always rethrow with bare `throw;` to preserve the original stack trace. Never use `throw ex;`.
+"""##,
+                codeSnippet: ##"""
+try {
+    int zero = 0;
+    int result = 100 / zero;
+} catch (DivideByZeroException) {
+    Console.WriteLine("Division by zero caught safely.");
+}
+"""##,
+                xpReward: 35
+            ),
+
+            Lesson(
+                id: "cs_exception_filters",
+                category: .csharpExceptions,
+                titleRU: "Фильтры исключений: ключевое слово when",
+                titleEN: "Exception Filters: The when Keyword",
+                summaryRU: "Перехват исключений по условию с помощью when, проверка статус-кодов и инспекция состояния без размотки стека вызовов.",
+                summaryEN: "Conditional exception catching using when, inspecting status codes, and preserving the stack without unwinding.",
+                contentMarkdownRU: ##"""
+### Фильтры исключений (`catch (...) when (...)`)
+
+Начиная с C# 6, блок `catch` можно снабдить предикатом `when`:
+
+```csharp
+try {
+    SendApiRequest();
+} catch (HttpRequestException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound) {
+    Console.WriteLine("Ресурс 404 не найден — переключаемся на резервный URL.");
+} catch (HttpRequestException ex) when (ex.StatusCode == System.Net.HttpStatusCode.Unauthorized) {
+    Console.WriteLine("Токен авторизации истек — выполняем refresh токена.");
+}
+```
+
+### Архитектурное преимущество: Stack Unwinding
+Если предикат `when` возвращает `false`, среда CLR **не начинает размотку стека** (stack unwinding). Стек вызовов сохраняется нетронутым, что позволяет инструментам мониторинга (Crash Dumps, Sentry) видеть точное состояние всех локальных переменных в момент возникновения сбоя.
+"""##,
+                contentMarkdownEN: ##"""
+### Exception Filters (when)
+
+Filters inspect exceptions before the CLR unwinds the call stack:
+
+```csharp
+try { /* ... */ }
+catch (Exception ex) when (ex.HResult == -2146233088) {
+    // Handles specific HResult without stack unwinding
+}
+```
+"""##,
+                codeSnippet: ##"""
+try {
+    throw new ArgumentException("Negative value", "amount");
+} catch (ArgumentException ex) when (ex.ParamName == "amount") {
+    Console.WriteLine($"Handled specific parameter error: {ex.ParamName}");
+}
+"""##,
+                xpReward: 40
+            ),
+
+            Lesson(
+                id: "cs_idisposable_using",
+                category: .csharpExceptions,
+                titleRU: "Управление ресурсами: IDisposable и декларации using",
+                titleEN: "Resource Management: IDisposable & using Declarations",
+                summaryRU: "Освобождение неуправляемых ресурсов (дескрипторы файлов, сокеты), паттерн Dispose, современный синтаксис using var и IAsyncDisposable.",
+                summaryEN: "Unmanaged resource cleanup (handles, sockets), Dispose pattern, modern using var declarations, and IAsyncDisposable.",
+                contentMarkdownRU: ##"""
+### Паттерн `IDisposable` и `using`
+
+Сборщик мусора (GC) управляет только памятью в куче, но не знает, как освобождать **неуправляемые системные ресурсы** (дескрипторы файлов, подключения к БД, сетевые сокеты).
+
+Для детерминированной очистки таких ресурсов класс реализует интерфейс `IDisposable`:
+
+```csharp
+public class ResourceWrapper : IDisposable {
+    public void Dispose() {
+        // Освобождение неуправляемых ресурсов
+        Console.WriteLine("Ресурс освобожден.");
+    }
+}
+```
+
+### Современные `using` декларации (C# 8+)
+Вместо громоздких вложенных блоков `using (...) { ... }` используется лаконичный синтаксис `using var`:
+
+```csharp
+void ProcessData() {
+    using var wrapper = new ResourceWrapper();
+    // Работа с ресурсом...
+    // Метод wrapper.Dispose() автоматически вызовется при выходе из скоупа функции!
+}
+```
+
+Для асинхронной очистки потоков ввода-вывода используется интерфейс `IAsyncDisposable` и конструкция `await using var`.
+"""##,
+                contentMarkdownEN: ##"""
+### IDisposable & using Statements
+
+The `using var` declaration calls `.Dispose()` automatically at the end of the enclosing scope:
+
+```csharp
+using var stream = new MemoryStream();
+stream.WriteByte(42);
+```
+"""##,
+                codeSnippet: ##"""
+public class Session : IDisposable {
+    public void Dispose() => Console.WriteLine("Session closed.");
+}
+
+using (var s = new Session()) {
+    Console.WriteLine("Inside active session");
+}
+"""##,
+                xpReward: 40
+            ),
+
+            Lesson(
+                id: "cs_async_await_fundamentals",
+                category: .csharpAsyncAwait,
+                titleRU: "Асинхронное программирование: Task и async/await",
+                titleEN: "Asynchronous Programming: Task & async/await",
+                summaryRU: "Неблокирующий ввод-вывод I/O, конечный автомат (State Machine), генерируемый компилятором, возврат Task и Task<T>.",
+                summaryEN: "Non-blocking I/O, compiler-generated async state machines, Task and Task<T> returns.",
+                contentMarkdownRU: ##"""
+### Асинхронность против Многопоточности
+
+Главная цель `async/await` — **не блокировать рабочий поток пула (ThreadPool)**, пока операционная система ждет завершения ввода-вывода (HTTP-запрос, чтение с диска, запрос к БД).
+
+- Метод с модификатором `async` преобразуется компилятором Roslyn в **структурный конечный автомат (IAsyncStateMachine)**.
+- При достижении `await` поток освобождается и возвращается в пул потоков для обслуживания других пользователей.
+- По завершении I/O операции ОС сигнализирует драйверу, и CLR возобновляет выполнение метода.
+
+```csharp
+public async Task<string> FetchDataAsync(string url) {
+    using var client = new HttpClient();
+    // Поток не простаивает во время сетевого вызова:
+    string html = await client.GetStringAsync(url);
+    return html;
+}
+```
+"""##,
+                contentMarkdownEN: ##"""
+### async and await Mechanics
+
+`await` yields the ThreadPool thread back during I/O operations, resuming execution when the underlying OS completion port signals.
+"""##,
+                codeSnippet: ##"""
+async Task<int> CalculateAsync() {
+    await Task.Delay(10);
     return 42;
 }
+
+int val = await CalculateAsync();
+Console.WriteLine($"Async computed value: {val}");
+"""##,
+                xpReward: 45
+            ),
+
+            Lesson(
+                id: "cs_valuetask_perf",
+                category: .csharpAsyncAwait,
+                titleRU: "Оптимизация производительности: ValueTask<T>",
+                titleEN: "High-Performance Async with ValueTask<T>",
+                summaryRU: "Устранение аллокаций объекта Task в куче для операций, завершающихся синхронно (кеширование), и правила использования ValueTask.",
+                summaryEN: "Eliminating heap allocations for synchronously completing operations using ValueTask<T>.",
+                contentMarkdownRU: ##"""
+### Зачем нужен `ValueTask<T>`?
+
+Обычный `Task<T>` — это ссылочный тип (`class`). Каждый асинхронный вызов создает новый объект в куче.
+
+Если метод часто возвращает результат **синхронно** (например, значение взято из кеша в оперативной памяти), аллоцировать `Task` в куче бессмысленно. Для этого создана структура `ValueTask<T>`:
+
+```csharp
+private readonly Dictionary<int, string> _memoryCache = new();
+
+public ValueTask<string> GetUserNameAsync(int id) {
+    // 1. Быстрый синхронный путь (0 аллокаций в куче!):
+    if (_memoryCache.TryGetValue(id, out var cachedName)) {
+        return ValueTask.FromResult(cachedName);
+    }
+
+    // 2. Медленный асинхронный путь (сеть / база):
+    return new ValueTask<string>(FetchUserFromDbAsync(id));
+}
 ```
-""",
-                codeSnippet: """
-public record Coordinate(double Lat, double Lon);
-var c = new Coordinate(55.75, 37.61);
-Console.WriteLine($"Location: {c.Lat}, {c.Lon}");
-""",
-                xpReward: 50
+
+### Важное правило:
+`ValueTask` нельзя ожидать (`await`) дважды и нельзя использовать в `Task.WhenAll`.
+"""##,
+                contentMarkdownEN: ##"""
+### ValueTask<T> for Zero-Allocation Hot Paths
+
+When cached results complete synchronously, `ValueTask<T>` avoids creating Task instances on the managed heap.
+"""##,
+                codeSnippet: ##"""
+ValueTask<int> FastGetAsync(bool isCached) {
+    if (isCached) return ValueTask.FromResult(100);
+    return new ValueTask<int>(Task.FromResult(200));
+}
+
+var res = await FastGetAsync(true);
+Console.WriteLine($"Result: {res}");
+"""##,
+                xpReward: 45
+            ),
+
+            Lesson(
+                id: "cs_cancellation_tokens",
+                category: .csharpAsyncAwait,
+                titleRU: "Отмена асинхронных операций: CancellationTokenSource",
+                titleEN: "Asynchronous Cancellation & CancellationToken",
+                summaryRU: "Кооперативная отмена асинхронных цепочек: токен CancellationToken, проверка ThrowIfCancellationRequested и таймауты CancelAfter.",
+                summaryEN: "Cooperative cancellation: CancellationToken propagation, ThrowIfCancellationRequested, and CancelAfter timeouts.",
+                contentMarkdownRU: ##"""
+### Кооперативная отмена в .NET
+
+В .NET потоки и асинхронные задачи нельзя принудительно «убить» извне (это привело бы к повреждению памяти). Отмена является **кооперативной**: вызывающий код передает `CancellationToken`, а вызываемый метод регулярно проверяет, не запрошена ли отмена:
+
+```csharp
+using var cts = new CancellationTokenSource();
+cts.CancelAfter(TimeSpan.FromSeconds(3)); // Таймаут 3 секунды
+
+try {
+    await LongRunningProcessAsync(cts.Token);
+} catch (OperationCanceledException) {
+    Console.WriteLine("Операция была отменена по таймауту!");
+}
+
+async Task LongRunningProcessAsync(CancellationToken ct) {
+    for (int i = 0; i < 100; i++) {
+        ct.ThrowIfCancellationRequested(); // Выбрасывает исключение при отмене
+        await Task.Delay(100, ct);
+    }
+}
+```
+"""##,
+                contentMarkdownEN: ##"""
+### Cooperative Cancellation Pattern
+
+Propagate `CancellationToken` through async call chains to honor cancellation signals gracefully:
+
+```csharp
+using var cts = new CancellationTokenSource();
+cts.Cancel();
+```
+"""##,
+                codeSnippet: ##"""
+using var cts = new CancellationTokenSource();
+CancellationToken token = cts.Token;
+
+Console.WriteLine($"Is cancellation requested: {token.IsCancellationRequested}");
+"""##,
+                xpReward: 40
+            ),
+
+            Lesson(
+                id: "cs_configure_await",
+                category: .csharpAsyncAwait,
+                titleRU: "Контекст синхронизации и ConfigureAwait(false)",
+                titleEN: "SynchronizationContext & ConfigureAwait(false)",
+                summaryRU: "Архитектура контекста синхронизации, предотвращение дедлоков в UI-потоках и оптимизация библиотечного кода через ConfigureAwait(false).",
+                summaryEN: "SynchronizationContext architecture, preventing UI thread deadlocks, and library optimization with ConfigureAwait(false).",
+                contentMarkdownRU: ##"""
+### Роль `SynchronizationContext`
+
+По умолчанию после `await` среда выполнения пытается вернуть выполнение метода в **тот же контекст синхронизации**, из которого он был вызван (например, главный UI-поток в WPF, MAUI или iOS).
+
+### Почему библиотеки вызывают `ConfigureAwait(false)`?
+Библиотечному коду (утилиты, парсеры, сетевые клиенты) все равно, в каком потоке продолжать выполнение. Вызов `ConfigureAwait(false)` указывает рантайму: «не пытайся захватывать исходный контекст, продолжай в любом свободном потоке пула ThreadPool»:
+
+```csharp
+public async Task<byte[]> DownloadBytesAsync(string url) {
+    using var client = new HttpClient();
+    // ConfigureAwait(false) предотвращает переключение контекста и устраняет риск дедлоков:
+    return await client.GetByteArrayAsync(url).ConfigureAwait(false);
+}
+```
+"""##,
+                contentMarkdownEN: ##"""
+### ConfigureAwait(false) in Library Code
+
+`ConfigureAwait(false)` avoids capturing the calling `SynchronizationContext`, improving performance and eliminating UI deadlocks.
+"""##,
+                codeSnippet: ##"""
+async Task<string> GetDataAsync() {
+    await Task.Delay(5).ConfigureAwait(false);
+    return "Data loaded";
+}
+
+string res = await GetDataAsync();
+Console.WriteLine(res);
+"""##,
+                xpReward: 45
+            ),
+
+            Lesson(
+                id: "cs_thread_pool_tasks",
+                category: .csharpTPLThreading,
+                titleRU: "ThreadPool, Task.Run и параллельное выполнение",
+                titleEN: "ThreadPool, Task.Run & Parallel Coordination",
+                summaryRU: "Пул потоков CLR, отправка CPU-bound задач через Task.Run, координация параллельных задач Task.WhenAll и Task.WhenAny.",
+                summaryEN: "CLR ThreadPool, offloading CPU-bound workloads via Task.Run, and coordinating with Task.WhenAll / Task.WhenAny.",
+                contentMarkdownRU: ##"""
+### Пул потоков (CLR ThreadPool)
+
+Создание операционной системой нативного потока (`new Thread()`) стоит дорого (около 1 МБ стека и сотни микросекунд). Среда .NET содержит оптимизированный **ThreadPool**, повторно использующий готовые потоки.
+
+- **`Task.Run(action)`**: отправляет тяжелую CPU-интенсивную задачу в пул потоков.
+- **`Task.WhenAll(tasks)`**: ожидает завершения **всех** параллельных задач одновременно.
+- **`Task.WhenAny(tasks)`**: возвращает управление, как только завершится **хотя бы одна** из задач (паттерн гонки или таймаута).
+
+```csharp
+var taskA = Task.Run(() => ComputePrime(1000));
+var taskB = Task.Run(() => ComputePrime(2000));
+
+// Параллельное ожидание обеих задач:
+int[] results = await Task.WhenAll(taskA, taskB);
+Console.WriteLine($"Сумма: {results[0] + results[1]}");
+```
+"""##,
+                contentMarkdownEN: ##"""
+### ThreadPool and Task Coordination
+
+`Task.Run` offloads work to the ThreadPool. `Task.WhenAll` awaits multiple concurrent tasks efficiently:
+
+```csharp
+var t1 = Task.Delay(10);
+var t2 = Task.Delay(20);
+await Task.WhenAll(t1, t2);
+```
+"""##,
+                codeSnippet: ##"""
+var t1 = Task.FromResult(10);
+var t2 = Task.FromResult(20);
+
+int[] res = await Task.WhenAll(t1, t2);
+Console.WriteLine($"Combined: {res[0] + res[1]}");
+"""##,
+                xpReward: 40
+            ),
+
+            Lesson(
+                id: "cs_synchronization_lock",
+                category: .csharpTPLThreading,
+                titleRU: "Синхронизация потоков: lock, Monitor и Interlocked",
+                titleEN: "Thread Synchronization: lock, Monitor & Interlocked",
+                summaryRU: "Состояние гонки (Race Condition), критические секции lock, класс Monitor и высокоскоростные неблокирующие операции Interlocked.",
+                summaryEN: "Race conditions, critical sections with lock and Monitor, and lock-free atomic operations via Interlocked.",
+                contentMarkdownRU: ##"""
+### Защита от состояния гонки (Race Conditions)
+
+Когда несколько потоков одновременно модифицируют одну общую переменную, данные повреждаются:
+
+```csharp
+public class SafeCounter {
+    private readonly object _lockObj = new();
+    private int _count;
+
+    // 1. Классический lock (компилируется в Monitor.Enter / Monitor.Exit):
+    public void Increment() {
+        lock (_lockObj) {
+            _count++;
+        }
+    }
+
+    public int Value => _count;
+}
+```
+
+### Высокопроизводительный `Interlocked`
+Для простых арифметических операций `lock` избыточен. Класс `Interlocked` использует инструкции процессора на аппаратном уровне (атомарный инкремент/сравнение без блокировки потоков):
+
+```csharp
+public class LockFreeCounter {
+    private int _counter;
+
+    // Атомарная аппаратная операция за доли наносекунды:
+    public void Add(int amount) => Interlocked.Add(ref _counter, amount);
+    public int Value => Volatile.Read(ref _counter);
+}
+```
+"""##,
+                contentMarkdownEN: ##"""
+### Thread Synchronization & Interlocked
+
+Use `lock` for critical sections and `Interlocked` for lock-free atomic primitive operations.
+"""##,
+                codeSnippet: ##"""
+int counter = 0;
+Interlocked.Increment(ref counter);
+Interlocked.Add(ref counter, 5);
+
+Console.WriteLine($"Counter: {counter}");
+"""##,
+                xpReward: 40
+            ),
+
+            Lesson(
+                id: "cs_async_coordination",
+                category: .csharpTPLThreading,
+                titleRU: "Асинхронная координация: SemaphoreSlim и Channels",
+                titleEN: "Async Coordination: SemaphoreSlim & System.Threading.Channels",
+                summaryRU: "Ограничение степени параллелизма через SemaphoreSlim(maxConcurrency), очереди Producer-Consumer высокой производительности с Channels.",
+                summaryEN: "Throttling concurrency with SemaphoreSlim and high-throughput Producer-Consumer queues via Channels.",
+                contentMarkdownRU: ##"""
+### Ограничение параллелизма: `SemaphoreSlim`
+
+Обычный `lock` **запрещено** использовать с `await` внутри критической секции. Для асинхронного ограничения доступа к ресурсу (например, не более 5 одновременных запросов к внешнему API) используется `SemaphoreSlim`:
+
+```csharp
+private static readonly SemaphoreSlim _throttle = new(initialCount: 5, maxCount: 5);
+
+public async Task ProcessWithThrottleAsync(int id) {
+    await _throttle.WaitAsync(); // Асинхронное ожидание слота
+    try {
+        await CallExternalApiAsync(id);
+    } finally {
+        _throttle.Release(); // Освобождение слота
+    }
+}
+```
+
+### Каналы: `System.Threading.Channels`
+Современный стандарт паттерна «Производитель-Потребитель» (Producer-Consumer) в .NET. Канал позволяет безопасно передавать миллионы сообщений между потоками с минимальными накладными расходами памяти.
+"""##,
+                contentMarkdownEN: ##"""
+### SemaphoreSlim and Channels
+
+`SemaphoreSlim` throttles concurrent async tasks without thread blocking:
+
+```csharp
+var sem = new SemaphoreSlim(2);
+await sem.WaitAsync();
+try { /* Work */ } finally { sem.Release(); }
+```
+"""##,
+                codeSnippet: ##"""
+var sem = new SemaphoreSlim(1);
+await sem.WaitAsync();
+try {
+    Console.WriteLine("Protected section");
+} finally {
+    sem.Release();
+}
+"""##,
+                xpReward: 45
+            ),
+
+            Lesson(
+                id: "cs_parallel_plinq",
+                category: .csharpTPLThreading,
+                titleRU: "Параллельные вычисления: Parallel.ForEachAsync и PLINQ",
+                titleEN: "Parallel Computing: Parallel.ForEachAsync & PLINQ",
+                summaryRU: "Распараллеливание пакетных операций: Parallel.ForEachAsync в .NET 6+, параллельные LINQ-запросы PLINQ AsParallel и планирование потоков.",
+                summaryEN: "Batch parallel operations: Parallel.ForEachAsync in .NET 6+, PLINQ AsParallel, and partitioning.",
+                contentMarkdownRU: ##"""
+### Параллельная обработка данных
+
+1. **`Parallel.ForEachAsync` (введен в .NET 6)**:
+Идеальный инструмент для пакетной асинхронной обработки коллекций с контролем параллелизма:
+
+```csharp
+var urls = new[] { "url1", "url2", "url3", "url4" };
+
+await Parallel.ForEachAsync(urls, new ParallelOptions { MaxDegreeOfParallelism = 4 }, async (url, ct) => {
+    using var client = new HttpClient();
+    string res = await client.GetStringAsync(url, ct);
+    Console.WriteLine($"Загружено: {url} ({res.Length} байт)");
+});
+```
+
+2. **`PLINQ` (Parallel LINQ)**:
+Автоматически разделяет коллекцию на сегменты и вычисляет фильтрацию и проекцию на всех ядрах процессора:
+```csharp
+int[] bigArray = Enumerable.Range(1, 1_000_000).ToArray();
+var primes = bigArray.AsParallel()
+                     .Where(n => IsPrime(n))
+                     .ToArray();
+```
+"""##,
+                contentMarkdownEN: ##"""
+### Parallel.ForEachAsync & PLINQ
+
+Execute async operations concurrently across worker cores with controlled degrees of parallelism:
+
+```csharp
+await Parallel.ForEachAsync(items, async (item, ct) => {
+    await ProcessAsync(item);
+});
+```
+"""##,
+                codeSnippet: ##"""
+int[] numbers = [1, 2, 3, 4, 5];
+var doubled = numbers.AsParallel().Select(n => n * 2).ToArray();
+
+Console.WriteLine($"Doubled count: {doubled.Length}");
+"""##,
+                xpReward: 45
+            ),
+
+            Lesson(
+                id: "cs_gc_internals",
+                category: .csharpModern,
+                titleRU: "Внутреннее устройство Garbage Collection (GC) в .NET",
+                titleEN: "Garbage Collection (GC) Internals & Generations",
+                summaryRU: "Управляемая память CLR: поколения Gen 0, Gen 1, Gen 2, Large Object Heap (LOH), Pinned Object Heap (POH), фрагментация и уплотнение.",
+                summaryEN: "CLR managed memory: Gen 0/1/2 generations, Large Object Heap (LOH), Pinned Object Heap (POH), compaction and GC tuning.",
+                contentMarkdownRU: ##"""
+### Сборщик мусора (Garbage Collector) в .NET
+
+В .NET используется высокопроизводительный **поколенческий трассирующий сборщик мусора (Generational Tracing GC)**.
+
+### Три поколения объектов
+1. **Gen 0 (Поколение 0)**: самые новые короткоживущие объекты (локальные переменные функций). Сборка мусора в Gen 0 занимает доли миллисекунды.
+2. **Gen 1 (Поколение 1)**: буферное поколение между молодыми и долгоживущими объектами.
+3. **Gen 2 (Поколение 2)**: долгоживущие объекты (статические данные, кеши, синглтоны). Полная сборка (Full GC) охватывает Gen 2 и является наиболее ресурсоемкой.
+
+### Специальные кучи
+- **LOH (Large Object Heap)**: объекты размером более 85 000 байт (например, большие массивы) сразу размещаются в LOH, минуя Gen 0, чтобы избежать затрат на их перемещение при уплотнении памяти.
+- **POH (Pinned Object Heap, .NET 5+)**: куча для закрепленных объектов, используемых при интеропе с нативным кодом C/C++.
+"""##,
+                contentMarkdownEN: ##"""
+### Generational Garbage Collector
+
+- **Gen 0**: short-lived local objects.
+- **Gen 1**: intermediate buffer.
+- **Gen 2**: long-lived objects.
+- **LOH**: objects >= 85,000 bytes.
+"""##,
+                codeSnippet: ##"""
+long memoryBefore = GC.GetTotalMemory(forceFullCollection: false);
+Console.WriteLine($"Allocated memory: {memoryBefore / 1024} KB");
+"""##,
+                xpReward: 45
+            ),
+
+            Lesson(
+                id: "cs_reflection_attributes",
+                category: .csharpModern,
+                titleRU: "Рефлексия (Reflection) и Пользовательские Атрибуты",
+                titleEN: "Reflection, Type Metadata & Custom Attributes",
+                summaryRU: "Инспекция типов во время выполнения: класс Type, typeof, чтение атрибутов через GetCustomAttributes, и создание декларативных метаданных.",
+                summaryEN: "Runtime type inspection with Type, typeof, custom attributes via [AttributeUsage], and metadata querying.",
+                contentMarkdownRU: ##"""
+### Метаданные и Рефлексия в C#
+
+Рефлексия позволяет программе динамически исследовать собственную структуру и типы во время выполнения через пространство имен `System.Reflection`:
+
+```csharp
+Type type = typeof(string);
+Console.WriteLine($"Имя типа: {type.FullName}");
+
+// Получение списка публичных методов:
+var methods = type.GetMethods().Select(m => m.Name).Take(5);
+Console.WriteLine(string.Join(", ", methods));
+```
+
+### Пользовательские Атрибуты (Custom Attributes)
+Атрибуты позволяют прикреплять декларативные метаданные к классам, свойствам или методам:
+
+```csharp
+[AttributeUsage(AttributeTargets.Property)]
+public class ColumnAttribute(string name) : Attribute {
+    public string Name { get; } = name;
+}
+
+public class User {
+    [Column("user_id")]
+    public int Id { get; set; }
+}
+```
+"""##,
+                contentMarkdownEN: ##"""
+### Reflection and Attributes
+
+Attributes attach metadata readable at runtime via reflection:
+
+```csharp
+var t = typeof(int);
+Console.WriteLine(t.IsValueType); // true
+```
+"""##,
+                codeSnippet: ##"""
+Type strType = typeof(string);
+Console.WriteLine($"Type: {strType.Name}, Assembly: {strType.Assembly.GetName().Name}");
+"""##,
+                xpReward: 45
+            ),
+
+            Lesson(
+                id: "cs_dependency_injection",
+                category: .csharpModern,
+                titleRU: "Dependency Injection: Внедрение зависимостей в .NET 8",
+                titleEN: "Dependency Injection & Service Lifetimes in .NET 8",
+                summaryRU: "Архитектурный стандарт .NET: контейнер IServiceCollection, жизненные циклы Transient, Scoped, Singleton и инверсия управления IoC.",
+                summaryEN: "The .NET architecture standard: IServiceCollection container, Transient, Scoped, Singleton lifetimes, and IoC.",
+                contentMarkdownRU: ##"""
+### Dependency Injection (DI) в современном .NET
+
+Платформа .NET имеет встроенный высокопроизводительный IoC-контейнер `Microsoft.Extensions.DependencyInjection`.
+
+### 3 времени жизни сервисов (Service Lifetimes)
+1. **Transient (`AddTransient`)**: новый экземпляр создается **каждый раз**, когда запрашивается сервис. Идеально для легковесных stateless-компонентов.
+2. **Scoped (`AddScoped`)**: создается **один экземпляр на всю область видимости (Scope)**. В веб-приложениях ASP.NET Core один scope создается на каждый входящий HTTP-запрос (идеально для `DbContext`).
+3. **Singleton (`AddSingleton`)**: создается **один-единственный экземпляр на всё время жизни приложения**.
+
+```csharp
+public interface IMetricsService { void Record(); }
+public class CloudMetricsService : IMetricsService {
+    public void Record() => Console.WriteLine("Метрика отправлена.");
+}
+
+// Регистрация в Program.cs:
+// builder.Services.AddSingleton<IMetricsService, CloudMetricsService>();
+```
+"""##,
+                contentMarkdownEN: ##"""
+### Dependency Injection Lifetimes
+
+- **Transient**: new instance per request.
+- **Scoped**: one instance per HTTP request scope.
+- **Singleton**: one instance throughout application lifetime.
+"""##,
+                codeSnippet: ##"""
+Console.WriteLine("DI Lifetimes: Transient, Scoped, Singleton");
+"""##,
+                xpReward: 45
             ),
 
             // MARK: - SQL Lessons
