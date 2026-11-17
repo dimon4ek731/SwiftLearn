@@ -536,6 +536,103 @@ class ScoreKeeper {
         )
 
         // MARK: - Python Challenges
+        
+        customChallenges["py_syntax_pep8"] = LessonPracticeChallenge(
+            id: "practice_py_syntax_pep8",
+            language: .python,
+            titleRU: "Практика: Приветствие пользователя",
+            titleEN: "Practice: User Greeting",
+            taskPromptRU: "Напишите функцию `format_greeting(name, year)`, возвращающую строку: `Привет, {name}! Твой год: {year}`.",
+            taskPromptEN: "Implement `format_greeting(name, year)` returning `Привет, {name}! Твой год: {year}`.",
+            starterCode: ##"""
+def format_greeting(name, year):
+    # Ваша реализация
+    return ""
+"""##,
+            solutionCode: ##"""
+def format_greeting(name, year):
+    return f"Привет, {name}! Твой год: {year}"
+"""##,
+            testCases: [
+                TaskTestCase(title: "Тест 1", inputDescription: "format_greeting('Анна', 2026)", expectedOutput: "Привет, Анна! Твой год: 2026", validationCode: "format_greeting('Анна', 2026) == 'Привет, Анна! Твой год: 2026'"),
+                TaskTestCase(title: "Тест 2", inputDescription: "format_greeting('Иван', 2000)", expectedOutput: "Привет, Иван! Твой год: 2000", validationCode: "format_greeting('Иван', 2000) == 'Привет, Иван! Твой год: 2000'")
+            ],
+            hintsRU: ["Используйте f-строку: `f'Привет, {name}! Твой год: {year}'`."],
+            hintsEN: ["Use f-string formatting."]
+        )
+
+        customChallenges["py_numbers_math"] = LessonPracticeChallenge(
+            id: "practice_py_numbers_math",
+            language: .python,
+            titleRU: "Практика: Расчет Гипотенузы",
+            titleEN: "Practice: Hypotenuse Calculation",
+            taskPromptRU: "Напишите функцию `calculate_hypotenuse(a, b)`, которая вычисляет длину гипотенузы прямоугольного треугольника с катетами a и b: `(a**2 + b**2)**0.5`.",
+            taskPromptEN: "Implement `calculate_hypotenuse(a, b)` returning `(a**2 + b**2)**0.5`.",
+            starterCode: ##"""
+def calculate_hypotenuse(a, b):
+    # Ваша реализация
+    return 0.0
+"""##,
+            solutionCode: ##"""
+def calculate_hypotenuse(a, b):
+    return (a**2 + b**2) ** 0.5
+"""##,
+            testCases: [
+                TaskTestCase(title: "Египетский треугольник", inputDescription: "calculate_hypotenuse(3, 4)", expectedOutput: "5.0", validationCode: "calculate_hypotenuse(3, 4) == 5.0"),
+                TaskTestCase(title: "Катеты 6 и 8", inputDescription: "calculate_hypotenuse(6, 8)", expectedOutput: "10.0", validationCode: "calculate_hypotenuse(6, 8) == 10.0")
+            ],
+            hintsRU: ["Возведение в степень в Python: `** 2` и `** 0.5`."],
+            hintsEN: ["Power operator in Python is `**`."]
+        )
+
+        customChallenges["py_strings_fstrings"] = LessonPracticeChallenge(
+            id: "practice_py_strings_fstrings",
+            language: .python,
+            titleRU: "Практика: Разворот строки через срез",
+            titleEN: "Practice: String Reversal",
+            taskPromptRU: "Напишите функцию `reverse_string(text)`, которая возвращает развернутую задом наперед строку с помощью среза `[::-1]`.",
+            taskPromptEN: "Implement `reverse_string(text)` returning the reversed string using `[::-1]`.",
+            starterCode: ##"""
+def reverse_string(text):
+    # Ваша реализация
+    return ""
+"""##,
+            solutionCode: ##"""
+def reverse_string(text):
+    return text[::-1]
+"""##,
+            testCases: [
+                TaskTestCase(title: "Слово python", inputDescription: "reverse_string('python')", expectedOutput: "nohtyp", validationCode: "reverse_string('python') == 'nohtyp'"),
+                TaskTestCase(title: "Палиндром", inputDescription: "reverse_string('radar')", expectedOutput: "radar", validationCode: "reverse_string('radar') == 'radar'")
+            ],
+            hintsRU: ["Используйте синтаксис среза: `text[::-1]`."],
+            hintsEN: ["Use slice step: `text[::-1]`."]
+        )
+
+        customChallenges["py_comprehensions_power"] = LessonPracticeChallenge(
+            id: "practice_py_comprehensions_power",
+            language: .python,
+            titleRU: "Практика: Квадраты четных чисел",
+            titleEN: "Practice: Even Squares Comprehension",
+            taskPromptRU: "Напишите функцию `get_even_squares(numbers)`, которая с помощью list comprehension возвращает список квадратов только четных чисел: `[x**2 for x in numbers if x % 2 == 0]`.",
+            taskPromptEN: "Implement `get_even_squares(numbers)` returning squares of even integers.",
+            starterCode: ##"""
+def get_even_squares(numbers):
+    # Ваша реализация
+    return []
+"""##,
+            solutionCode: ##"""
+def get_even_squares(numbers):
+    return [x**2 for x in numbers if x % 2 == 0]
+"""##,
+            testCases: [
+                TaskTestCase(title: "Тест 1..6", inputDescription: "get_even_squares([1, 2, 3, 4, 5, 6])", expectedOutput: "[4, 16, 36]", validationCode: "get_even_squares([1, 2, 3, 4, 5, 6]) == [4, 16, 36]"),
+                TaskTestCase(title: "Только нечетные", inputDescription: "get_even_squares([1, 3, 5])", expectedOutput: "[]", validationCode: "get_even_squares([1, 3, 5]) == []")
+            ],
+            hintsRU: ["Используйте `[x**2 for x in numbers if x % 2 == 0]`."],
+            hintsEN: ["Use list comprehension with an if filter."]
+        )
+
         customChallenges["py_basics_types"] = LessonPracticeChallenge(
             id: "practice_py_basics_types",
             language: .python,

@@ -135,11 +135,16 @@ public enum LessonCategory: String, CaseIterable, Identifiable, Codable {
     
     // MARK: - Track 3: Python Core
     case pythonBasics = "python_basics"
+    case pythonControlFlow = "python_control_flow"
     case pythonCollections = "python_collections"
     case pythonFunctions = "python_functions"
     
     // MARK: - Track 4: Python Advanced
     case pythonOOP = "python_oop"
+    case pythonDunder = "python_dunder"
+    case pythonGenerators = "python_generators"
+    case pythonDecorators = "python_decorators"
+    case pythonAsync = "python_async"
     case pythonAdvanced = "python_advanced"
     
     // MARK: - Track 5: C# Core
@@ -181,11 +186,11 @@ public enum LessonCategory: String, CaseIterable, Identifiable, Codable {
             return .swiftUI
             
         // Python Core
-        case .pythonBasics, .pythonCollections, .pythonFunctions:
+        case .pythonBasics, .pythonControlFlow, .pythonCollections, .pythonFunctions:
             return .pythonCore
             
         // Python Advanced
-        case .pythonOOP, .pythonAdvanced:
+        case .pythonOOP, .pythonDunder, .pythonGenerators, .pythonDecorators, .pythonAsync, .pythonAdvanced:
             return .pythonAdvanced
             
         // C# Core
@@ -247,16 +252,26 @@ public enum LessonCategory: String, CaseIterable, Identifiable, Codable {
         // Python Core
         case .pythonBasics:
             return language == .russian ? "1. Синтаксис, Переменные и Типы" : "1. Python Syntax & Dynamic Types"
+        case .pythonControlFlow:
+            return language == .russian ? "2. Условия, Циклы и Match" : "2. Control Flow, Loops & Match"
         case .pythonCollections:
-            return language == .russian ? "2. Списки, Словари и Comprehensions" : "2. Lists, Dicts & Comprehensions"
+            return language == .russian ? "3. Списки, Словари, Кортежи и Sets" : "3. Collections, Dicts, Sets & Comprehensions"
         case .pythonFunctions:
-            return language == .russian ? "3. Функции, *args/**kwargs и Лямбды" : "3. Functions, Args & Lambdas"
+            return language == .russian ? "4. Функции, *args/**kwargs и Лямбды" : "4. Functions, Args & Lambdas"
             
         // Python Advanced
         case .pythonOOP:
-            return language == .russian ? "4. Классы, __init__ и Наследование" : "4. OOP, Classes & Inheritance"
+            return language == .russian ? "5. Классы, __init__ и Наследование" : "5. OOP, Classes & Inheritance"
+        case .pythonDunder:
+            return language == .russian ? "6. Магические Методы (Dunder) и Протоколы" : "6. Magic Methods (Dunder) & Protocols"
+        case .pythonGenerators:
+            return language == .russian ? "7. Генераторы, Итераторы и Contextlib" : "7. Generators, Iterators & Context"
+        case .pythonDecorators:
+            return language == .russian ? "8. Декораторы и Обработка Ошибок" : "8. Decorators & Exceptions"
+        case .pythonAsync:
+            return language == .russian ? "9. Asyncio, Event Loop и Архитектура GIL" : "9. Asyncio, Event Loop & GIL"
         case .pythonAdvanced:
-            return language == .russian ? "5. Декораторы, Генераторы и Контексты" : "5. Decorators, Generators & Contexts"
+            return language == .russian ? "10. Метаклассы и Оптимизация" : "10. Metaclasses & Optimization"
             
         // C# Core
         case .csharpBasics:
@@ -315,10 +330,15 @@ public enum LessonCategory: String, CaseIterable, Identifiable, Codable {
             
         // Python
         case .pythonBasics: return "chevron.left.forwardslash.chevron.right"
+        case .pythonControlFlow: return "arrow.triangle.branch"
         case .pythonCollections: return "list.bullet.rectangle"
         case .pythonFunctions: return "function"
         case .pythonOOP: return "cube.transparent"
-        case .pythonAdvanced: return "sparkles"
+        case .pythonDunder: return "sparkles"
+        case .pythonGenerators: return "arrow.triangle.2.circlepath"
+        case .pythonDecorators: return "slider.horizontal.3"
+        case .pythonAsync: return "bolt.badge.clock"
+        case .pythonAdvanced: return "cpu"
             
         // C#
         case .csharpBasics: return "number"
