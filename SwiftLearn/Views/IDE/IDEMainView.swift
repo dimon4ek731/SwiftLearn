@@ -45,10 +45,10 @@ public struct IDEMainView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .clipped()
         .onAppear(perform: syncEditorWithActiveFile)
-        .onChange(of: ideManager.activeProjectId) { _ in
+        .onChange(of: ideManager.activeProjectId) { _, _ in
             syncEditorWithActiveFile()
         }
-        .onChange(of: ideManager.activeProject?.activeFileId) { _ in
+        .onChange(of: ideManager.activeProject?.activeFileId) { _, _ in
             syncEditorWithActiveFile()
         }
         .sheet(isPresented: $showingProjectList) {
