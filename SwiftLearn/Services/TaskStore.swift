@@ -5133,7 +5133,672 @@ func findMedianSortedArrays(_ nums1: [Int], _ nums2: [Int]) -> Double {
 }
 """##,
                 xpReward: 100
-            )
+            ),
+            CodingTask(
+                id: "sql_task_select_distinct",
+                language: .sql,
+                titleRU: "Уникальные города клиентов (DISTINCT)",
+                titleEN: "Unique Customer Cities (DISTINCT)",
+                difficulty: .easy,
+                category: .sqlBasics,
+                summaryRU: "Исключение дубликатов из выборки с помощью оператора DISTINCT и сортировка по алфавиту.",
+                summaryEN: "Eliminating duplicate rows with DISTINCT and ascending alphabetic sorting.",
+                descriptionRU: "Напишите SQL-запрос, который выбирает уникальные города (`city`) из таблицы `customers` и сортирует их по возрастанию (`ORDER BY city`).",
+                descriptionEN: "Write a SQL query selecting unique `city` names from `customers`, sorted ascending.",
+                requirementsRU: ["Используйте SELECT DISTINCT city", "Таблица: customers", "Сортировка: ORDER BY city"],
+                requirementsEN: ["Use SELECT DISTINCT city", "Table: customers", "Sort: ORDER BY city"],
+                starterCode: ##"""
+-- Напишите ваш SQL-запрос
+SELECT city FROM customers;
+"""##,
+                testCases: [
+                    TaskTestCase(
+                        title: "Проверка SQL-запроса",
+                        inputDescription: "Выполнение запроса на базе SQLite",
+                        expectedOutput: "| Kazan |\n| Moscow |\n| Samara |",
+                        validationCode: "CREATE TABLE customers (id INT, name TEXT, city TEXT); INSERT INTO customers VALUES (1, 'Alice', 'Moscow'), (2, 'Bob', 'Kazan'), (3, 'Charlie', 'Moscow'), (4, 'Diana', 'Samara');"
+                    )
+                ],
+                hintsRU: ["Внимательно проверьте структуру таблиц и условия фильтрации."],
+                hintsEN: ["Check schema constraints and filtering predicates."],
+                solutionCode: ##"""
+SELECT DISTINCT city FROM customers ORDER BY city;
+"""##,
+                xpReward: 35
+            ),
+
+            CodingTask(
+                id: "sql_task_where_between_in",
+                language: .sql,
+                titleRU: "Фильтрация товаров по диапазону цены и категориям",
+                titleEN: "Product Filtering by Range & Category",
+                difficulty: .easy,
+                category: .sqlBasics,
+                summaryRU: "Комбинированная фильтрация с предикатами IN и BETWEEN, а также логическим оператором AND.",
+                summaryEN: "Combined filtering using IN, BETWEEN, and logical AND predicates.",
+                descriptionRU: "Выберите `title` и `price` из таблицы `products`, где категория (`category`) входит в список `('Electronics', 'Appliances')`, а цена `price` находится в диапазоне от `1000` до `5000` включительно. Отсортируйте результат по цене.",
+                descriptionEN: "Select `title` and `price` from `products` where `category IN ('Electronics', 'Appliances')` and `price BETWEEN 1000 AND 5000`. Sort by price.",
+                requirementsRU: ["Колонки: title, price", "Категории: IN ('Electronics', 'Appliances')", "Диапазон: BETWEEN 1000 AND 5000", "Сортировка: ORDER BY price"],
+                requirementsEN: ["Columns: title, price", "category IN ('Electronics', 'Appliances')", "price BETWEEN 1000 AND 5000", "ORDER BY price"],
+                starterCode: ##"""
+-- Напишите ваш SQL-запрос
+SELECT title, price FROM products;
+"""##,
+                testCases: [
+                    TaskTestCase(
+                        title: "Проверка SQL-запроса",
+                        inputDescription: "Выполнение запроса на базе SQLite",
+                        expectedOutput: "| Kettle | 1800 |\n| Headphones | 2500 |",
+                        validationCode: "CREATE TABLE products (id INT, title TEXT, category TEXT, price INT); INSERT INTO products VALUES (1, 'Headphones', 'Electronics', 2500), (2, 'Kettle', 'Appliances', 1800), (3, 'Phone', 'Electronics', 45000), (4, 'Book', 'Books', 800);"
+                    )
+                ],
+                hintsRU: ["Внимательно проверьте структуру таблиц и условия фильтрации."],
+                hintsEN: ["Check schema constraints and filtering predicates."],
+                solutionCode: ##"""
+SELECT title, price FROM products WHERE category IN ('Electronics', 'Appliances') AND price BETWEEN 1000 AND 5000 ORDER BY price;
+"""##,
+                xpReward: 35
+            ),
+
+            CodingTask(
+                id: "sql_task_null_handling",
+                language: .sql,
+                titleRU: "Поиск незавершенных заказов (IS NULL)",
+                titleEN: "Pending Orders & Null Handling (IS NULL)",
+                difficulty: .easy,
+                category: .sqlBasics,
+                summaryRU: "Правильная проверка отсутствующих значений в реляционных базах с помощью оператора IS NULL.",
+                summaryEN: "Accurate checking of absent values in relational databases using IS NULL.",
+                descriptionRU: "Найдите все заказы из таблицы `orders`, у которых дата доставки `delivered_at` не заполнена (`IS NULL`). Выведите `order_id` и `status`, упорядочив по `order_id`.",
+                descriptionEN: "Find orders where `delivered_at IS NULL`. Return `order_id` and `status` ordered by `order_id`.",
+                requirementsRU: ["Колонки: order_id, status", "Условие: delivered_at IS NULL", "Сортировка: ORDER BY order_id"],
+                requirementsEN: ["Columns: order_id, status", "Condition: delivered_at IS NULL", "Sort: ORDER BY order_id"],
+                starterCode: ##"""
+-- Напишите ваш SQL-запрос
+SELECT order_id, status FROM orders;
+"""##,
+                testCases: [
+                    TaskTestCase(
+                        title: "Проверка SQL-запроса",
+                        inputDescription: "Выполнение запроса на базе SQLite",
+                        expectedOutput: "| 101 | shipped |\n| 103 | processing |",
+                        validationCode: "CREATE TABLE orders (order_id INT, status TEXT, delivered_at TEXT); INSERT INTO orders VALUES (101, 'shipped', NULL), (102, 'delivered', '2026-11-10'), (103, 'processing', NULL);"
+                    )
+                ],
+                hintsRU: ["Внимательно проверьте структуру таблиц и условия фильтрации."],
+                hintsEN: ["Check schema constraints and filtering predicates."],
+                solutionCode: ##"""
+SELECT order_id, status FROM orders WHERE delivered_at IS NULL ORDER BY order_id;
+"""##,
+                xpReward: 35
+            ),
+
+            CodingTask(
+                id: "sql_task_aggregations_stats",
+                language: .sql,
+                titleRU: "Метрики зарплатного фонда компании (COUNT, SUM, AVG)",
+                titleEN: "Payroll Aggregations & Summary",
+                difficulty: .easy,
+                category: .sqlAggregations,
+                summaryRU: "Агрегатные функции COUNT, MIN, MAX и AVG для вычисления сводных метрик по набору строк.",
+                summaryEN: "Aggregate functions COUNT, MIN, MAX, and AVG for calculating summary metrics over table rows.",
+                descriptionRU: "Вычислите сводную статистику по таблице `employees`: общее количество сотрудников `COUNT(*)`, минимальную зарплату `MIN(salary)`, максимальную зарплату `MAX(salary)` и среднюю зарплату `AVG(salary)`.",
+                descriptionEN: "Calculate summary metrics over `employees`: `COUNT(*)`, `MIN(salary)`, `MAX(salary)`, and `AVG(salary)`.",
+                requirementsRU: ["Функции: COUNT(*), MIN(salary), MAX(salary), AVG(salary)", "Таблица: employees"],
+                requirementsEN: ["Functions: COUNT(*), MIN(salary), MAX(salary), AVG(salary)", "Table: employees"],
+                starterCode: ##"""
+-- Напишите ваш SQL-запрос
+SELECT COUNT(*), MIN(salary) FROM employees;
+"""##,
+                testCases: [
+                    TaskTestCase(
+                        title: "Проверка SQL-запроса",
+                        inputDescription: "Выполнение запроса на базе SQLite",
+                        expectedOutput: "| 3 | 50000 | 120000 | 80000.0 |",
+                        validationCode: "CREATE TABLE employees (id INT, name TEXT, salary INT); INSERT INTO employees VALUES (1, 'Ivan', 50000), (2, 'Anna', 120000), (3, 'Oleg', 70000);"
+                    )
+                ],
+                hintsRU: ["Внимательно проверьте структуру таблиц и условия фильтрации."],
+                hintsEN: ["Check schema constraints and filtering predicates."],
+                solutionCode: ##"""
+SELECT COUNT(*), MIN(salary), MAX(salary), AVG(salary) FROM employees;
+"""##,
+                xpReward: 35
+            ),
+
+            CodingTask(
+                id: "sql_task_group_by_having",
+                language: .sql,
+                titleRU: "Крупные отделы с бюджетом выше 200 000 (HAVING)",
+                titleEN: "Departments with High Budget (HAVING)",
+                difficulty: .medium,
+                category: .sqlAggregations,
+                summaryRU: "Группировка записей GROUP BY с последующей пост-фильтрацией агрегатов через предложение HAVING.",
+                summaryEN: "Grouping records with GROUP BY and post-filtering aggregate groups using HAVING.",
+                descriptionRU: "Сгруппируйте сотрудников из таблицы `staff` по отделам (`department`), вычислите суммарный бюджет `SUM(salary) AS total_payroll` и число сотрудников `COUNT(*) AS emp_count`. Оставьте только отделы, где суммарный бюджет строго больше `200000`. Отсортируйте по `total_payroll` по убыванию.",
+                descriptionEN: "Group by `department`, calculate `SUM(salary) AS total_payroll` and `COUNT(*) AS emp_count`. Filter with `HAVING SUM(salary) > 200000`. Order by total_payroll DESC.",
+                requirementsRU: ["Группировка: GROUP BY department", "Фильтр групп: HAVING SUM(salary) > 200000", "Сортировка: ORDER BY total_payroll DESC"],
+                requirementsEN: ["GROUP BY department", "HAVING SUM(salary) > 200000", "ORDER BY total_payroll DESC"],
+                starterCode: ##"""
+-- Напишите ваш SQL-запрос
+SELECT department FROM staff GROUP BY department;
+"""##,
+                testCases: [
+                    TaskTestCase(
+                        title: "Проверка SQL-запроса",
+                        inputDescription: "Выполнение запроса на базе SQLite",
+                        expectedOutput: "| IT | 270000 | 2 |\n| Finance | 250000 | 1 |",
+                        validationCode: "CREATE TABLE staff (id INT, name TEXT, department TEXT, salary INT); INSERT INTO staff VALUES (1, 'Alice', 'IT', 150000), (2, 'Bob', 'IT', 120000), (3, 'Charlie', 'HR', 60000), (4, 'David', 'HR', 70000), (5, 'Eve', 'Finance', 250000);"
+                    )
+                ],
+                hintsRU: ["Внимательно проверьте структуру таблиц и условия фильтрации."],
+                hintsEN: ["Check schema constraints and filtering predicates."],
+                solutionCode: ##"""
+SELECT department, SUM(salary) AS total_payroll, COUNT(*) AS emp_count FROM staff GROUP BY department HAVING SUM(salary) > 200000 ORDER BY total_payroll DESC;
+"""##,
+                xpReward: 45
+            ),
+
+            CodingTask(
+                id: "sql_task_inner_join_orders",
+                language: .sql,
+                titleRU: "Связка клиентов и оформленных заказов (INNER JOIN)",
+                titleEN: "Customer Orders Inner Join",
+                difficulty: .easy,
+                category: .sqlJoins,
+                summaryRU: "Объединение двух реляционных таблиц по первичному и внешнему ключам с помощью INNER JOIN.",
+                summaryEN: "Joining two relational tables on primary and foreign keys using INNER JOIN.",
+                descriptionRU: "Объедините таблицы `clients` и `orders` по общему полю `client_id`. Выведите имя клиента `clients.name`, номер заказа `orders.order_id` и сумму заказа `orders.amount`, отсортировав результат по `order_id`.",
+                descriptionEN: "Join `clients` and `orders` on `client_id`. Return `clients.name`, `orders.order_id`, and `orders.amount` ordered by `order_id`.",
+                requirementsRU: ["Связка: clients.client_id = orders.client_id", "Колонки: clients.name, orders.order_id, orders.amount", "Сортировка: ORDER BY orders.order_id"],
+                requirementsEN: ["Join on clients.client_id = orders.client_id", "Columns: clients.name, orders.order_id, orders.amount", "ORDER BY orders.order_id"],
+                starterCode: ##"""
+-- Напишите ваш SQL-запрос
+SELECT clients.name FROM clients INNER JOIN orders ON clients.client_id = orders.client_id;
+"""##,
+                testCases: [
+                    TaskTestCase(
+                        title: "Проверка SQL-запроса",
+                        inputDescription: "Выполнение запроса на базе SQLite",
+                        expectedOutput: "| Elena | 101 | 1500 |\n| Elena | 102 | 3200 |\n| Maxim | 103 | 750 |",
+                        validationCode: "CREATE TABLE clients (client_id INT, name TEXT); CREATE TABLE orders (order_id INT, client_id INT, amount INT); INSERT INTO clients VALUES (1, 'Elena'), (2, 'Maxim'); INSERT INTO orders VALUES (101, 1, 1500), (102, 1, 3200), (103, 2, 750);"
+                    )
+                ],
+                hintsRU: ["Внимательно проверьте структуру таблиц и условия фильтрации."],
+                hintsEN: ["Check schema constraints and filtering predicates."],
+                solutionCode: ##"""
+SELECT clients.name, orders.order_id, orders.amount FROM clients INNER JOIN orders ON clients.client_id = orders.client_id ORDER BY orders.order_id;
+"""##,
+                xpReward: 40
+            ),
+
+            CodingTask(
+                id: "sql_task_left_join_inactive",
+                language: .sql,
+                titleRU: "Клиенты без единой покупки (LEFT JOIN & IS NULL)",
+                titleEN: "Customers with Zero Orders (LEFT JOIN)",
+                difficulty: .medium,
+                category: .sqlJoins,
+                summaryRU: "Поиск отсутствующих связей через левое внешнее соединение LEFT JOIN и проверку orders.id IS NULL.",
+                summaryEN: "Detecting missing relationships via LEFT JOIN and filtering with orders.id IS NULL.",
+                descriptionRU: "Найдите имена всех пользователей из таблицы `users`, которые **ни разу не сделали заказ** в таблице `orders`. Выведите `users.name`, упорядочив по алфавиту.",
+                descriptionEN: "Find names of all users who never placed an order in `orders`. Select `users.name` sorted alphabetically.",
+                requirementsRU: ["Используйте: users LEFT JOIN orders ON users.id = orders.user_id", "Фильтр отсутствия: WHERE orders.id IS NULL", "Сортировка: ORDER BY users.name"],
+                requirementsEN: ["users LEFT JOIN orders ON users.id = orders.user_id", "WHERE orders.id IS NULL", "ORDER BY users.name"],
+                starterCode: ##"""
+-- Напишите ваш SQL-запрос
+SELECT users.name FROM users LEFT JOIN orders ON users.id = orders.user_id;
+"""##,
+                testCases: [
+                    TaskTestCase(
+                        title: "Проверка SQL-запроса",
+                        inputDescription: "Выполнение запроса на базе SQLite",
+                        expectedOutput: "| Boris |\n| Clara |",
+                        validationCode: "CREATE TABLE users (id INT, name TEXT); CREATE TABLE orders (id INT, user_id INT); INSERT INTO users VALUES (1, 'Anna'), (2, 'Boris'), (3, 'Clara'); INSERT INTO orders VALUES (10, 1), (11, 1);"
+                    )
+                ],
+                hintsRU: ["Внимательно проверьте структуру таблиц и условия фильтрации."],
+                hintsEN: ["Check schema constraints and filtering predicates."],
+                solutionCode: ##"""
+SELECT users.name FROM users LEFT JOIN orders ON users.id = orders.user_id WHERE orders.id IS NULL ORDER BY users.name;
+"""##,
+                xpReward: 45
+            ),
+
+            CodingTask(
+                id: "sql_task_self_join_managers",
+                language: .sql,
+                titleRU: "Сотрудники и их руководители (SELF JOIN)",
+                titleEN: "Employees & Managers Hierarchy (SELF JOIN)",
+                difficulty: .medium,
+                category: .sqlJoins,
+                summaryRU: "Самообъединение таблицы с самой собой по иерархическому внешнему ключу manager_id.",
+                summaryEN: "Self-joining a table with itself on a hierarchical foreign key manager_id.",
+                descriptionRU: "Таблица `employees` хранит сотрудников с колонками `emp_id`, `emp_name` и `manager_id` (ссылающимся на `emp_id` руководителя). Напишите запрос, возвращающий имя сотрудника `e.emp_name AS employee` и имя его руководителя `m.emp_name AS manager` для всех сотрудников, у которых есть руководитель.",
+                descriptionEN: "Self-join `employees` to return `employee` and `manager` names for all subordinates.",
+                requirementsRU: ["Объединение: employees e INNER JOIN employees m ON e.manager_id = m.emp_id", "Алиасы колонок: e.emp_name AS employee, m.emp_name AS manager", "Сортировка: ORDER BY e.emp_id"],
+                requirementsEN: ["employees e INNER JOIN employees m ON e.manager_id = m.emp_id", "e.emp_name AS employee, m.emp_name AS manager", "ORDER BY e.emp_id"],
+                starterCode: ##"""
+-- Напишите ваш SQL-запрос
+SELECT e.emp_name, m.emp_name FROM employees e INNER JOIN employees m ON e.manager_id = m.emp_id;
+"""##,
+                testCases: [
+                    TaskTestCase(
+                        title: "Проверка SQL-запроса",
+                        inputDescription: "Выполнение запроса на базе SQLite",
+                        expectedOutput: "| Dmitry Lead | Arthur CEO |\n| Sergey Dev | Dmitry Lead |",
+                        validationCode: "CREATE TABLE employees (emp_id INT, emp_name TEXT, manager_id INT); INSERT INTO employees VALUES (1, 'Arthur CEO', NULL), (2, 'Dmitry Lead', 1), (3, 'Sergey Dev', 2);"
+                    )
+                ],
+                hintsRU: ["Внимательно проверьте структуру таблиц и условия фильтрации."],
+                hintsEN: ["Check schema constraints and filtering predicates."],
+                solutionCode: ##"""
+SELECT e.emp_name AS employee, m.emp_name AS manager FROM employees e INNER JOIN employees m ON e.manager_id = m.emp_id ORDER BY e.emp_id;
+"""##,
+                xpReward: 45
+            ),
+
+            CodingTask(
+                id: "sql_task_subquery_above_avg",
+                language: .sql,
+                titleRU: "Сотрудники с зарплатой выше средней (Вложенный SELECT)",
+                titleEN: "Employees Earning Above Average (Subquery)",
+                difficulty: .medium,
+                category: .sqlBasics,
+                summaryRU: "Использование скалярного вложенного подзапроса в условии WHERE для динамического сравнения со средним.",
+                summaryEN: "Using a scalar subquery inside WHERE to dynamically compare against table averages.",
+                descriptionRU: "Выберите `name` и `salary` сотрудников из таблицы `workers`, чья зарплата строго выше средней зарплаты всех сотрудников компании: `WHERE salary > (SELECT AVG(salary) FROM workers)`. Отсортируйте по зарплате по убыванию.",
+                descriptionEN: "Select `name` and `salary` from `workers` where `salary > (SELECT AVG(salary) FROM workers)` sorted descending.",
+                requirementsRU: ["Колонки: name, salary", "Подзапрос: WHERE salary > (SELECT AVG(salary) FROM workers)", "Сортировка: ORDER BY salary DESC"],
+                requirementsEN: ["Columns: name, salary", "WHERE salary > (SELECT AVG(salary) FROM workers)", "ORDER BY salary DESC"],
+                starterCode: ##"""
+-- Напишите ваш SQL-запрос
+SELECT name, salary FROM workers;
+"""##,
+                testCases: [
+                    TaskTestCase(
+                        title: "Проверка SQL-запроса",
+                        inputDescription: "Выполнение запроса на базе SQLite",
+                        expectedOutput: "| Cyril | 110000 |",
+                        validationCode: "CREATE TABLE workers (id INT, name TEXT, salary INT); INSERT INTO workers VALUES (1, 'Alex', 40000), (2, 'Boris', 60000), (3, 'Cyril', 110000);"
+                    )
+                ],
+                hintsRU: ["Внимательно проверьте структуру таблиц и условия фильтрации."],
+                hintsEN: ["Check schema constraints and filtering predicates."],
+                solutionCode: ##"""
+SELECT name, salary FROM workers WHERE salary > (SELECT AVG(salary) FROM workers) ORDER BY salary DESC;
+"""##,
+                xpReward: 40
+            ),
+
+            CodingTask(
+                id: "sql_task_subquery_exists",
+                language: .sql,
+                titleRU: "Поиск поставщиков с активными поставками (EXISTS)",
+                titleEN: "Suppliers with Active Shipments (EXISTS)",
+                difficulty: .medium,
+                category: .sqlJoins,
+                summaryRU: "Высокоэффективная проверка наличия связанных записей с помощью логического предиката WHERE EXISTS.",
+                summaryEN: "High-performance checking of related record existence via WHERE EXISTS.",
+                descriptionRU: "Найдите `name` поставщиков из таблицы `suppliers`, у которых есть хотя бы одна поставка в таблице `shipments` со статусом `status = 'in_transit'`. Используйте предикат `WHERE EXISTS (...)`.",
+                descriptionEN: "Find supplier names with at least one shipment having `status = 'in_transit'` using `WHERE EXISTS`.",
+                requirementsRU: ["Предикат: WHERE EXISTS (SELECT 1 FROM shipments WHERE ...)", "Статус: status = 'in_transit'", "Сортировка: ORDER BY name"],
+                requirementsEN: ["WHERE EXISTS (SELECT 1 FROM shipments WHERE ...)", "status = 'in_transit'", "ORDER BY name"],
+                starterCode: ##"""
+-- Напишите ваш SQL-запрос
+SELECT name FROM suppliers;
+"""##,
+                testCases: [
+                    TaskTestCase(
+                        title: "Проверка SQL-запроса",
+                        inputDescription: "Выполнение запроса на базе SQLite",
+                        expectedOutput: "| Nordic Log |",
+                        validationCode: "CREATE TABLE suppliers (id INT, name TEXT); CREATE TABLE shipments (id INT, supplier_id INT, status TEXT); INSERT INTO suppliers VALUES (1, 'Nordic Log'), (2, 'TransAsia'), (3, 'EuroCargo'); INSERT INTO shipments VALUES (101, 1, 'in_transit'), (102, 3, 'delivered');"
+                    )
+                ],
+                hintsRU: ["Внимательно проверьте структуру таблиц и условия фильтрации."],
+                hintsEN: ["Check schema constraints and filtering predicates."],
+                solutionCode: ##"""
+SELECT name FROM suppliers WHERE EXISTS (SELECT 1 FROM shipments WHERE shipments.supplier_id = suppliers.id AND shipments.status = 'in_transit') ORDER BY name;
+"""##,
+                xpReward: 45
+            ),
+
+            CodingTask(
+                id: "sql_task_case_when_conditional",
+                language: .sql,
+                titleRU: "Категоризация чека по размеру (CASE WHEN)",
+                titleEN: "Order Size Categorization (CASE WHEN)",
+                difficulty: .easy,
+                category: .sqlBasics,
+                summaryRU: "Ветвление логики внутри запроса с помощью условного выражения CASE WHEN ... THEN ... ELSE ... END.",
+                summaryEN: "Conditional in-query branching using CASE WHEN ... THEN ... ELSE ... END.",
+                descriptionRU: "Для каждого заказа из таблицы `orders` выведите `order_id`, сумму `amount` и вычисляемый столбец `tier`: `'Small'` если amount < 1000, `'Medium'` если amount < 5000, и `'Large'` в остальных случаях. Отсортируйте по `order_id`.",
+                descriptionEN: "Select `order_id, amount`, and a computed column `tier` using `CASE WHEN` (< 1000 'Small', < 5000 'Medium', else 'Large').",
+                requirementsRU: ["Выражение: CASE WHEN amount < 1000 ... END AS tier", "Колонки: order_id, amount, tier", "Сортировка: ORDER BY order_id"],
+                requirementsEN: ["CASE WHEN amount < 1000 ... END AS tier", "Columns: order_id, amount, tier", "ORDER BY order_id"],
+                starterCode: ##"""
+-- Напишите ваш SQL-запрос
+SELECT order_id, amount FROM orders;
+"""##,
+                testCases: [
+                    TaskTestCase(
+                        title: "Проверка SQL-запроса",
+                        inputDescription: "Выполнение запроса на базе SQLite",
+                        expectedOutput: "| 1 | 450 | Small |\n| 2 | 2300 | Medium |\n| 3 | 12000 | Large |",
+                        validationCode: "CREATE TABLE orders (order_id INT, amount INT); INSERT INTO orders VALUES (1, 450), (2, 2300), (3, 12000);"
+                    )
+                ],
+                hintsRU: ["Внимательно проверьте структуру таблиц и условия фильтрации."],
+                hintsEN: ["Check schema constraints and filtering predicates."],
+                solutionCode: ##"""
+SELECT order_id, amount, CASE WHEN amount < 1000 THEN 'Small' WHEN amount < 5000 THEN 'Medium' ELSE 'Large' END AS tier FROM orders ORDER BY order_id;
+"""##,
+                xpReward: 35
+            ),
+
+            CodingTask(
+                id: "sql_task_union_all_combine",
+                language: .sql,
+                titleRU: "Объединение телефонных книг (UNION ALL)",
+                titleEN: "Combining Contact Books (UNION ALL)",
+                difficulty: .easy,
+                category: .sqlJoins,
+                summaryRU: "Вертикальное объединение строк из двух таблиц с одинаковыми колонками с сохранением дубликатов через UNION ALL.",
+                summaryEN: "Vertical concatenation of table rows with schema alignment via UNION ALL.",
+                descriptionRU: "Объедините контакты из таблицы `clients_contacts (name, phone)` и таблицы `partners_contacts (name, phone)` в единый список. Отсортируйте по `name, phone`.",
+                descriptionEN: "Concatenate contacts from `clients_contacts` and `partners_contacts` using `UNION ALL`. Sort by name, phone.",
+                requirementsRU: ["Оператор: UNION ALL", "Колонки: name, phone", "Сортировка: ORDER BY name, phone"],
+                requirementsEN: ["UNION ALL operator", "Columns: name, phone", "ORDER BY name, phone"],
+                starterCode: ##"""
+-- Напишите ваш SQL-запрос
+SELECT name, phone FROM clients_contacts;
+"""##,
+                testCases: [
+                    TaskTestCase(
+                        title: "Проверка SQL-запроса",
+                        inputDescription: "Выполнение запроса на базе SQLite",
+                        expectedOutput: "| Alice | 111 |\n| Alice | 111 |\n| Bob | 222 |\n| Charlie | 333 |",
+                        validationCode: "CREATE TABLE clients_contacts (name TEXT, phone TEXT); CREATE TABLE partners_contacts (name TEXT, phone TEXT); INSERT INTO clients_contacts VALUES ('Alice', '111'), ('Bob', '222'); INSERT INTO partners_contacts VALUES ('Charlie', '333'), ('Alice', '111');"
+                    )
+                ],
+                hintsRU: ["Внимательно проверьте структуру таблиц и условия фильтрации."],
+                hintsEN: ["Check schema constraints and filtering predicates."],
+                solutionCode: ##"""
+SELECT name, phone FROM clients_contacts UNION ALL SELECT name, phone FROM partners_contacts ORDER BY name, phone;
+"""##,
+                xpReward: 35
+            ),
+
+            CodingTask(
+                id: "sql_task_ddl_create_table",
+                language: .sql,
+                titleRU: "Проектирование схемы таблицы студентов (CREATE TABLE)",
+                titleEN: "Schema Design with Constraints (CREATE TABLE)",
+                difficulty: .easy,
+                category: .sqlDdlDml,
+                summaryRU: "Определение структуры таблицы с ограничениями целостности: PRIMARY KEY, NOT NULL, CHECK и UNIQUE.",
+                summaryEN: "Table DDL definition with PRIMARY KEY, NOT NULL, CHECK, and UNIQUE schema constraints.",
+                descriptionRU: "Напишите SQL-команду DDL для создания таблицы `students` со следующими полями: `id INTEGER PRIMARY KEY`, `full_name TEXT NOT NULL`, `age INTEGER CHECK(age >= 16)`, `email TEXT UNIQUE`.",
+                descriptionEN: "Write a DDL statement creating `students` table with `id INTEGER PRIMARY KEY`, `full_name TEXT NOT NULL`, `age INTEGER CHECK(age >= 16)`, and `email TEXT UNIQUE`.",
+                requirementsRU: ["CREATE TABLE students (...)", "PRIMARY KEY на поле id", "CHECK(age >= 16)", "UNIQUE на поле email"],
+                requirementsEN: ["CREATE TABLE students (...)", "PRIMARY KEY on id", "CHECK(age >= 16)", "UNIQUE on email"],
+                starterCode: ##"""
+-- Напишите команду CREATE TABLE
+CREATE TABLE students (
+);
+"""##,
+                testCases: [
+                    TaskTestCase(
+                        title: "Проверка SQL-запроса",
+                        inputDescription: "Выполнение запроса на базе SQLite",
+                        expectedOutput: "",
+                        validationCode: "SELECT 1;"
+                    )
+                ],
+                hintsRU: ["Внимательно проверьте структуру таблиц и условия фильтрации."],
+                hintsEN: ["Check schema constraints and filtering predicates."],
+                solutionCode: ##"""
+CREATE TABLE students (id INTEGER PRIMARY KEY, full_name TEXT NOT NULL, age INTEGER CHECK(age >= 16), email TEXT UNIQUE);
+"""##,
+                xpReward: 35
+            ),
+
+            CodingTask(
+                id: "sql_task_dml_update_prices",
+                language: .sql,
+                titleRU: "Массовая индексация цен (UPDATE с условием)",
+                titleEN: "Batch Price Inflation (UPDATE)",
+                difficulty: .easy,
+                category: .sqlDdlDml,
+                summaryRU: "Модификация существующих строк в таблице с помощью команды UPDATE и арифметического пересчета.",
+                summaryEN: "Modifying existing table rows using UPDATE and arithmetic column recomputation.",
+                descriptionRU: "В таблице `inventory` увеличьте цену `price` на 15% (`CAST(price * 1.15 AS INT)`) для товаров категории `'Beverages'`. Затем выполните выборку `SELECT title, price FROM inventory WHERE category = 'Beverages' ORDER BY id;`.",
+                descriptionEN: "Update `price = CAST(price * 1.15 AS INT)` for items with `category = 'Beverages'`. Then select `title, price` ordered by id.",
+                requirementsRU: ["UPDATE inventory SET price = CAST(price * 1.15 AS INT) WHERE category = 'Beverages';", "SELECT title, price FROM inventory WHERE category = 'Beverages' ORDER BY id;"],
+                requirementsEN: ["UPDATE inventory SET price = ... WHERE category = 'Beverages';", "SELECT title, price FROM inventory WHERE ..."],
+                starterCode: ##"""
+-- Напишите ваш SQL-запрос
+UPDATE inventory SET price = price WHERE category = 'Beverages';
+SELECT title, price FROM inventory WHERE category = 'Beverages';
+"""##,
+                testCases: [
+                    TaskTestCase(
+                        title: "Проверка SQL-запроса",
+                        inputDescription: "Выполнение запроса на базе SQLite",
+                        expectedOutput: "| Coffee | 230 |\n| Tea | 115 |",
+                        validationCode: "CREATE TABLE inventory (id INT, title TEXT, category TEXT, price INT); INSERT INTO inventory VALUES (1, 'Coffee', 'Beverages', 200), (2, 'Tea', 'Beverages', 100), (3, 'Snack', 'Food', 50);"
+                    )
+                ],
+                hintsRU: ["Внимательно проверьте структуру таблиц и условия фильтрации."],
+                hintsEN: ["Check schema constraints and filtering predicates."],
+                solutionCode: ##"""
+UPDATE inventory SET price = CAST(price * 1.15 AS INT) WHERE category = 'Beverages'; SELECT title, price FROM inventory WHERE category = 'Beverages' ORDER BY id;
+"""##,
+                xpReward: 40
+            ),
+
+            CodingTask(
+                id: "sql_task_dml_delete_inactive",
+                language: .sql,
+                titleRU: "Очистка устаревших сессий (DELETE)",
+                titleEN: "Expired Sessions Cleanup (DELETE)",
+                difficulty: .easy,
+                category: .sqlDdlDml,
+                summaryRU: "Удаление устаревших строк таблицы по условию с помощью команды DELETE FROM.",
+                summaryEN: "Purging obsolete table rows based on filter predicates using DELETE FROM.",
+                descriptionRU: "Удалите из таблицы `sessions` записи со статусом `status = 'expired'`. Затем выберите оставшиеся записи `SELECT session_id, status FROM sessions ORDER BY session_id;`.",
+                descriptionEN: "Delete rows where `status = 'expired'`. Then select remaining records ordered by session_id.",
+                requirementsRU: ["DELETE FROM sessions WHERE status = 'expired';", "SELECT session_id, status FROM sessions ORDER BY session_id;"],
+                requirementsEN: ["DELETE FROM sessions WHERE status = 'expired';", "SELECT session_id, status FROM sessions ORDER BY session_id;"],
+                starterCode: ##"""
+-- Напишите ваш SQL-запрос
+DELETE FROM sessions;
+SELECT session_id, status FROM sessions;
+"""##,
+                testCases: [
+                    TaskTestCase(
+                        title: "Проверка SQL-запроса",
+                        inputDescription: "Выполнение запроса на базе SQLite",
+                        expectedOutput: "| s1 | active |\n| s3 | active |",
+                        validationCode: "CREATE TABLE sessions (session_id TEXT, status TEXT); INSERT INTO sessions VALUES ('s1', 'active'), ('s2', 'expired'), ('s3', 'active');"
+                    )
+                ],
+                hintsRU: ["Внимательно проверьте структуру таблиц и условия фильтрации."],
+                hintsEN: ["Check schema constraints and filtering predicates."],
+                solutionCode: ##"""
+DELETE FROM sessions WHERE status = 'expired'; SELECT session_id, status FROM sessions ORDER BY session_id;
+"""##,
+                xpReward: 35
+            ),
+
+            CodingTask(
+                id: "sql_task_window_row_number",
+                language: .sql,
+                titleRU: "Топ-1 сотрудник в каждом отделе (ROW_NUMBER)",
+                titleEN: "Top Earner per Department (ROW_NUMBER)",
+                difficulty: .hard,
+                category: .sqlWindow,
+                summaryRU: "Секционирование данных оконной функцией ROW_NUMBER() OVER (PARTITION BY ... ORDER BY ...) и фильтрация через CTE.",
+                summaryEN: "Partitioned ranking via ROW_NUMBER() OVER (PARTITION BY ... ORDER BY ...) and CTE filtering.",
+                descriptionRU: "С помощью оконной функции `ROW_NUMBER()` и общего табличного выражения `WITH` найдите сотрудника с наибольшей зарплатой в каждом отделе (`dept`). Выведите `dept, name, salary`, отсортировав по названию отдела.",
+                descriptionEN: "Find the highest-earning employee per department using `ROW_NUMBER() OVER (PARTITION BY dept ORDER BY salary DESC)`. Output dept, name, salary.",
+                requirementsRU: ["Оконная функция: ROW_NUMBER() OVER (PARTITION BY dept ORDER BY salary DESC)", "Фильтрация: WHERE rn = 1", "Сортировка: ORDER BY dept"],
+                requirementsEN: ["ROW_NUMBER() OVER (PARTITION BY dept ORDER BY salary DESC)", "WHERE rn = 1", "ORDER BY dept"],
+                starterCode: ##"""
+-- Напишите ваш SQL-запрос с CTE
+WITH Ranked AS (
+    SELECT name, dept, salary FROM staff
+)
+SELECT dept, name, salary FROM Ranked;
+"""##,
+                testCases: [
+                    TaskTestCase(
+                        title: "Проверка SQL-запроса",
+                        inputDescription: "Выполнение запроса на базе SQLite",
+                        expectedOutput: "| IT | Anna | 180000 |\n| Sales | Pavel | 110000 |",
+                        validationCode: "CREATE TABLE staff (name TEXT, dept TEXT, salary INT); INSERT INTO staff VALUES ('Anna', 'IT', 180000), ('Oleg', 'IT', 120000), ('Maria', 'Sales', 90000), ('Pavel', 'Sales', 110000);"
+                    )
+                ],
+                hintsRU: ["Внимательно проверьте структуру таблиц и условия фильтрации."],
+                hintsEN: ["Check schema constraints and filtering predicates."],
+                solutionCode: ##"""
+WITH Ranked AS (SELECT name, dept, salary, ROW_NUMBER() OVER (PARTITION BY dept ORDER BY salary DESC) as rn FROM staff) SELECT dept, name, salary FROM Ranked WHERE rn = 1 ORDER BY dept;
+"""##,
+                xpReward: 50
+            ),
+
+            CodingTask(
+                id: "sql_task_window_dense_rank",
+                language: .sql,
+                titleRU: "Плотный рейтинг продавцов (DENSE_RANK)",
+                titleEN: "Dense Sales Ranking (DENSE_RANK)",
+                difficulty: .medium,
+                category: .sqlWindow,
+                summaryRU: "Ранжирование без пропусков номеров при одинаковых значениях с помощью DENSE_RANK().",
+                summaryEN: "Gapless ranking for tied values using DENSE_RANK() OVER (ORDER BY ...).",
+                descriptionRU: "Назначьте рейтинг продавцам в таблице `leaderboard` по убыванию объема продаж `sales_amount`, используя оконную функцию `DENSE_RANK() OVER (ORDER BY sales_amount DESC) AS rank`. Выведите `seller, sales_amount, rank`, отсортировав по рангу и имени.",
+                descriptionEN: "Rank sellers by sales volume descending using `DENSE_RANK() OVER (ORDER BY sales_amount DESC) AS rank`.",
+                requirementsRU: ["Оконная функция: DENSE_RANK() OVER (ORDER BY sales_amount DESC) AS rank", "Колонки: seller, sales_amount, rank", "Сортировка: ORDER BY rank, seller"],
+                requirementsEN: ["DENSE_RANK() OVER (ORDER BY sales_amount DESC) AS rank", "Columns: seller, sales_amount, rank", "ORDER BY rank, seller"],
+                starterCode: ##"""
+-- Напишите ваш SQL-запрос
+SELECT seller, sales_amount FROM leaderboard;
+"""##,
+                testCases: [
+                    TaskTestCase(
+                        title: "Проверка SQL-запроса",
+                        inputDescription: "Выполнение запроса на базе SQLite",
+                        expectedOutput: "| Dmitry | 500000 | 1 |\n| Elena | 500000 | 1 |\n| Sergey | 320000 | 2 |\n| Victor | 180000 | 3 |",
+                        validationCode: "CREATE TABLE leaderboard (seller TEXT, sales_amount INT); INSERT INTO leaderboard VALUES ('Dmitry', 500000), ('Elena', 500000), ('Sergey', 320000), ('Victor', 180000);"
+                    )
+                ],
+                hintsRU: ["Внимательно проверьте структуру таблиц и условия фильтрации."],
+                hintsEN: ["Check schema constraints and filtering predicates."],
+                solutionCode: ##"""
+SELECT seller, sales_amount, DENSE_RANK() OVER (ORDER BY sales_amount DESC) AS rank FROM leaderboard ORDER BY rank, seller;
+"""##,
+                xpReward: 45
+            ),
+
+            CodingTask(
+                id: "sql_task_window_running_total",
+                language: .sql,
+                titleRU: "Нарастающий итог ежедневной выручки (Running Total)",
+                titleEN: "Running Total Revenue (Cumulative Window)",
+                difficulty: .hard,
+                category: .sqlWindow,
+                summaryRU: "Кумулятивная сумма по дням с помощью накопительного окна SUM() OVER (ORDER BY date).",
+                summaryEN: "Cumulative running total computation over timeline using SUM() OVER (ORDER BY date).",
+                descriptionRU: "Вычислите накопительный нарастающий итог выручки по дням из таблицы `daily_sales` с помощью оконной функции `SUM(daily_revenue) OVER (ORDER BY sale_date) AS running_total`. Выведите `sale_date, daily_revenue, running_total`.",
+                descriptionEN: "Compute daily cumulative revenue running total using `SUM(daily_revenue) OVER (ORDER BY sale_date) AS running_total`.",
+                requirementsRU: ["Окно: SUM(daily_revenue) OVER (ORDER BY sale_date) AS running_total", "Колонки: sale_date, daily_revenue, running_total", "Сортировка: ORDER BY sale_date"],
+                requirementsEN: ["SUM(daily_revenue) OVER (ORDER BY sale_date) AS running_total", "Columns: sale_date, daily_revenue, running_total", "ORDER BY sale_date"],
+                starterCode: ##"""
+-- Напишите ваш SQL-запрос
+SELECT sale_date, daily_revenue FROM daily_sales;
+"""##,
+                testCases: [
+                    TaskTestCase(
+                        title: "Проверка SQL-запроса",
+                        inputDescription: "Выполнение запроса на базе SQLite",
+                        expectedOutput: "| 2026-11-01 | 1000 | 1000 |\n| 2026-11-02 | 1500 | 2500 |\n| 2026-11-03 | 2000 | 4500 |",
+                        validationCode: "CREATE TABLE daily_sales (sale_date TEXT, daily_revenue INT); INSERT INTO daily_sales VALUES ('2026-11-01', 1000), ('2026-11-02', 1500), ('2026-11-03', 2000);"
+                    )
+                ],
+                hintsRU: ["Внимательно проверьте структуру таблиц и условия фильтрации."],
+                hintsEN: ["Check schema constraints and filtering predicates."],
+                solutionCode: ##"""
+SELECT sale_date, daily_revenue, SUM(daily_revenue) OVER (ORDER BY sale_date) AS running_total FROM daily_sales ORDER BY sale_date;
+"""##,
+                xpReward: 50
+            ),
+
+            CodingTask(
+                id: "sql_task_cte_duplicate_remover",
+                language: .sql,
+                titleRU: "Поиск повторяющихся email-адресов (HAVING COUNT > 1)",
+                titleEN: "Duplicate Email Detection",
+                difficulty: .medium,
+                category: .sqlAggregations,
+                summaryRU: "Выявление дубликатов в базе контактов с подсчетом количества вхождений через GROUP BY и HAVING.",
+                summaryEN: "Detecting duplicate emails and counting occurrences via GROUP BY and HAVING.",
+                descriptionRU: "Найдите все email-адреса из таблицы `contacts`, которые встречаются **более 1 раза**, и выведите `email` и число повторений `COUNT(*) AS dup_count`. Отсортируйте по количеству повторений по убыванию.",
+                descriptionEN: "Find emails occurring more than once in `contacts`. Return `email` and `COUNT(*) AS dup_count` sorted descending.",
+                requirementsRU: ["Группировка: GROUP BY email", "Фильтр дубликатов: HAVING COUNT(*) > 1", "Сортировка: ORDER BY dup_count DESC"],
+                requirementsEN: ["GROUP BY email", "HAVING COUNT(*) > 1", "ORDER BY dup_count DESC"],
+                starterCode: ##"""
+-- Напишите ваш SQL-запрос
+SELECT email FROM contacts;
+"""##,
+                testCases: [
+                    TaskTestCase(
+                        title: "Проверка SQL-запроса",
+                        inputDescription: "Выполнение запроса на базе SQLite",
+                        expectedOutput: "| user@swift.dev | 3 |",
+                        validationCode: "CREATE TABLE contacts (id INT, email TEXT); INSERT INTO contacts VALUES (1, 'user@swift.dev'), (2, 'admin@apple.com'), (3, 'user@swift.dev'), (4, 'test@google.com'), (5, 'user@swift.dev');"
+                    )
+                ],
+                hintsRU: ["Внимательно проверьте структуру таблиц и условия фильтрации."],
+                hintsEN: ["Check schema constraints and filtering predicates."],
+                solutionCode: ##"""
+SELECT email, COUNT(*) AS dup_count FROM contacts GROUP BY email HAVING COUNT(*) > 1 ORDER BY dup_count DESC;
+"""##,
+                xpReward: 40
+            ),
+
+            CodingTask(
+                id: "sql_task_retention_subquery",
+                language: .sql,
+                titleRU: "Лояльные клиенты: 2+ заказа и сумма > 5000",
+                titleEN: "High-Value Repeat Customers Analysis",
+                difficulty: .hard,
+                category: .sqlAggregations,
+                summaryRU: "Анализ покупательской активности клиентов: фильтрация когорты по числу покупок и суммарному чеку.",
+                summaryEN: "Customer cohort analysis: filtering repeat buyers by order frequency and aggregate transaction volume.",
+                descriptionRU: "Из таблицы `customer_orders` найдите постоянных ценных клиентов (`customer_id`), которые совершили **не менее 2 заказов** (`COUNT(*) >= 2`) и суммарно потратили **более 5000** (`SUM(amount) > 5000`). Выведите `customer_id, SUM(amount) AS total_spent, COUNT(*) AS orders_count`, отсортировав по `total_spent` по убыванию.",
+                descriptionEN: "Find customers with `>= 2` orders and `SUM(amount) > 5000`. Return customer_id, total_spent, orders_count ordered by total_spent DESC.",
+                requirementsRU: ["Группировка: GROUP BY customer_id", "Условие: HAVING COUNT(*) >= 2 AND SUM(amount) > 5000", "Сортировка: ORDER BY total_spent DESC"],
+                requirementsEN: ["GROUP BY customer_id", "HAVING COUNT(*) >= 2 AND SUM(amount) > 5000", "ORDER BY total_spent DESC"],
+                starterCode: ##"""
+-- Напишите ваш SQL-запрос
+SELECT customer_id FROM customer_orders GROUP BY customer_id;
+"""##,
+                testCases: [
+                    TaskTestCase(
+                        title: "Проверка SQL-запроса",
+                        inputDescription: "Выполнение запроса на базе SQLite",
+                        expectedOutput: "| 10 | 7500 | 2 |",
+                        validationCode: "CREATE TABLE customer_orders (order_id INT, customer_id INT, amount INT); INSERT INTO customer_orders VALUES (1, 10, 3000), (2, 10, 4500), (3, 20, 7000), (4, 30, 1000), (5, 30, 2000);"
+                    )
+                ],
+                hintsRU: ["Внимательно проверьте структуру таблиц и условия фильтрации."],
+                hintsEN: ["Check schema constraints and filtering predicates."],
+                solutionCode: ##"""
+SELECT customer_id, SUM(amount) AS total_spent, COUNT(*) AS orders_count FROM customer_orders GROUP BY customer_id HAVING COUNT(*) >= 2 AND SUM(amount) > 5000 ORDER BY total_spent DESC;
+"""##,
+                xpReward: 50
+            ),
         ]
     }
 }

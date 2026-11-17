@@ -5,6 +5,7 @@ public struct ChallengesView: View {
     @ObservedObject var storage = StorageService.shared
     private let tasks = TaskStore.shared.tasks
     
+    @State private var selectedLanguage: TargetLanguage? = nil
     @State private var selectedDifficulty: TaskDifficulty? = nil // nil = Все
     @State private var selectedPlatform: String? = nil // "LeetCode", "Codeforces", nil
     @State private var searchText: String = ""
@@ -13,6 +14,7 @@ public struct ChallengesView: View {
     
     private var filteredTasks: [CodingTask] {
         tasks.filter { task in
+            let matchesLanguage = selectedLanguage == nil || task.language == selectedLanguage
             let matchesDifficulty = selectedDifficulty == nil || task.difficulty == selectedDifficulty
             let matchesPlatform = selectedPlatform == nil ||
                 task.titleRU.contains(selectedPlatform!) ||
@@ -22,7 +24,7 @@ public struct ChallengesView: View {
                 task.titleEN.localizedCaseInsensitiveContains(searchText) ||
                 task.summaryRU.localizedCaseInsensitiveContains(searchText) ||
                 task.summaryEN.localizedCaseInsensitiveContains(searchText)
-            return matchesDifficulty && matchesPlatform && matchesSearch
+            return matchesLanguage && matchesDifficulty && matchesPlatform && matchesSearch
         }
     }
     
@@ -52,6 +54,9 @@ public struct ChallengesView: View {
                 if let idx = ProcessInfo.processInfo.arguments.firstIndex(of: "-openPlatform"),
                    idx + 1 < ProcessInfo.processInfo.arguments.count {
                     selectedPlatform = ProcessInfo.processInfo.arguments[idx + 1]
+                }
+                if ProcessInfo.processInfo.arguments.contains("-sql") {
+                    selectedLanguage = .sql
                 }
             }
         }
@@ -140,6 +145,42 @@ public struct ChallengesView: View {
     // MARK: - Filter Controls
     private var filterControls: some View {
         VStack(spacing: 10) {
+            // Language Pills
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 8) {
+                    filterPill(
+                        title: lang.localized("Все языки", "All Languages"),
+                        isSelected: selectedLanguage == nil
+                    ) {
+                        selectedLanguage = nil
+                    }
+                    
+                    ForEach(TargetLanguage.allCases) { item in
+                        Button(action: {
+                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                            selectedLanguage = selectedLanguage == item ? nil : item
+                        }) {
+                            HStack(spacing: 5) {
+                                Image(systemName: item.icon)
+                                    .font(.system(size: 11, weight: .semibold))
+                                Text(item.displayName)
+                                    .font(.caption.bold())
+                            }
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 6)
+                            .background(
+                                selectedLanguage == item ?
+                                LinearGradient(colors: [Color(red: 0.14, green: 0.38, blue: 0.88), Color(red: 0.28, green: 0.52, blue: 0.95)], startPoint: .leading, endPoint: .trailing) :
+                                LinearGradient(colors: [Color(UIColor.secondarySystemBackground), Color(UIColor.secondarySystemBackground)], startPoint: .leading, endPoint: .trailing)
+                            )
+                            .foregroundColor(selectedLanguage == item ? .white : .primary)
+                            .clipShape(Capsule())
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+            }
+
             // Search Input
             HStack {
                 Image(systemName: "magnifyingglass")
@@ -277,6 +318,18 @@ public struct ChallengesView: View {
                     
                     // Metadata tags
                     HStack(spacing: 6) {
+                        // Language Badge
+                        HStack(spacing: 3) {
+                            Image(systemName: task.language.icon)
+                            Text(task.language.displayName)
+                        }
+                        .font(.system(size: 9, weight: .bold))
+                        .foregroundColor(task.language == .sql ? Color(red: 0.16, green: 0.58, blue: 0.40) : .primary)
+                        .padding(.horizontal, 5)
+                        .padding(.vertical, 2)
+                        .background(task.language == .sql ? Color(red: 0.16, green: 0.58, blue: 0.40).opacity(0.12) : Color(UIColor.secondarySystemFill))
+                        .clipShape(Capsule())
+
                         if task.titleRU.contains("[LeetCode") {
                             Text("LeetCode")
                                 .font(.system(size: 9, weight: .bold))

@@ -386,14 +386,36 @@ public struct TaskDetailView: View {
             
             for tc in task.testCases {
                 // Construct executable verification script:
-                // Append user's code + validation assert check
-                let testHarness = """
+                let testHarness: String
+                if task.language == .sql {
+                    testHarness = """
+\(tc.validationCode);
+\(code);
+"""
+                } else if task.language == .python {
+                    testHarness = """
+\(code)
+
+__test_passed = \(tc.validationCode)
+print("__TEST_RESULT:" + str(__test_passed).lower())
+"""
+                } else if task.language == .csharp {
+                    testHarness = """
+\(code)
+
+bool __testPassed = \(tc.validationCode);
+Console.WriteLine("__TEST_RESULT:" + __testPassed.ToString().ToLower());
+"""
+                } else {
+                    testHarness = """
 \(code)
 
 let __testPassed = \(tc.validationCode)
 print("__TEST_RESULT:" + String(__testPassed))
 """
-                let exec = await PlaygroundEngine.shared.execute(code: testHarness)
+                }
+                
+                let exec = await PlaygroundEngine.shared.execute(code: testHarness, language: task.language)
                 
                 if let err = exec.error {
                     results.append(TestExecutionResult(
@@ -402,6 +424,17 @@ print("__TEST_RESULT:" + String(__testPassed))
                         message: "\(lang.localized("Ошибка", "Error")): \(err.message)"
                     ))
                     everyTestPassed = false
+                } else if task.language == .sql {
+                    let cleanedOutput = exec.output.replacingOccurrences(of: " ", with: "").lowercased()
+                    let cleanedExpected = tc.expectedOutput.replacingOccurrences(of: " ", with: "").lowercased()
+                    let passed = cleanedOutput.contains(cleanedExpected)
+                    
+                    results.append(TestExecutionResult(
+                        testCase: tc,
+                        passed: passed,
+                        message: passed ? "\(tc.title): \(exec.output.trimmingCharacters(in: .whitespacesAndNewlines))" : "\(lang.localized("Ожидалось", "Expected")): \(tc.expectedOutput), \(lang.localized("Получено", "Got")): \(exec.output.isEmpty ? "<пусто>" : exec.output)"
+                    ))
+                    if !passed { everyTestPassed = false }
                 } else if exec.output.contains("__TEST_RESULT:true") {
                     results.append(TestExecutionResult(
                         testCase: tc,

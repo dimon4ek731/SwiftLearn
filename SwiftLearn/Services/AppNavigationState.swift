@@ -8,7 +8,13 @@ public final class AppNavigationState: ObservableObject {
     @Published public var selectedTab: Int = 0
     @Published public var presentedLesson: Lesson? = nil
     
-    public init() {}
+    public init() {
+        if let idx = ProcessInfo.processInfo.arguments.firstIndex(of: "-openTab"),
+           idx + 1 < ProcessInfo.processInfo.arguments.count,
+           let tabIndex = Int(ProcessInfo.processInfo.arguments[idx + 1]) {
+            selectedTab = tabIndex
+        }
+    }
     
     public func navigateToCurriculum() {
         selectedTab = 0

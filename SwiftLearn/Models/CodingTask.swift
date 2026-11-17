@@ -40,6 +40,13 @@ public enum TaskCategory: String, CaseIterable, Identifiable, Codable {
     case concurrency = "concurrency"
     case architecture = "architecture"
     
+    // SQL Categories
+    case sqlBasics = "sql_basics"
+    case sqlJoins = "sql_joins"
+    case sqlAggregations = "sql_aggregations"
+    case sqlDdlDml = "sql_ddl_dml"
+    case sqlWindow = "sql_window"
+    
     public var id: String { rawValue }
     
     public func title(for language: AppLanguage) -> String {
@@ -58,6 +65,16 @@ public enum TaskCategory: String, CaseIterable, Identifiable, Codable {
             return language == .russian ? "Асинхронность и Акторы" : "Concurrency & Actors"
         case .architecture:
             return language == .russian ? "Архитектура и Модели" : "Architecture & Patterns"
+        case .sqlBasics:
+            return language == .russian ? "SQL Выборка и Фильтрация" : "SQL Query & Filter"
+        case .sqlJoins:
+            return language == .russian ? "SQL Объединения JOIN" : "SQL Joins & Relations"
+        case .sqlAggregations:
+            return language == .russian ? "SQL Агрегации и Группировка" : "SQL Aggregations & Grouping"
+        case .sqlDdlDml:
+            return language == .russian ? "SQL Создание и Изменение" : "SQL DDL & DML Schema"
+        case .sqlWindow:
+            return language == .russian ? "SQL Оконные Функции" : "SQL Window Functions"
         }
     }
     
@@ -70,6 +87,11 @@ public enum TaskCategory: String, CaseIterable, Identifiable, Codable {
         case .functionalAndClosures: return "function"
         case .concurrency: return "arrow.triangle.2.circlepath"
         case .architecture: return "macwindow"
+        case .sqlBasics: return "cylinder.split.1x2"
+        case .sqlJoins: return "link"
+        case .sqlAggregations: return "function"
+        case .sqlDdlDml: return "plus.square.on.square"
+        case .sqlWindow: return "chart.bar.xaxis"
         }
     }
 }
@@ -98,6 +120,7 @@ public struct TaskTestCase: Identifiable, Codable, Hashable, Equatable {
 
 public struct CodingTask: Identifiable, Codable {
     public var id: String
+    public var language: TargetLanguage
     public var titleRU: String
     public var titleEN: String
     public var difficulty: TaskDifficulty
@@ -117,6 +140,7 @@ public struct CodingTask: Identifiable, Codable {
     
     public init(
         id: String,
+        language: TargetLanguage = .swift,
         titleRU: String,
         titleEN: String,
         difficulty: TaskDifficulty,
@@ -135,6 +159,7 @@ public struct CodingTask: Identifiable, Codable {
         xpReward: Int = 30
     ) {
         self.id = id
+        self.language = language
         self.titleRU = titleRU
         self.titleEN = titleEN
         self.difficulty = difficulty
