@@ -1654,6 +1654,98 @@ LIMIT 5;
 """##
             ),
 
+            OfficialDocTopic(
+                id: "sql_doc_joins",
+                language: .sql,
+                section: .languageGuide,
+                chapterNumber: 3,
+                titleEN: "Table Relationships & JOINs",
+                titleRU: "Связи таблиц и операторы JOIN",
+                summaryEN: "Official specification of relational algebra joins: INNER, LEFT, CROSS, and subqueries.",
+                summaryRU: "Официальное руководство по связыванию реляционных таблиц, типам JOIN и проверке предикатов ON.",
+                webSlug: "lang_join.html",
+                contentMarkdownEN: ##"""
+# Relational Joins in SQL
+
+Relational databases break data down into normalized tables. Joins reconstruct combined views.
+
+## Join Types
+- `INNER JOIN`: Returns records with matching values in both tables.
+- `LEFT OUTER JOIN`: Returns all records from the left table and matched records from the right.
+- `CROSS JOIN`: Returns the Cartesian product of rows from both tables.
+
+```sql
+SELECT orders.id, customers.name, orders.amount
+FROM orders
+INNER JOIN customers ON orders.customer_id = customers.id;
+```
+"""##,
+                contentMarkdownRU: ##"""
+# Реляционные соединения (JOIN) в SQL
+
+Реляционные СУБД нормализуют данные по таблицам, а операторы `JOIN` связывают их по ключам.
+
+## Основные типы JOIN
+- **INNER JOIN**: только строки, совпавшие в обеих таблицах.
+- **LEFT JOIN**: все строки из левой таблицы плюс совпавшие из правой (или NULL).
+- **CROSS JOIN**: декартово произведение всех строк.
+
+```sql
+SELECT o.id, c.name, o.amount 
+FROM orders o 
+JOIN customers c ON o.customer_id = c.id;
+```
+"""##
+            ),
+
+            OfficialDocTopic(
+                id: "sql_doc_window",
+                language: .sql,
+                section: .languageGuide,
+                chapterNumber: 4,
+                titleEN: "Window Functions & Analytic Clauses",
+                titleRU: "Оконные функции и аналитика OVER",
+                summaryEN: "Official SQLite and standard SQL window function reference: PARTITION BY, framing, and ranking.",
+                summaryRU: "Официальное руководство по оконным функциям, секционированию PARTITION BY, рамкам фреймов и ранжированию.",
+                webSlug: "windowfunctions.html",
+                contentMarkdownEN: ##"""
+# Window Functions Specification
+
+Window functions perform calculations across a set of table rows that are somehow related to the current row, without collapsing them like `GROUP BY`.
+
+```sql
+SELECT 
+    name, department, salary,
+    AVG(salary) OVER (PARTITION BY department) AS dept_avg,
+    ROW_NUMBER() OVER (PARTITION BY department ORDER BY salary DESC) AS rank_in_dept
+FROM employees;
+```
+
+## Key Capabilities
+- **Partitioning**: `PARTITION BY` groups calculations logically.
+- **Ranking**: `ROW_NUMBER()`, `RANK()`, `DENSE_RANK()`, `NTILE()`.
+- **Offsets**: `LAG()`, `LEAD()`, `FIRST_VALUE()`, `LAST_VALUE()`.
+"""##,
+                contentMarkdownRU: ##"""
+# Спецификация оконных функций
+
+Оконные функции вычисляют агрегаты по группе строк, сохраняя индивидуальность каждой строки в выборке.
+
+```sql
+SELECT 
+    name, department, salary,
+    AVG(salary) OVER (PARTITION BY department) AS dept_avg,
+    ROW_NUMBER() OVER (PARTITION BY department ORDER BY salary DESC) AS pos
+FROM employees;
+```
+
+## Возможности
+- **Секционирование**: `PARTITION BY` делит данные на независимые группы.
+- **Ранжирование**: `ROW_NUMBER()`, `RANK()`, `DENSE_RANK()`.
+- **Смещения**: `LAG()`, `LEAD()`, `FIRST_VALUE()`.
+"""##
+            ),
+
         ]
     }
     

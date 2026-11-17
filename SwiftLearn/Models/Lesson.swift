@@ -68,7 +68,9 @@ public enum CurriculumTrack: String, CaseIterable, Identifiable, Codable {
     
     // SQL Tracks
     case sqlCore = "sql_core"
-    case sqlAdvanced = "sql_advanced"
+    case sqlJoins = "sql_joins_track"
+    case sqlAnalytics = "sql_analytics_track"
+    case sqlSystems = "sql_systems_track"
     
     public var id: String { rawValue }
     
@@ -77,7 +79,7 @@ public enum CurriculumTrack: String, CaseIterable, Identifiable, Codable {
         case .swiftCore, .swiftUI: return .swift
         case .pythonCore, .pythonAdvanced, .pythonStdlib, .pythonSystems: return .python
         case .csharpCore, .csharpOOP, .csharpCollections, .csharpAdvanced: return .csharp
-        case .sqlCore, .sqlAdvanced: return .sql
+        case .sqlCore, .sqlJoins, .sqlAnalytics, .sqlSystems: return .sql
         }
     }
     
@@ -104,9 +106,13 @@ public enum CurriculumTrack: String, CaseIterable, Identifiable, Codable {
         case .csharpAdvanced:
             return language == .russian ? "C# Concurrency & .NET" : "C# Concurrency & .NET"
         case .sqlCore:
-            return language == .russian ? "SQL Запросы & DDL" : "SQL Queries & DDL"
-        case .sqlAdvanced:
-            return language == .russian ? "SQL JOIN & Аналитика" : "SQL JOIN & Analytics"
+            return language == .russian ? "SQL Запросы & Агрегации" : "SQL Queries & Aggregations"
+        case .sqlJoins:
+            return language == .russian ? "SQL Связи & JOIN" : "SQL Relations & JOINs"
+        case .sqlAnalytics:
+            return language == .russian ? "SQL Оконные Функции & CTE" : "SQL Window Functions & CTE"
+        case .sqlSystems:
+            return language == .russian ? "SQL DDL, Индексы & ACID" : "SQL DDL, Indexes & ACID"
         }
     }
     
@@ -123,7 +129,9 @@ public enum CurriculumTrack: String, CaseIterable, Identifiable, Codable {
         case .csharpCollections: return "square.stack.3d.up"
         case .csharpAdvanced: return "bolt.badge.clock"
         case .sqlCore: return "cylinder.split.1x2"
-        case .sqlAdvanced: return "chart.bar.xaxis"
+        case .sqlJoins: return "link"
+        case .sqlAnalytics: return "chart.bar.xaxis"
+        case .sqlSystems: return "server.rack"
         }
     }
 }
@@ -199,12 +207,28 @@ public enum LessonCategory: String, CaseIterable, Identifiable, Codable {
     // MARK: - Track 7: SQL Core
     case sqlBasics = "sql_basics"
     case sqlFiltering = "sql_filtering"
+    case sqlSortingPagination = "sql_sorting_pagination"
     case sqlAggregations = "sql_aggregations"
     
-    // MARK: - Track 8: SQL Advanced
+    // MARK: - Track 8: SQL Relations & JOINs
+    case sqlRelationalDesign = "sql_relational_design"
     case sqlJoins = "sql_joins"
-    case sqlDdlDml = "sql_ddl_dml"
+    case sqlAdvancedJoins = "sql_advanced_joins"
+    case sqlSubqueries = "sql_subqueries"
+    case sqlSetOperations = "sql_set_operations"
+    
+    // MARK: - Track 9: SQL Window & Analytics
+    case sqlCTE = "sql_cte"
     case sqlWindow = "sql_window"
+    case sqlWindowValues = "sql_window_values"
+    case sqlExpressionsMath = "sql_expressions_math"
+    
+    // MARK: - Track 10: SQL Systems & DDL
+    case sqlDdlDml = "sql_ddl_dml"
+    case sqlDmlModifications = "sql_dml_modifications"
+    case sqlIndexesPerf = "sql_indexes_perf"
+    case sqlTransactions = "sql_transactions"
+    case sqlViewsTriggers = "sql_views_triggers"
     
     public var id: String { rawValue }
     
@@ -257,12 +281,20 @@ public enum LessonCategory: String, CaseIterable, Identifiable, Codable {
             return .csharpAdvanced
             
         // SQL Core
-        case .sqlBasics, .sqlFiltering, .sqlAggregations:
+        case .sqlBasics, .sqlFiltering, .sqlSortingPagination, .sqlAggregations:
             return .sqlCore
             
-        // SQL Advanced
-        case .sqlJoins, .sqlDdlDml, .sqlWindow:
-            return .sqlAdvanced
+        // SQL Relations & JOINs
+        case .sqlRelationalDesign, .sqlJoins, .sqlAdvancedJoins, .sqlSubqueries, .sqlSetOperations:
+            return .sqlJoins
+            
+        // SQL Window & Analytics
+        case .sqlCTE, .sqlWindow, .sqlWindowValues, .sqlExpressionsMath:
+            return .sqlAnalytics
+            
+        // SQL Systems & DDL
+        case .sqlDdlDml, .sqlDmlModifications, .sqlIndexesPerf, .sqlTransactions, .sqlViewsTriggers:
+            return .sqlSystems
         }
     }
     
@@ -386,17 +418,45 @@ public enum LessonCategory: String, CaseIterable, Identifiable, Codable {
         case .sqlBasics:
             return language == .russian ? "1. Основы SQL и выборка SELECT" : "1. SQL Basics & SELECT"
         case .sqlFiltering:
-            return language == .russian ? "2. Фильтрация WHERE и Сортировка" : "2. Filtering & Sorting"
+            return language == .russian ? "2. Фильтрация WHERE, IN, LIKE и NULL" : "2. Filtering: WHERE, IN, LIKE & NULL"
+        case .sqlSortingPagination:
+            return language == .russian ? "3. Сортировка ORDER BY и Пагинация LIMIT" : "3. Sorting & LIMIT Pagination"
         case .sqlAggregations:
-            return language == .russian ? "3. Агрегатные функции и GROUP BY" : "3. Aggregations & GROUP BY"
+            return language == .russian ? "4. Агрегатные функции и GROUP BY / HAVING" : "4. Aggregations & GROUP BY / HAVING"
             
-        // SQL Advanced
+        // SQL Relations & JOINs
+        case .sqlRelationalDesign:
+            return language == .russian ? "5. Реляционная модель, PK, FK и Связи" : "5. Relational Design, PK, FK & Keys"
         case .sqlJoins:
-            return language == .russian ? "4. Объединение таблиц JOIN" : "4. Table Joins (INNER, LEFT, RIGHT)"
-        case .sqlDdlDml:
-            return language == .russian ? "5. DDL и DML: Создание и Модификация" : "5. DDL & DML Operations"
+            return language == .russian ? "6. Объединения INNER и LEFT JOIN" : "6. INNER & LEFT JOINs"
+        case .sqlAdvancedJoins:
+            return language == .russian ? "7. RIGHT, FULL, CROSS и SELF JOIN" : "7. RIGHT, FULL, CROSS & SELF JOIN"
+        case .sqlSubqueries:
+            return language == .russian ? "8. Подзапросы (Scalar, Correlated, EXISTS)" : "8. Subqueries (Scalar, Correlated, EXISTS)"
+        case .sqlSetOperations:
+            return language == .russian ? "9. Множества: UNION, INTERSECT, EXCEPT" : "9. Set Operations: UNION, INTERSECT, EXCEPT"
+            
+        // SQL Window & Analytics
+        case .sqlCTE:
+            return language == .russian ? "10. CTE (WITH) и Рекурсивные запросы" : "10. CTE (WITH) & Recursive Queries"
         case .sqlWindow:
-            return language == .russian ? "6. Оконные функции и Аналитика" : "6. Window Functions & Analytics"
+            return language == .russian ? "11. Оконные функции: OVER, PARTITION BY, Ранжирование" : "11. Window Functions: OVER, PARTITION & Ranks"
+        case .sqlWindowValues:
+            return language == .russian ? "12. Оконные смещения: LAG, LEAD и Фреймы" : "12. Window Offsets: LAG, LEAD & Frames"
+        case .sqlExpressionsMath:
+            return language == .russian ? "13. Условная логика CASE WHEN, COALESCE и Строки" : "13. Conditional CASE WHEN, COALESCE & Strings"
+            
+        // SQL Systems & DDL
+        case .sqlDdlDml:
+            return language == .russian ? "14. DDL: CREATE/ALTER TABLE, Ограничения и Типы" : "14. DDL: CREATE/ALTER TABLE & Constraints"
+        case .sqlDmlModifications:
+            return language == .russian ? "15. DML: INSERT, UPDATE, DELETE и UPSERT" : "15. DML: INSERT, UPDATE, DELETE & UPSERT"
+        case .sqlIndexesPerf:
+            return language == .russian ? "16. B-Tree индексы, EXPLAIN QUERY PLAN и Оптимизация" : "16. B-Tree Indexes, EXPLAIN & Optimization"
+        case .sqlTransactions:
+            return language == .russian ? "17. Транзакции ACID, Блокировки и Savepoints" : "17. ACID Transactions, Locks & Savepoints"
+        case .sqlViewsTriggers:
+            return language == .russian ? "18. Представления VIEW и Триггеры (TRIGGERS)" : "18. Views & Triggers"
         }
     }
     
@@ -456,13 +516,31 @@ public enum LessonCategory: String, CaseIterable, Identifiable, Codable {
         case .csharpTPLThreading: return "cpu"
         case .csharpModern: return "gearshape.2"
             
-        // SQL
+        // SQL Core
         case .sqlBasics: return "cylinder.split.1x2"
         case .sqlFiltering: return "line.3.horizontal.decrease.circle"
+        case .sqlSortingPagination: return "arrow.up.arrow.down.square"
         case .sqlAggregations: return "function"
+            
+        // SQL Relations & JOINs
+        case .sqlRelationalDesign: return "key.fill"
         case .sqlJoins: return "link"
-        case .sqlDdlDml: return "plus.square.on.square"
+        case .sqlAdvancedJoins: return "arrow.triangle.branch"
+        case .sqlSubqueries: return "arrow.turn.right.down"
+        case .sqlSetOperations: return "square.stack.3d.down.forward"
+            
+        // SQL Window & Analytics
+        case .sqlCTE: return "arrow.triangle.swap"
         case .sqlWindow: return "chart.bar.xaxis"
+        case .sqlWindowValues: return "chart.line.uptrend.xyaxis"
+        case .sqlExpressionsMath: return "slider.horizontal.2.square"
+            
+        // SQL Systems & DDL
+        case .sqlDdlDml: return "plus.square.on.square"
+        case .sqlDmlModifications: return "pencil.and.outline"
+        case .sqlIndexesPerf: return "speedometer"
+        case .sqlTransactions: return "lock.shield"
+        case .sqlViewsTriggers: return "bolt.badge.clock"
         }
     }
 }

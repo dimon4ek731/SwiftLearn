@@ -9230,360 +9230,3354 @@ Console.WriteLine("DI Lifetimes: Transient, Scoped, Singleton");
 
             // MARK: - SQL Lessons
             Lesson(
-                id: "sql_basics_select",
+                id: "sql_relational_foundations",
                 category: .sqlBasics,
-                titleRU: "Выборка данных: SELECT, AS и DISTINCT",
-                titleEN: "Data Querying: SELECT, AS & DISTINCT",
-                summaryRU: "Основы языка SQL: операторы SELECT, выбор конкретных колонок, переименование через AS и исключение дубликатов DISTINCT.",
-                summaryEN: "Core SQL syntax: querying data with SELECT, column aliasing with AS, and eliminating duplicates with DISTINCT.",
+                titleRU: "Реляционная модель, таблицы и атрибуты",
+                titleEN: "Relational Model, Tables & Attributes",
+                summaryRU: "Фундамент реляционных БД: сущности, кортежи, домены, первичные ключи и декларативный характер SQL.",
+                summaryEN: "Relational database foundations: entities, tuples, domains, primary keys, and declarative SQL paradigm.",
                 contentMarkdownRU: ##"""
-# Основы SQL и Оператор SELECT
+### Реляционная модель данных (РМД)
 
-SQL (Structured Query Language) — декларативный язык структурированных запросов для взаимодействия с реляционными базами данных (PostgreSQL, SQLite, MySQL).
+Реляционная модель, сформулированная Эдгаром Коддом в 1970 году, основана на математической теории множеств и предикатной логике:
+- **Отношение (Relation)** — в физическом представлении таблица.
+- **Кортеж (Tuple)** — строка таблицы, представляющая единичный экземпляр сущности.
+- **Атрибут (Attribute)** — именованная колонка с фиксированным доменом (типом данных).
+- **Степень (Arity)** — количество столбцов в таблице.
+- **Мощность (Cardinality)** — текущее количество строк в таблице.
 
-## Простейший запрос
-Символ `*` выбирает абсолютно все доступные колонки из таблицы:
+### Декларативная парадигма SQL
+В отличие от императивных языков (Swift, Python, C#), где программист указывает алгоритм *«как вычислять»*, в SQL формулируется *«какие данные нужны»* (декларативное описание желаемого результата). Оптимизатор запросов (Query Planner) СУБД самостоятельно строит дерево выполнения.
+
+### Первичный ключ (Primary Key)
+Каждая таблица должна иметь столбец или группу столбцов, однозначно идентифицирующих запись:
+- Гарантирует уникальность кортежа.
+- Не допускает значений `NULL`.
+- Служит основой для построения кластерных и B-Tree индексов.
+"""##,
+                contentMarkdownEN: ##"""
+### The Relational Model
+Formulated by Edgar F. Codd in 1970, the relational model maps real-world entities into mathematical relations (tables):
+- **Relation**: Table holding homogenous rows.
+- **Tuple**: Single record representing an entity instance.
+- **Attribute**: Named column adhering to a defined data type.
+- **Cardinality**: Number of rows stored in a relation.
+
+### Declarative Nature of SQL
+Unlike imperative languages where developers outline step-by-step algorithms, SQL queries specify *what* data to retrieve, leaving the query planner to determine *how* best to execute it.
+"""##,
+                codeSnippet: ##"""
+-- Создание базовой сущности с первичным ключом
+CREATE TABLE users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT NOT NULL UNIQUE,
+    email TEXT NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+INSERT INTO users (username, email) VALUES 
+('alex_dev', 'alex@example.com'),
+('elena_qa', 'elena@example.com');
+
+SELECT id, username, email FROM users;
+"""##,
+                xpReward: 35,
+                quiz: [
+                    QuizQuestion(
+                        questionRU: "Какое понятие реляционной теории соответствует строке физической таблицы?",
+                        questionEN: "Which relational concept corresponds to a physical table row?",
+                        optionsRU: ["Кортеж (Tuple)", "Домен (Domain)", "Атрибут (Attribute)", "Мощность (Cardinality)"],
+                        optionsEN: ["Tuple", "Domain", "Attribute", "Cardinality"],
+                        correctIndex: 0,
+                        explanationRU: "В реляционной алгебре строка таблицы называется кортежем.",
+                        explanationEN: "In relational algebra, a row is termed a tuple."
+                    ),
+                    QuizQuestion(
+                        questionRU: "Может ли первичный ключ (Primary Key) содержать значение NULL?",
+                        questionEN: "Can a Primary Key column contain NULL values?",
+                        optionsRU: ["Нет, первичный ключ обязан быть уникальным и NOT NULL", "Да, если это SQLite", "Да, если колонка текстовая", "Только для первой строки"],
+                        optionsEN: ["No, a Primary Key must be unique and NOT NULL", "Yes, in SQLite only", "Yes, for text columns", "Only for the first row"],
+                        correctIndex: 0,
+                        explanationRU: "Первичный ключ строго требует уникальности и запрещает значение NULL согласно стандарту SQL.",
+                        explanationEN: "Primary Keys strictly mandate uniqueness and disallow NULL per SQL standards."
+                    )
+                ]
+            ),
+
+            Lesson(
+                id: "sql_select_syntax",
+                category: .sqlBasics,
+                titleRU: "Синтаксис SELECT, проекция и вычисления",
+                titleEN: "SELECT Syntax, Projections & Expressions",
+                summaryRU: "Выборка данных, порядок выполнения операторов SQL, математические вычисления в столбцах и константы.",
+                summaryEN: "Data selection, SQL statement execution order, in-flight calculations, and constant projections.",
+                contentMarkdownRU: ##"""
+### Оператор SELECT и проекция данных
+
+Оператор `SELECT` задает проекцию — список колонок и выражений, возвращаемых клиенту.
+
 ```sql
-SELECT * FROM employees;
+SELECT column1, column2, column3 * 1.2 FROM table_name;
 ```
 
-## Выбор конкретных колонок и псевдонимы (AS)
-Для минимизации сетевого трафика и расхода памяти рекомендуется запрашивать только нужные поля, а также давать им понятные имена:
+### Реальный логический порядок выполнения SQL
+Несмотря на то, что запрос начинается со слова `SELECT`, СУБД вычисляет части запроса в совершенно другом порядке:
+1. `FROM` — выбор источника данных (и JOIN таблиц).
+2. `WHERE` — предварительная фильтрация строк.
+3. `GROUP BY` — группировка строк.
+4. `HAVING` — фильтрация агрегированных групп.
+5. `SELECT` — вычисление выражений, присвоение псевдонимов `AS`.
+6. `DISTINCT` — исключение дубликатов.
+7. `ORDER BY` — сортировка результатов.
+8. `LIMIT` / `OFFSET` — ограничение объема возвращаемых строк.
+
+Именно поэтому псевдоним (alias), объявленный в `SELECT`, нельзя использовать в `WHERE`!
+
+### Вычисления на лету
+В блоке `SELECT` можно выполнять арифметические операции, конкатенацию строк и использовать системные функции:
 ```sql
 SELECT 
-    first_name AS name,
-    salary * 12 AS annual_salary
+    name,
+    salary,
+    salary * 0.13 AS tax_amount,
+    salary * 0.87 AS net_income
 FROM employees;
 ```
+"""##,
+                contentMarkdownEN: ##"""
+### The SELECT Statement and Logical Processing
+While queries begin with `SELECT`, SQL engines execute clauses in a strict logical sequence:
+1. `FROM` (and JOINs)
+2. `WHERE`
+3. `GROUP BY`
+4. `HAVING`
+5. `SELECT`
+6. `DISTINCT`
+7. `ORDER BY`
+8. `LIMIT` / `OFFSET`
 
-## Устранение дубликатов (DISTINCT)
-Ключевое слово `DISTINCT` оставляет только уникальные комбинации значений:
+Because `WHERE` executes before `SELECT`, column aliases declared in `SELECT` cannot be referenced inside `WHERE`.
+"""##,
+                codeSnippet: ##"""
+-- Проекция с вычисляемыми полями
+CREATE TABLE products (
+    id INTEGER PRIMARY KEY,
+    name TEXT,
+    cost_price REAL,
+    markup_percent REAL
+);
+
+INSERT INTO products VALUES 
+(1, 'Клавиатура Pro', 4500.0, 25.0),
+(2, 'Мышь Master', 2800.0, 30.0);
+
+SELECT 
+    name, 
+    cost_price, 
+    ROUND(cost_price * (1 + markup_percent / 100.0), 2) AS retail_price
+FROM products;
+"""##,
+                xpReward: 35,
+                quiz: [
+                    QuizQuestion(
+                        questionRU: "Почему в блоке WHERE нельзя использовать alias столбца, объявленный в SELECT?",
+                        questionEN: "Why can't you reference an alias defined in SELECT inside the WHERE clause?",
+                        optionsRU: ["Блок WHERE логически выполняется раньше, чем блок SELECT", "В SQL запрещены псевдонимы колонок", "WHERE работает только с целыми числами", "Это ограничение только в SQLite"],
+                        optionsEN: ["WHERE logically executes before the SELECT clause", "SQL forbids column aliases", "WHERE only works with integers", "It is only an SQLite limitation"],
+                        correctIndex: 0,
+                        explanationRU: "Поскольку WHERE выполняется на шаге 2, а SELECT на шаге 5, на этапе фильтрации алиас еще не существует.",
+                        explanationEN: "Because WHERE is evaluated during step 2 while SELECT occurs at step 5, aliases are unknown to WHERE."
+                    )
+                ]
+            ),
+
+            Lesson(
+                id: "sql_distinct_aliases",
+                category: .sqlBasics,
+                titleRU: "Устранение дубликатов DISTINCT и псевдонимы AS",
+                titleEN: "Eliminating Duplicates (DISTINCT) & Aliasing (AS)",
+                summaryRU: "Модификатор DISTINCT для уникализации строк выборки, мульти-колоночный DISTINCT и правила использования AS.",
+                summaryEN: "Eliminating duplicate result tuples with DISTINCT, multi-column uniqueness, and table/column aliasing rules.",
+                contentMarkdownRU: ##"""
+### Модификатор DISTINCT
+
+По умолчанию реляционный SQL возвращает мультимножество (строки могут повторяться). Ключевое слово `DISTINCT` принудительно удаляет дублирующиеся строки:
+
 ```sql
 SELECT DISTINCT department FROM employees;
 ```
 
-## Ограничение выборки (LIMIT и OFFSET)
+### DISTINCT для нескольких колонок
+`DISTINCT` применяется ко **всей строке** проекции целиком, а не к первому столбцу:
 ```sql
-SELECT name, price FROM products 
-ORDER BY price DESC 
-LIMIT 5 OFFSET 0;
+-- Возвратит уникальные пары (страна, город)
+SELECT DISTINCT country, city FROM offices;
 ```
-"""##,
-                contentMarkdownEN: ##"""
-# SQL Fundamentals: SELECT Statement
+Если в таблице 10 офисов в Москве (Россия), в результате останется только одна строка `('Россия', 'Москва')`.
 
-SQL is the universal declarative language for relational database management systems.
-
-## Basic Query
+### Псевдонимы колонок и таблиц (AS)
+Ключевое слово `AS` переименовывает поля в результирующем наборе и сокращает длинные имена таблиц:
 ```sql
-SELECT first_name AS name, salary 
-FROM employees;
-```
-
-## Removing Duplicates
-```sql
-SELECT DISTINCT country FROM customers;
-```
-"""##,
-                codeSnippet: ##"""
 SELECT 
-    name, 
-    department, 
-    salary 
-FROM employees 
-WHERE salary > 50000;
+    e.first_name AS given_name,
+    e.last_name AS surname
+FROM enterprise_employees AS e;
+```
+Слово `AS` опционально в большинстве диалектов, однако его явное указание считается стандартом промышленного кода.
 """##,
-                xpReward: 35
+                contentMarkdownEN: ##"""
+### Eliminating Duplicates with DISTINCT
+By default, queries return multi-sets with potential duplicate rows. `DISTINCT` enforces set semantics on the output columns.
+
+When multiple columns are specified, uniqueness evaluates the entire tuple of requested attributes, not individual fields.
+"""##,
+                codeSnippet: ##"""
+CREATE TABLE visits (
+    user_id INTEGER,
+    page_url TEXT,
+    visited_at DATE
+);
+
+INSERT INTO visits VALUES 
+(101, '/home', '2026-03-01'),
+(101, '/home', '2026-03-01'),
+(101, '/catalog', '2026-03-01'),
+(102, '/home', '2026-03-01');
+
+-- Получаем уникальные страницы, посещенные пользователями
+SELECT DISTINCT user_id, page_url FROM visits;
+"""##,
+                xpReward: 35,
+                quiz: [
+                    QuizQuestion(
+                        questionRU: "К каким колонкам применяется DISTINCT в запросе `SELECT DISTINCT city, street FROM addresses;`?",
+                        questionEN: "Which columns does DISTINCT evaluate in `SELECT DISTINCT city, street FROM addresses;`?",
+                        optionsRU: ["Ко всей совокупности колонок (city, street)", "Только к первой колонке city", "Только ко второй колонке street", "Только к числу строк"],
+                        optionsEN: ["To the entire combination of (city, street)", "Only to the first column (city)", "Only to the second column (street)", "Only to the row count"],
+                        correctIndex: 0,
+                        explanationRU: "DISTINCT оценивает уникальность всей комбинации всех указанных в SELECT полей.",
+                        explanationEN: "DISTINCT enforces uniqueness across the entire projected tuple."
+                    )
+                ]
             ),
+
             Lesson(
-                id: "sql_filtering_where",
+                id: "sql_where_comparison",
                 category: .sqlFiltering,
-                titleRU: "Фильтрация строк: WHERE, IN, BETWEEN и LIKE",
-                titleEN: "Row Filtering: WHERE, IN, BETWEEN & LIKE",
-                summaryRU: "Построение предикатов и условий: сравнение, логические операторы AND/OR, проверка вхождения IN и поиск по шаблону LIKE.",
-                summaryEN: "Filter rows with WHERE clauses, logical operators AND/OR, range checks BETWEEN, and wildcard pattern matching LIKE.",
+                titleRU: "Фильтрация WHERE: сравнение и логика AND/OR/NOT",
+                titleEN: "WHERE Filtering: Comparison & Boolean Logic",
+                summaryRU: "Предикаты условий, приоритеты логических операторов, круглые скобки и ловушки смешивания AND с OR.",
+                summaryEN: "Condition predicates, boolean operator precedence, parenthesis rules, and pitfalls of mixing AND with OR.",
                 contentMarkdownRU: ##"""
-# Фильтрация данных с помощью WHERE
+### Предложение WHERE и операторы сравнения
 
-Предложение `WHERE` фильтрует строки таблицы до их попадания в итоговую выборку.
+Предложение `WHERE` оставляет только те строки, для которых условие вычисляется в `TRUE`:
+- Равенство: `=`, неравенство: `<>` или `!=`
+- Сравнение величин: `<`, `>`, `<=`, `>=`
 
-## Операторы сравнения и логика
+### Логические связки: AND, OR, NOT
+- `AND` — конъюнкция (оба условия должны быть истинными).
+- `OR` — дизъюнкция (хотя бы одно условие истинно).
+- `NOT` — логическое отрицание.
+
+### Приоритет операторов (Operator Precedence)
+В стандарте SQL оператор **AND имеет более высокий приоритет**, чем оператор **OR** (аналогично умножению перед сложением в арифметике).
+
+Пример опасной ошибки:
 ```sql
-SELECT * FROM orders 
-WHERE amount >= 100.00 AND status = 'completed';
-```
-
-## Поиск в диапазоне (BETWEEN)
-```sql
-SELECT * FROM products 
-WHERE price BETWEEN 50 AND 150;
-```
-
-## Проверка множества (IN)
-```sql
+-- ОШИБКА: вернет активных админов ИЛИ любых заблокированных пользователей!
 SELECT * FROM users 
-WHERE role IN ('admin', 'moderator', 'editor');
-```
+WHERE role = 'admin' OR role = 'manager' AND status = 'active';
 
-## Поиск по подстроке (LIKE)
-- `%` — любая последовательность символов (ноль или больше).
-- `_` — ровно один любой символ.
-```sql
-SELECT * FROM customers 
-WHERE email LIKE '%@gmail.com';
+-- ПРАВИЛЬНО: явные скобки группируют дизъюнкцию
+SELECT * FROM users 
+WHERE (role = 'admin' OR role = 'manager') AND status = 'active';
 ```
 """##,
                 contentMarkdownEN: ##"""
-# Filtering Rows with WHERE
+### WHERE Clause & Comparison Operators
+The `WHERE` clause filters candidate records based on boolean predicates.
 
-```sql
-SELECT * FROM employees
-WHERE department = 'IT' AND salary >= 70000;
-```
+### Precedence of Boolean Operators
+`AND` evaluates before `OR`. Always employ explicit parentheses when combining conjunctions and disjunctions to prevent unintended query outcomes.
 """##,
                 codeSnippet: ##"""
-SELECT title, rating FROM movies
-WHERE release_year >= 2020 AND rating >= 8.0;
+CREATE TABLE accounts (
+    id INTEGER PRIMARY KEY,
+    owner TEXT,
+    tier TEXT,
+    balance REAL,
+    is_active INTEGER
+);
+
+INSERT INTO accounts VALUES 
+(1, 'Anna', 'VIP', 150000.0, 1),
+(2, 'Boris', 'Standard', 3500.0, 0),
+(3, 'Cyril', 'Standard', 80000.0, 1);
+
+-- Выбор активных пользователей с балансом свыше 50 000
+SELECT owner, tier, balance 
+FROM accounts 
+WHERE is_active = 1 AND balance >= 50000;
 """##,
-                xpReward: 40
+                xpReward: 40,
+                quiz: [
+                    QuizQuestion(
+                        questionRU: "Какой оператор в SQL имеет более высокий приоритет выполнения: AND или OR?",
+                        questionEN: "Which boolean operator has higher evaluation precedence in SQL: AND or OR?",
+                        optionsRU: ["AND", "OR", "Они имеют одинаковый приоритет", "Зависит от порядка колонок в таблице"],
+                        optionsEN: ["AND", "OR", "They have equal precedence", "Depends on column order"],
+                        correctIndex: 0,
+                        explanationRU: "Оператор AND вычисляется раньше оператора OR, поэтому сложные условия требуют скобок.",
+                        explanationEN: "AND binds more tightly than OR, mirroring arithmetic multiplication over addition."
+                    )
+                ]
             ),
+
             Lesson(
-                id: "sql_aggregations_group",
-                category: .sqlAggregations,
-                titleRU: "Агрегатные функции и GROUP BY",
-                titleEN: "Aggregate Functions & GROUP BY",
-                summaryRU: "Вычисление итоговых метрик: COUNT, SUM, AVG, MIN, MAX. Группировка строк через GROUP BY и фильтрация групп HAVING.",
-                summaryEN: "Compute dataset aggregates with COUNT, SUM, AVG, MIN, MAX. Group rows with GROUP BY and filter group metrics with HAVING.",
+                id: "sql_in_between_operators",
+                category: .sqlFiltering,
+                titleRU: "Диапазоны BETWEEN и проверка множеств IN",
+                titleEN: "Range Checks (BETWEEN) & Set Inclusion (IN)",
+                summaryRU: "Операторы IN и NOT IN, оптимизация условий, включение границ в BETWEEN и работа с датами.",
+                summaryEN: "IN and NOT IN operators, condition optimization, inclusive boundary behavior in BETWEEN, and temporal ranges.",
                 contentMarkdownRU: ##"""
-# Агрегатные функции и Группировка
+### Оператор IN
+Позволяет проверить вхождение значения в заданный список констант или результат подзапроса:
+```sql
+SELECT title, genre FROM books 
+WHERE genre IN ('Sci-Fi', 'Fantasy', 'Cyberpunk');
+```
+Это эквивалентно цепочке `genre = 'Sci-Fi' OR genre = 'Fantasy' ...`, но выполняется оптимизатором значительно эффективнее.
 
-Агрегатные функции сворачивают множество значений в одно итоговое число.
+### Оператор NOT IN и опасность NULL
+> [!WARNING]
+> Если список для `NOT IN` содержит хотя бы одно значение `NULL`, выражение `col NOT IN (1, 2, NULL)` вернет пустое множество для всех строк из-за трехзначной логики SQL!
 
-## Базовые агрегаты
-- `COUNT(*)` — общее количество строк.
-- `SUM(column)` — сумма числовых значений.
-- `AVG(column)` — среднее арифметическое.
+### Оператор BETWEEN
+Проверяет попадание значения в диапазон. **Обе границы включаются**:
+```sql
+SELECT product_name, price FROM store 
+WHERE price BETWEEN 100 AND 500;
+-- Полный эквивалент: price >= 100 AND price <= 500
+```
+"""##,
+                contentMarkdownEN: ##"""
+### Set Matching with IN
+`IN` verifies whether an expression matches any item in a literal tuple or subquery result set.
+
+### Interval Checking with BETWEEN
+`BETWEEN low AND high` is inclusive on both boundary ends (`>= low AND <= high`). Be mindful of temporal comparisons where dates include fractional timestamps.
+"""##,
+                codeSnippet: ##"""
+CREATE TABLE orders (
+    order_id INTEGER PRIMARY KEY,
+    client TEXT,
+    status TEXT,
+    total REAL
+);
+
+INSERT INTO orders VALUES 
+(1, 'Acme Corp', 'SHIPPED', 1200.0),
+(2, 'Beta LLC', 'PENDING', 450.0),
+(3, 'Gamma Inc', 'DELIVERED', 890.0),
+(4, 'Delta Ltd', 'CANCELLED', 110.0);
+
+-- Выбираем заказы с валидными успешными статусами в диапазоне чека
+SELECT order_id, client, total 
+FROM orders 
+WHERE status IN ('SHIPPED', 'DELIVERED') 
+  AND total BETWEEN 500.0 AND 2000.0;
+"""##,
+                xpReward: 40,
+                quiz: [
+                    QuizQuestion(
+                        questionRU: "Включает ли оператор `price BETWEEN 100 AND 200` числа 100 и 200?",
+                        questionEN: "Does `price BETWEEN 100 AND 200` include the values 100 and 200?",
+                        optionsRU: ["Да, обе границы диапазона включаются", "Нет, только 100", "Нет, только 200", "Нет, границы строго исключаются"],
+                        optionsEN: ["Yes, both boundaries are included", "No, only 100 is included", "No, only 200 is included", "No, it is strictly exclusive"],
+                        correctIndex: 0,
+                        explanationRU: "BETWEEN в стандарте SQL является инклюзивным для обоих концов отрезка.",
+                        explanationEN: "BETWEEN is inclusive on both lower and upper bounds."
+                    )
+                ]
+            ),
+
+            Lesson(
+                id: "sql_like_wildcards",
+                category: .sqlFiltering,
+                titleRU: "Поиск по шаблону LIKE и подстановочные знаки",
+                titleEN: "Pattern Matching: LIKE & Wildcards",
+                summaryRU: "Символы подстановки % и _, регистрозависимость, экранирование ESCAPE и оператор GLOB в SQLite.",
+                summaryEN: "Wildcard symbols % and _, case-sensitivity rules, escape sequences, and SQLite GLOB operator.",
+                contentMarkdownRU: ##"""
+### Оператор LIKE и спецсимволы
+
+Оператор `LIKE` производит сопоставление строки с шаблоном:
+- `%` — заменяет любое количество символов (от нуля до бесконечности).
+- `_` — заменяет ровно один произвольный символ.
+
+```sql
+-- Поиск email адресов на домене .org
+SELECT * FROM users WHERE email LIKE '%.org';
+
+-- Поиск кодов вида AB-1, CD-9 (ровно один символ в конце)
+SELECT * FROM parts WHERE part_code LIKE '__-_';
+```
+
+### Экранирование спецсимволов (ESCAPE)
+Если нужно найти сам знак процента или подчеркивания:
+```sql
+SELECT * FROM discounts WHERE discount_name LIKE '%50!%%' ESCAPE '!';
+```
+
+### Регистрозависимость
+В SQLite оператор `LIKE` по умолчанию нечувствителен к регистру для латиницы (ASCII). Для регистрозависимого сопоставления SQLite предоставляет оператор `GLOB`, использующий Unix-синтаксис `*` и `?`.
+"""##,
+                contentMarkdownEN: ##"""
+### String Pattern Matching with LIKE
+- `%` represents zero or more characters.
+- `_` represents exactly one single character.
+
+To search for literal `%` or `_` characters, supply an explicit `ESCAPE` escape clause.
+"""##,
+                codeSnippet: ##"""
+CREATE TABLE staff (
+    id INTEGER PRIMARY KEY,
+    full_name TEXT,
+    phone TEXT
+);
+
+INSERT INTO staff VALUES 
+(1, 'Иван Иванов', '+7-999-111-22-33'),
+(2, 'Иван Петров', '+7-999-222-33-44'),
+(3, 'Сергей Иванов', '+7-495-555-66-77');
+
+-- Ищем всех сотрудников с фамилией Иванов
+SELECT id, full_name, phone 
+FROM staff 
+WHERE full_name LIKE '%Иванов';
+"""##,
+                xpReward: 40,
+                quiz: [
+                    QuizQuestion(
+                        questionRU: "Какой спецсимвол в операторе LIKE заменяет ровно один любой символ?",
+                        questionEN: "Which wildcard character in LIKE matches exactly one character?",
+                        optionsRU: ["Символ подчеркивания `_`", "Знак процента `%`", "Звездочка `*`", "Знак вопроса `?`"],
+                        optionsEN: ["Underscore `_`", "Percent sign `%`", "Asterisk `*`", "Question mark `?`"],
+                        correctIndex: 0,
+                        explanationRU: "Символ `_` обозначает строго одну позицию символа.",
+                        explanationEN: "The underscore `_` matches exactly one character in SQL standard LIKE clauses."
+                    )
+                ]
+            ),
+
+            Lesson(
+                id: "sql_null_three_valued_logic",
+                category: .sqlFiltering,
+                titleRU: "Трехзначная логика SQL: NULL, IS NULL и UNKNOWN",
+                titleEN: "Three-Valued Logic: NULL, IS NULL & UNKNOWN",
+                summaryRU: "Сущность NULL как отсутствия значения, почему NULL = NULL дает UNKNOWN, и правильная проверка через IS NULL.",
+                summaryEN: "Semantics of NULL as missing information, why NULL = NULL evaluates to UNKNOWN, and proper IS NULL predicates.",
+                contentMarkdownRU: ##"""
+### Природа NULL в SQL
+
+`NULL` — это не число 0, не пустая строка `""` и не пустой массив. Это маркер **отсутствия значения** (unknown / missing information).
+
+### Главное правило: NULL ничему не равен
+Попытка сравнить `NULL` через обычные операторы всегда возвращает третье логическое состояние — `UNKNOWN`:
+```sql
+NULL = 0       --> UNKNOWN
+NULL = NULL    --> UNKNOWN
+NULL != NULL   --> UNKNOWN
+```
+
+Поскольку `WHERE` оставляет только строки со значением `TRUE`, условие `WHERE col = NULL` **никогда не вернет ни одной строки**!
+
+### Правильная проверка: IS NULL и IS NOT NULL
+```sql
+SELECT employee_name, phone 
+FROM contacts 
+WHERE phone IS NULL; -- Строки с незаполненным телефоном
+
+SELECT employee_name, phone 
+FROM contacts 
+WHERE phone IS NOT NULL; -- Строки с существующим телефоном
+```
+"""##,
+                contentMarkdownEN: ##"""
+### Three-Valued Logic (3VL)
+SQL operates on three truth values: `TRUE`, `FALSE`, and `UNKNOWN`.
+
+Direct comparisons against `NULL` using `=` or `!=` yield `UNKNOWN`, never `TRUE`. Consequently, `WHERE val = NULL` will never evaluate to true. Always use `IS NULL` or `IS NOT NULL`.
+"""##,
+                codeSnippet: ##"""
+CREATE TABLE candidates (
+    id INTEGER PRIMARY KEY,
+    name TEXT,
+    referral_code TEXT
+);
+
+INSERT INTO candidates VALUES 
+(1, 'Максим', 'REF2026'),
+(2, 'Ольга', NULL),
+(3, 'Дмитрий', NULL);
+
+-- Корректная выборка кандидатов без реферального кода
+SELECT name FROM candidates WHERE referral_code IS NULL;
+"""##,
+                xpReward: 40,
+                quiz: [
+                    QuizQuestion(
+                        questionRU: "Каков результат вычисления выражения `NULL = NULL` в стандарте SQL?",
+                        questionEN: "What is the result of evaluating `NULL = NULL` in standard SQL?",
+                        optionsRU: ["UNKNOWN (Неизвестно)", "TRUE (Истина)", "FALSE (Ложь)", "Синтаксическая ошибка"],
+                        optionsEN: ["UNKNOWN", "TRUE", "FALSE", "Syntax Error"],
+                        correctIndex: 0,
+                        explanationRU: "Любое прямое сравнение с NULL возвращает логическое значение UNKNOWN.",
+                        explanationEN: "Comparisons involving NULL produce UNKNOWN in three-valued logic."
+                    )
+                ]
+            ),
+
+            Lesson(
+                id: "sql_order_by_multi",
+                category: .sqlSortingPagination,
+                titleRU: "Сортировка строк ORDER BY: ASC, DESC и NULLS",
+                titleEN: "Sorting with ORDER BY: ASC, DESC & NULLS",
+                summaryRU: "Многоуровневая сортировка по нескольким колонкам, позиционные номера колонок и размещение NULL значений.",
+                summaryEN: "Multi-column ordering, ascending vs descending, positional references, and NULL placement strategies.",
+                contentMarkdownRU: ##"""
+### Сортировка результатов с ORDER BY
+
+Реляционная таблица по определению является неупорядоченным множеством. Без явного указания `ORDER BY` порядок возврата строк недетерминирован СУБД!
+
+### Направление сортировки
+- `ASC` (по умолчанию) — по возрастанию (от А к Я, от 1 к 10).
+- `DESC` — по убыванию (от Я к А, от 10 к 1).
+
+### Множественная сортировка
+Колонки сортируются слева направо. Вторая колонка учитывается только при равенстве значений в первой:
+```sql
+SELECT department, last_name, salary 
+FROM employees 
+ORDER BY department ASC, salary DESC;
+```
+
+### Поведение NULL значений
+В стандарте SQL поддерживаются спецификаторы `NULLS FIRST` и `NULLS LAST`:
+```sql
+SELECT name, bonus FROM agents 
+ORDER BY bonus DESC NULLS LAST;
+```
+"""##,
+                contentMarkdownEN: ##"""
+### Deterministic Results with ORDER BY
+Tables maintain no inherent row order. To guarantee consistent ordering across executions, append `ORDER BY`.
+
+Multiple columns evaluate left-to-right. Use `ASC` (default) for ascending and `DESC` for descending order.
+"""##,
+                codeSnippet: ##"""
+CREATE TABLE leaderboard (
+    id INTEGER PRIMARY KEY,
+    player TEXT,
+    division INTEGER,
+    score INTEGER
+);
+
+INSERT INTO leaderboard VALUES 
+(1, 'Ace', 1, 950),
+(2, 'Blitz', 2, 880),
+(3, 'Nova', 1, 1020),
+(4, 'Shadow', 2, 880);
+
+-- Сортировка сначала по дивизиону, затем по очкам (топ игроки вверху)
+SELECT division, player, score 
+FROM leaderboard 
+ORDER BY division ASC, score DESC;
+"""##,
+                xpReward: 35,
+                quiz: [
+                    QuizQuestion(
+                        questionRU: "Гарантирует ли SQL детерминированный порядок строк в ответе, если в запросе отсутствует ORDER BY?",
+                        questionEN: "Does SQL guarantee a deterministic row order without an explicit ORDER BY clause?",
+                        optionsRU: ["Нет, без ORDER BY порядок строк не гарантируется", "Да, строки всегда идут в порядке добавления (по id)", "Да, строки сортируются по алфавиту", "Да, если таблица меньше 1000 строк"],
+                        optionsEN: ["No, row ordering is non-deterministic without ORDER BY", "Yes, always follows insertion order", "Yes, alphabetical by default", "Yes, for tables under 1000 rows"],
+                        correctIndex: 0,
+                        explanationRU: "Таблица в реляционной теории — неупорядоченное множество, поэтому порядок гарантирует только ORDER BY.",
+                        explanationEN: "Relations are unordered sets; only explicit ORDER BY clauses ensure deterministic order."
+                    )
+                ]
+            ),
+
+            Lesson(
+                id: "sql_limit_offset_paging",
+                category: .sqlSortingPagination,
+                titleRU: "Пагинация данных: LIMIT, OFFSET и Keyset Pagination",
+                titleEN: "Data Pagination: LIMIT, OFFSET & Keyset Pagination",
+                summaryRU: "Ограничение размера ответа LIMIT, смещение OFFSET, проблема производительности глубокой пагинации и курсорный подход.",
+                summaryEN: "Row limits with LIMIT, pagination offsets, deep pagination performance degradation, and keyset cursor optimization.",
+                contentMarkdownRU: ##"""
+### Ограничение выборки: LIMIT и OFFSET
+
+Для постраничного вывода (pagination) используются операторы:
+- `LIMIT N` — вернуть не более N строк.
+- `OFFSET M` — пропустить первые M строк перед возвратом.
+
+```sql
+-- Страница 3 при размере страницы 20 элементов:
+SELECT id, title FROM articles 
+ORDER BY created_at DESC 
+LIMIT 20 OFFSET 40; -- пропуск 2 страниц (2 * 20)
+```
+
+### Проблема производительности глубокого OFFSET
+При выполнении `OFFSET 1000000 LIMIT 20` СУБД вынуждена физически прочитать и отсортировать 1 000 020 строк, после чего отбросить миллион. Это вызывает катастрофическую деградацию времени ответа.
+
+### Решение: Keyset (Cursor-based) пагинация
+Вместо `OFFSET` фильтруют по значению последнего увиденного первичного ключа:
+```sql
+SELECT id, title FROM articles 
+WHERE id < :last_seen_id 
+ORDER BY id DESC 
+LIMIT 20;
+```
+Такой запрос использует индекс и отрабатывает за $O(\log N)$ независимо от глубины страницы!
+"""##,
+                contentMarkdownEN: ##"""
+### Pagination with LIMIT and OFFSET
+`LIMIT` caps returned row count, while `OFFSET` skips initial entries.
+
+### The Deep Pagination Pitfall
+`OFFSET 1000000` requires database engines to scan, order, and discard one million records. For large datasets, utilize **keyset pagination** (`WHERE id > last_seen_id`) leveraging index seeks.
+"""##,
+                codeSnippet: ##"""
+CREATE TABLE events (
+    id INTEGER PRIMARY KEY,
+    event_type TEXT,
+    payload TEXT
+);
+
+INSERT INTO events (event_type, payload) VALUES 
+('LOGIN', 'User 1'), ('CLICK', 'Btn A'),
+('PURCHASE', 'Order 10'), ('LOGOUT', 'User 1'),
+('LOGIN', 'User 2'), ('PAGEVIEW', '/home');
+
+-- Получаем 2 события со второй страницы (пропуская первые 2)
+SELECT id, event_type, payload 
+FROM events 
+ORDER BY id ASC 
+LIMIT 2 OFFSET 2;
+"""##,
+                xpReward: 40,
+                quiz: [
+                    QuizQuestion(
+                        questionRU: "Почему использование большого значения OFFSET (например, OFFSET 500000) не рекомендуется для больших таблиц?",
+                        questionEN: "Why is large OFFSET values (e.g., OFFSET 500000) discouraged on high-scale tables?",
+                        optionsRU: ["СУБД вынуждена прочитать и отбросить все 500 000 строк", "OFFSET работает только с текстовыми полями", "В SQL лимит OFFSET ограничен 1000", "База данных блокирует всю таблицу"],
+                        optionsEN: ["The engine must physically scan and discard all 500k rows", "OFFSET only works with text columns", "SQL restricts OFFSET to 1000 maximum", "The database places exclusive locks on the table"],
+                        correctIndex: 0,
+                        explanationRU: "OFFSET требует полного сканирования и пропуска предшествующих строк, что резко замедляет запрос.",
+                        explanationEN: "OFFSET incurs full linear scans up to the offset count before returning requested items."
+                    )
+                ]
+            ),
+
+            Lesson(
+                id: "sql_aggregate_functions",
+                category: .sqlAggregations,
+                titleRU: "Агрегатные функции: COUNT, SUM, AVG, MIN, MAX",
+                titleEN: "Aggregate Functions: COUNT, SUM, AVG, MIN & MAX",
+                summaryRU: "Сворачивание множеств значений в скалярные метрики, разница COUNT(*) и COUNT(column), игнорирование NULL.",
+                summaryEN: "Collapsing recordsets into scalar metrics, COUNT(*) vs COUNT(column) distinctions, and NULL avoidance rules.",
+                contentMarkdownRU: ##"""
+### Скалярные агрегаты
+
+Агрегатные функции принимают набор значений колонки и возвращают одно итоговое число:
+- `COUNT(*)` — количество всех строк, включая содержащие `NULL`.
+- `COUNT(column)` — количество строк, где `column IS NOT NULL`.
+- `COUNT(DISTINCT column)` — количество уникальных не-NULL значений.
+- `SUM(column)` — сумма чисел.
+- `AVG(column)` — среднее значение (сумма деленная на количество не-NULL).
 - `MIN(column)` / `MAX(column)` — минимальное и максимальное значения.
 
-```sql
-SELECT 
-    COUNT(*) AS total_workers,
-    AVG(salary) AS average_salary,
-    MAX(salary) AS max_salary
-FROM employees;
-```
+### КРИТИЧЕСКИ ВАЖНО: NULL игнорируется
+Все агрегаты (кроме `COUNT(*)`) полностью игнорируют значения `NULL`:
+Если в колонке 4 строки со значениями `[10, 20, NULL, 30]`:
+- `COUNT(*)` вернет `4`.
+- `COUNT(val)` вернет `3`.
+- `AVG(val)` вернет `(10 + 20 + 30) / 3 = 20.0` (а НЕ 15.0)!
+"""##,
+                contentMarkdownEN: ##"""
+### Aggregate Functions
+Aggregates collapse multiple input rows into a single scalar value.
 
-## Предложение GROUP BY
-Разбивает строки на непересекающиеся группы по указанному признаку:
-```sql
+All mathematical aggregate functions (`SUM`, `AVG`, `MIN`, `MAX`, and `COUNT(col)`) ignore `NULL` entries. Only `COUNT(*)` tallies physical rows regardless of column nullability.
+"""##,
+                codeSnippet: ##"""
+CREATE TABLE sensor_readings (
+    id INTEGER PRIMARY KEY,
+    device_id TEXT,
+    temperature REAL
+);
+
+INSERT INTO sensor_readings VALUES 
+(1, 'sensor_a', 22.5),
+(2, 'sensor_a', 24.1),
+(3, 'sensor_a', NULL),
+(4, 'sensor_a', 23.0);
+
 SELECT 
-    department, 
-    COUNT(*) AS employee_count, 
-    AVG(salary) AS avg_sal
-FROM employees
+    COUNT(*) AS total_records,
+    COUNT(temperature) AS valid_readings,
+    MIN(temperature) AS min_temp,
+    MAX(temperature) AS max_temp,
+    ROUND(AVG(temperature), 2) AS avg_temp
+FROM sensor_readings;
+"""##,
+                xpReward: 40,
+                quiz: [
+                    QuizQuestion(
+                        questionRU: "Какая агрегатная функция учитывает строки, содержащие значение NULL?",
+                        questionEN: "Which aggregate function accounts for rows containing NULL values?",
+                        optionsRU: ["COUNT(*)", "COUNT(column)", "AVG(column)", "SUM(column)"],
+                        optionsEN: ["COUNT(*)", "COUNT(column)", "AVG(column)", "SUM(column)"],
+                        correctIndex: 0,
+                        explanationRU: "COUNT(*) подсчитывает физические строки таблицы независимо от содержимого колонок.",
+                        explanationEN: "COUNT(*) tallies row occurrences without inspecting specific column nullability."
+                    )
+                ]
+            ),
+
+            Lesson(
+                id: "sql_group_by_having",
+                category: .sqlAggregations,
+                titleRU: "Группировка GROUP BY и фильтрация групп HAVING",
+                titleEN: "Grouping with GROUP BY & Filtering with HAVING",
+                summaryRU: "Разделение выборки на группы, правило валидности проекции в GROUP BY и разница WHERE vs HAVING.",
+                summaryEN: "Partitioning recordsets into groups, projection validity rules in GROUP BY, and WHERE vs HAVING comparison.",
+                contentMarkdownRU: ##"""
+### Предложение GROUP BY
+
+Оператор `GROUP BY` объединяет строки с одинаковыми значениями в указанных столбцах в единую сводную запись для агрегации:
+
+```sql
+SELECT department, COUNT(*) AS headcount, AVG(salary) AS mean_pay
+FROM employees 
 GROUP BY department;
 ```
 
-## Разница между WHERE и HAVING
-- `WHERE` фильтрует строки **до** группировки.
-- `HAVING` фильтрует группы **после** вычисления агрегатов:
+### Главное синтаксическое правило GROUP BY
+Если в запросе присутствует `GROUP BY`, каждый столбец в блоке `SELECT` обязан быть либо:
+1. Перечислен в предложении `GROUP BY`.
+2. Обернут в агрегатную функцию (`SUM`, `AVG`, `MAX` и т.д.).
+
+Любая колонка вне этого правила приводит к недетерминированному поведению или ошибке `Column must appear in the GROUP BY clause`.
+
+### WHERE против HAVING
+- `WHERE` фильтрует **исходные строки до** группировки. В `WHERE` нельзя использовать агрегатные функции!
+- `HAVING` фильтрует **сформированные группы после** агрегации:
 ```sql
-SELECT department, COUNT(*) AS cnt
-FROM employees
-GROUP BY department
-HAVING COUNT(*) > 5;
+SELECT department, AVG(salary) AS avg_sal 
+FROM employees 
+WHERE is_employed = 1         -- фильтр строк
+GROUP BY department 
+HAVING AVG(salary) > 80000;   -- фильтр агрегированных групп
 ```
 """##,
                 contentMarkdownEN: ##"""
-# Aggregations & GROUP BY
+### GROUP BY & HAVING
+`GROUP BY` condenses identical values in target fields into aggregate buckets.
 
-```sql
-SELECT department, AVG(salary) AS avg_salary
-FROM employees
-GROUP BY department
-HAVING COUNT(*) >= 3;
-```
+Every unaggregated attribute in the `SELECT` list must be explicitly declared in the `GROUP BY` clause.
+
+Use `WHERE` for row-level pre-filtering and `HAVING` for group-level metric filtering.
 """##,
                 codeSnippet: ##"""
-SELECT category, COUNT(*) AS items_count, AVG(price) AS avg_price
-FROM store_products
-GROUP BY category;
-"""##,
-                xpReward: 45
-            ),
-            Lesson(
-                id: "sql_joins_types",
-                category: .sqlJoins,
-                titleRU: "Объединение таблиц: INNER, LEFT и FULL JOIN",
-                titleEN: "Table Joins: INNER, LEFT & FULL JOIN",
-                summaryRU: "Связывание реляционных данных по ключам. Строгое пересечение INNER JOIN и сохранение родительских записей в LEFT JOIN.",
-                summaryEN: "Link data across tables with foreign keys. Compare strict INNER JOIN with non-matching preserved rows in LEFT JOIN.",
-                contentMarkdownRU: ##"""
-# Реляционные связи: Табличные JOIN
-
-Реляционные базы данных нормализуют информацию, разнося сущности по разным таблицам. Операторы `JOIN` восстанавливают целостную картину.
-
-## INNER JOIN
-Возвращает только те строки, для которых условие связи истинно в **обеих** таблицах:
-```sql
-SELECT 
-    users.name,
-    orders.amount,
-    orders.created_at
-FROM users
-INNER JOIN orders ON users.id = orders.user_id;
-```
-
-## LEFT JOIN (LEFT OUTER JOIN)
-Возвращает **все** строки из левой таблицы. Если в правой таблице совпадений нет, её поля заполняются значением `NULL`:
-```sql
-SELECT 
-    users.name,
-    COUNT(orders.id) AS total_orders
-FROM users
-LEFT JOIN orders ON users.id = orders.user_id
-GROUP BY users.name;
-```
-"""##,
-                contentMarkdownEN: ##"""
-# Combining Tables with JOIN
-
-```sql
-SELECT u.username, o.product_name, o.price
-FROM users u
-INNER JOIN orders o ON u.id = o.user_id;
-```
-"""##,
-                codeSnippet: ##"""
-SELECT employees.name, departments.title
-FROM employees
-INNER JOIN departments ON employees.dept_id = departments.id;
-"""##,
-                xpReward: 50
-            ),
-            Lesson(
-                id: "sql_ddl_tables",
-                category: .sqlDdlDml,
-                titleRU: "DDL & DML: Создание таблиц и Изменение данных",
-                titleEN: "DDL & DML: Schema Design & Data Mutation",
-                summaryRU: "Проектирование схемы: CREATE TABLE, PRIMARY KEY, типы данных. Вставка строк INSERT INTO, модификация UPDATE и удаление DELETE.",
-                summaryEN: "Schema definition with CREATE TABLE, primary keys, and data types. Data mutation with INSERT, UPDATE, and DELETE.",
-                contentMarkdownRU: ##"""
-# DDL и DML Операции
-
-SQL делится на две ключевые подсистемы:
-- **DDL (Data Definition Language)** — структура и схема БД.
-- **DML (Data Manipulation Language)** — работа со строками данных.
-
-## Создание таблицы (CREATE TABLE)
-```sql
-CREATE TABLE tasks (
+CREATE TABLE sales (
     id INTEGER PRIMARY KEY,
-    title TEXT NOT NULL,
-    priority INTEGER DEFAULT 1,
-    is_completed BOOLEAN DEFAULT FALSE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    category TEXT,
+    revenue REAL
+);
+
+INSERT INTO sales VALUES 
+(1, 'Электроника', 12000.0),
+(2, 'Электроника', 35000.0),
+(3, 'Книги', 1500.0),
+(4, 'Книги', 2200.0),
+(5, 'Мебель', 45000.0);
+
+-- Выводим категории с суммарной выручкой свыше 10 000
+SELECT category, COUNT(*) AS items_sold, SUM(revenue) AS total_revenue
+FROM sales 
+GROUP BY category 
+HAVING SUM(revenue) >= 10000.0 
+ORDER BY total_revenue DESC;
+"""##,
+                xpReward: 45,
+                quiz: [
+                    QuizQuestion(
+                        questionRU: "В чем ключевое отличие предложения HAVING от WHERE?",
+                        questionEN: "What is the core distinction between HAVING and WHERE?",
+                        optionsRU: ["HAVING фильтрует вычисленные группы после GROUP BY, а WHERE фильтрует строки до группировки", "HAVING работает быстрее WHERE", "В HAVING нельзя использовать агрегатные функции", "WHERE используется только для сортировки"],
+                        optionsEN: ["HAVING filters aggregated groups after GROUP BY; WHERE filters rows prior to grouping", "HAVING is faster than WHERE", "HAVING disallows aggregate expressions", "WHERE is exclusively used for sorting"],
+                        correctIndex: 0,
+                        explanationRU: "WHERE отсекает строки до агрегации, а HAVING фильтрует готовые группы по результатам агрегатных функций.",
+                        explanationEN: "WHERE acts on base tuples prior to grouping; HAVING evaluates calculated aggregate values."
+                    )
+                ]
+            ),
+
+            Lesson(
+                id: "sql_keys_pk_fk",
+                category: .sqlRelationalDesign,
+                titleRU: "Первичные и внешние ключи: PK, FK и Целостность",
+                titleEN: "Primary & Foreign Keys: Referential Integrity",
+                summaryRU: "Реляционная целостность, синтаксис FOREIGN KEY, каскадные действия ON DELETE CASCADE и защита данных.",
+                summaryEN: "Referential integrity constraints, FOREIGN KEY declarations, ON DELETE CASCADE options, and orphaned record prevention.",
+                contentMarkdownRU: ##"""
+### Реляционные связи и целостность данных
+
+В реляционных базах данных целостность ссылок (Referential Integrity) гарантирует, что связь между двумя таблицами всегда остается валидной.
+
+### Первичный ключ (PRIMARY KEY)
+Уникальный идентификатор строки в родительской таблице.
+
+### Внешний ключ (FOREIGN KEY)
+Поле в дочерней таблице, ссылающееся на первичный ключ родительской таблицы:
+```sql
+CREATE TABLE orders (
+    order_id INTEGER PRIMARY KEY,
+    user_id INTEGER,
+    amount REAL,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 ```
 
-## Вставка данных (INSERT INTO)
+### Каскадные действия (ON DELETE / ON UPDATE)
+Определяют поведение СУБД при удалении родительской записи:
+1. `CASCADE` — автоматически удаляет все дочерние записи.
+2. `RESTRICT` / `NO ACTION` — блокирует удаление родителя, если есть дочерние ссылки (вызывает ошибку).
+3. `SET NULL` — заменяет поле внешнего ключа в дочерних записях на `NULL`.
+4. `SET DEFAULT` — присваивает значение по умолчанию.
+"""##,
+                contentMarkdownEN: ##"""
+### Referential Integrity: PK & FK
+Foreign keys enforce relational relationships between parent and child tables.
+
+### Referential Actions on Delete
+- `CASCADE`: Propagates deletion to referencing child rows.
+- `RESTRICT`: Rejects deletion if dependent children exist.
+- `SET NULL`: Nullifies foreign key fields in referencing rows.
+"""##,
+                codeSnippet: ##"""
+PRAGMA foreign_keys = ON;
+
+CREATE TABLE authors (
+    id INTEGER PRIMARY KEY,
+    name TEXT NOT NULL
+);
+
+CREATE TABLE books (
+    id INTEGER PRIMARY KEY,
+    author_id INTEGER NOT NULL,
+    title TEXT NOT NULL,
+    FOREIGN KEY (author_id) REFERENCES authors(id) ON DELETE CASCADE
+);
+
+INSERT INTO authors VALUES (1, 'Лев Толстой');
+INSERT INTO books VALUES (101, 1, 'Война и мир');
+
+-- Удаление автора каскадно удалит и его книги
+DELETE FROM authors WHERE id = 1;
+
+SELECT COUNT(*) AS remaining_books FROM books;
+"""##,
+                xpReward: 45,
+                quiz: [
+                    QuizQuestion(
+                        questionRU: "Что произойдет при попытке удалить запись из родительской таблицы, если внешний ключ настроен как ON DELETE CASCADE?",
+                        questionEN: "What happens when deleting a parent row whose foreign key specifies ON DELETE CASCADE?",
+                        optionsRU: ["Все связанные записи в дочерней таблице автоматически удалятся", "СУБД выбросит ошибку нарушения целостности", "Значения в дочерних записях станут равны 0", "Таблица заблокируется навсегда"],
+                        optionsEN: ["All dependent rows in the child table are deleted automatically", "The engine raises a constraint violation error", "Child foreign key values become 0", "The table locks permanently"],
+                        correctIndex: 0,
+                        explanationRU: "CASCADE обеспечивает автоматическое удаление всех зависимых дочерних записей.",
+                        explanationEN: "CASCADE automatically deletes all referencing child rows, preserving referential integrity."
+                    )
+                ]
+            ),
+
+            Lesson(
+                id: "sql_cardinality_relations",
+                category: .sqlRelationalDesign,
+                titleRU: "Типы связей: 1:1, 1:N и N:M (Junction Tables)",
+                titleEN: "Cardinality Relationships: 1:1, 1:N & M:N",
+                summaryRU: "Моделирование отношений между сущностями, промежуточные таблицы (Join/Junction table) и составные первичные ключи.",
+                summaryEN: "Modeling domain entities: one-to-one, one-to-many, and many-to-many using junction tables and composite keys.",
+                contentMarkdownRU: ##"""
+### Кардинальность связей в БД
+
+1. **Один к одному (1:1)**:
+   - Профиль пользователя и приватные паспортные данные.
+   - Реализуется через внешний ключ с ограничением `UNIQUE`:
+     ```sql
+     CREATE TABLE user_profiles (
+         user_id INTEGER PRIMARY KEY,
+         bio TEXT,
+         FOREIGN KEY (user_id) REFERENCES users(id)
+     );
+     ```
+
+2. **Один ко многим (1:N)**:
+   - Самый распространенный тип связи: один отдел — много сотрудников, один клиент — много заказов.
+   - Внешний ключ помещается на стороне «многие».
+
+3. **Многие ко многим (N:M / M:N)**:
+   - Один студент посещает много курсов, один курс посещают много студентов.
+   - Невозможно выразить одним внешним ключом напрямую.
+   - **Решение**: Промежуточная таблица-связка (Junction / Bridge table) с составным ключом:
+     ```sql
+     CREATE TABLE student_courses (
+         student_id INTEGER,
+         course_id INTEGER,
+         enrolled_at DATE,
+         PRIMARY KEY (student_id, course_id),
+         FOREIGN KEY (student_id) REFERENCES students(id),
+         FOREIGN KEY (course_id) REFERENCES courses(id)
+     );
+     ```
+"""##,
+                contentMarkdownEN: ##"""
+### Relational Cardinality
+- **1:1**: One entity maps to one entity (enforced via `UNIQUE` foreign key).
+- **1:N**: Parent entity references multiple children via a child foreign key.
+- **M:N**: Implemented via a junction/bridge table carrying foreign keys to both parent entities and a composite primary key.
+"""##,
+                codeSnippet: ##"""
+CREATE TABLE students (
+    id INTEGER PRIMARY KEY,
+    name TEXT
+);
+
+CREATE TABLE courses (
+    id INTEGER PRIMARY KEY,
+    title TEXT
+);
+
+CREATE TABLE enrollments (
+    student_id INTEGER,
+    course_id INTEGER,
+    PRIMARY KEY (student_id, course_id)
+);
+
+INSERT INTO students VALUES (1, 'Анна'), (2, 'Илья');
+INSERT INTO courses VALUES (10, 'Базы Данных'), (20, 'Алгоритмы');
+
+INSERT INTO enrollments VALUES (1, 10), (1, 20), (2, 10);
+
+-- Выборка всех курсов Анны через таблицу связку
+SELECT s.name, c.title 
+FROM students s
+JOIN enrollments e ON s.id = e.student_id
+JOIN courses c ON e.course_id = c.id
+WHERE s.id = 1;
+"""##,
+                xpReward: 45,
+                quiz: [
+                    QuizQuestion(
+                        questionRU: "Как правильно смоделировать связь 'многие ко многим' (M:N) между двумя реляционными таблицами?",
+                        questionEN: "How should a many-to-many (M:N) relationship be structured in a relational database?",
+                        optionsRU: ["Создать промежуточную таблицу-связку с внешними ключами на обе таблицы", "Хранить список ID через запятую в текстовом поле", "Добавить 50 колонок course_id1, course_id2 в таблицу студента", "Связи M:N не поддерживаются в SQL"],
+                        optionsEN: ["Introduce a junction table referencing primary keys of both entities", "Store comma-separated IDs inside a text column", "Add multiple columns like course_id1, course_id2", "M:N relations are not possible in SQL"],
+                        correctIndex: 0,
+                        explanationRU: "Связь многие ко многим моделируется через третью связующую таблицу (Junction table).",
+                        explanationEN: "Junction tables resolve many-to-many associations by breaking them down into two 1:N links."
+                    )
+                ]
+            ),
+
+            Lesson(
+                id: "sql_inner_join_deep",
+                category: .sqlJoins,
+                titleRU: "INNER JOIN: строгое объединение по условию ON",
+                titleEN: "INNER JOIN: Strict Condition Matching",
+                summaryRU: "Механизм пересечения таблиц, синтаксис предиката ON, фильтрация несоответствующих строк и оптимизация Hash/Merge Join.",
+                summaryEN: "Table intersection semantics, ON predicate syntax, unmatched row exclusion, and query engine join algorithms.",
+                contentMarkdownRU: ##"""
+### Оператор INNER JOIN
+
+`INNER JOIN` возвращает только те строки, для которых условие связывания в предикате `ON` является истинным (`TRUE`) в **обеих** таблицах:
+
 ```sql
-INSERT INTO tasks (title, priority) 
-VALUES ('Изучить SQL', 5), ('Собрать проект', 3);
+SELECT 
+    orders.id AS order_id,
+    clients.company_name,
+    orders.amount
+FROM orders
+INNER JOIN clients ON orders.client_id = clients.id;
 ```
 
-## Обновление данных (UPDATE)
-> Внимание: всегда указывайте условие `WHERE`, иначе обновятся абсолютно все строки в таблице!
+### Как СУБД выполняет JOIN
+Оптимизатор запросов выбирает один из алгоритмов соединения в зависимости от размера данных и наличия индексов:
+1. **Nested Loop Join** — для каждой строки левой таблицы сканируется правая (эффективно, если правая таблица имеет индекс по ключу).
+2. **Hash Join** — строит хеш-таблицу в памяти по меньшей таблице и выполняет мгновенный лукап для второй.
+3. **Merge Join** — если обе таблицы отсортированы по ключу объединения, выполняется параллельное линейное слияние за $O(N + M)$.
+"""##,
+                contentMarkdownEN: ##"""
+### INNER JOIN Mechanics
+An `INNER JOIN` produces the relational intersection where the `ON` condition evaluates to `TRUE`. Unmatched rows from either side are excluded.
+
+Under the hood, database query engines leverage Nested Loops, Hash Joins, or Sort-Merge Joins depending on indexes and table volumes.
+"""##,
+                codeSnippet: ##"""
+CREATE TABLE departments (
+    id INTEGER PRIMARY KEY,
+    dept_name TEXT
+);
+
+CREATE TABLE employees (
+    id INTEGER PRIMARY KEY,
+    name TEXT,
+    dept_id INTEGER
+);
+
+INSERT INTO departments VALUES (1, 'Инженерия'), (2, 'Маркетинг'), (3, 'HR');
+INSERT INTO employees VALUES (101, 'Артем', 1), (102, 'Вера', 1), (103, 'Денис', 2);
+
+SELECT e.name, d.dept_name 
+FROM employees e 
+INNER JOIN departments d ON e.dept_id = d.id;
+"""##,
+                xpReward: 45,
+                quiz: [
+                    QuizQuestion(
+                        questionRU: "Попадут ли в результат INNER JOIN строки из левой таблицы, для которых нет совпадений в правой?",
+                        questionEN: "Will unmatched rows from the left table appear in an INNER JOIN result?",
+                        optionsRU: ["Нет, INNER JOIN возвращает только строки с подтвержденным совпадением с обеих сторон", "Да, со значениями NULL в правой части", "Да, если это SQLite", "Да, если указан LIMIT"],
+                        optionsEN: ["No, INNER JOIN returns only records having matching keys on both sides", "Yes, with NULLs for missing fields", "Yes, in SQLite", "Yes, if LIMIT is specified"],
+                        correctIndex: 0,
+                        explanationRU: "INNER JOIN возвращает только строгое пересечение данных, отбрасывая несовпадающие строки.",
+                        explanationEN: "INNER JOIN strictly retains matching records from both relations."
+                    )
+                ]
+            ),
+
+            Lesson(
+                id: "sql_left_outer_join",
+                category: .sqlJoins,
+                titleRU: "LEFT OUTER JOIN: сохранение строк и поиск пропусков",
+                titleEN: "LEFT JOIN: Preserving Rows & Detecting Gaps",
+                summaryRU: "Сохранение всех записей левой таблицы, заполнение NULL для правой стороны, и паттерн поиска сирот через IS NULL.",
+                summaryEN: "Preserving all left records, NULL generation for missing right attributes, and anti-join gap detection using IS NULL.",
+                contentMarkdownRU: ##"""
+### Оператор LEFT JOIN (LEFT OUTER JOIN)
+
+`LEFT JOIN` гарантирует, что **каждая строка из левой таблицы попадет в результат**:
+- Если в правой таблице найдено соответствие по `ON`, поля заполняются данными.
+- Если совпадений нет, все поля правой таблицы заполняются значением `NULL`.
+
 ```sql
-UPDATE tasks 
-SET is_completed = TRUE 
-WHERE id = 1;
+SELECT 
+    users.id,
+    users.username,
+    orders.id AS order_id
+FROM users
+LEFT JOIN orders ON users.id = orders.user_id;
 ```
 
-## Удаление данных (DELETE)
+### Паттерн Anti-Join: поиск неактивных сущностей
+LEFT JOIN в комбинации с проверкой `WHERE right_table.id IS NULL` позволяет мгновенно найти записи, у которых нет дочерних элементов (например, пользователей без заказов):
+
 ```sql
-DELETE FROM tasks 
-WHERE is_completed = TRUE;
+SELECT u.username 
+FROM users u 
+LEFT JOIN orders o ON u.id = o.user_id 
+WHERE o.id IS NULL; -- Отбираем только тех, у кого нет заказов!
 ```
 """##,
                 contentMarkdownEN: ##"""
-# DDL and DML in SQL
+### LEFT OUTER JOIN and Anti-Join Pattern
+`LEFT JOIN` preserves every record from the left table regardless of whether matching entries exist on the right. Missing attributes return as `NULL`.
 
-```sql
-CREATE TABLE authors (id INTEGER PRIMARY KEY, name TEXT);
-INSERT INTO authors (id, name) VALUES (1, 'Leo Tolstoy');
-UPDATE authors SET name = 'Lev Tolstoy' WHERE id = 1;
-```
+The **Anti-Join** pattern leverages `WHERE right_table.id IS NULL` to efficiently locate parent records without associated children.
 """##,
                 codeSnippet: ##"""
-CREATE TABLE courses (id INT PRIMARY KEY, name TEXT, hours INT);
-INSERT INTO courses VALUES (1, 'SQL Mastery', 40);
-SELECT * FROM courses;
+CREATE TABLE customers (
+    id INTEGER PRIMARY KEY,
+    name TEXT
+);
+
+CREATE TABLE purchases (
+    id INTEGER PRIMARY KEY,
+    customer_id INTEGER,
+    item TEXT
+);
+
+INSERT INTO customers VALUES (1, 'Алексей'), (2, 'Мария'), (3, 'Олег');
+INSERT INTO purchases VALUES (10, 1, 'Ноутбук'), (11, 1, 'Чехол');
+
+-- Находим клиентов, которые еще ничего не купили (Anti-Join)
+SELECT c.id, c.name 
+FROM customers c 
+LEFT JOIN purchases p ON c.id = p.customer_id 
+WHERE p.id IS NULL;
 """##,
-                xpReward: 40
+                xpReward: 45,
+                quiz: [
+                    QuizQuestion(
+                        questionRU: "Каким значением заполняются столбцы правой таблицы в LEFT JOIN, если соответствие не найдено?",
+                        questionEN: "What value populates right-table columns when no match exists in a LEFT JOIN?",
+                        optionsRU: ["NULL", "0 (ноль)", "Пустая строка", "Значение первичного ключа"],
+                        optionsEN: ["NULL", "0 (zero)", "Empty string", "Primary key value"],
+                        correctIndex: 0,
+                        explanationRU: "При отсутствии соответствия в правой таблице все ее атрибуты заполняются значением NULL.",
+                        explanationEN: "Unmatched rows from the preserving table have right-side attributes set to NULL."
+                    )
+                ]
             ),
+
             Lesson(
-                id: "sql_window_functions",
-                category: .sqlWindow,
-                titleRU: "Оконные функции: OVER, ROW_NUMBER и RANK",
-                titleEN: "Window Functions: OVER, ROW_NUMBER & Analytics",
-                summaryRU: "Аналитические вычисления без схлопывания строк: нумерация строк с ROW_NUMBER(), ранжирование RANK() и секционирование PARTITION BY.",
-                summaryEN: "Advanced row analytics without collapsing: calculate running totals, ROW_NUMBER(), and RANK() across PARTITION BY windows.",
+                id: "sql_multi_table_joins",
+                category: .sqlJoins,
+                titleRU: "Каскадные JOIN: объединение 3+ таблиц",
+                titleEN: "Multi-Table Joins: Chaining 3+ Tables",
+                summaryRU: "Сложные реляционные запросы через цепочки JOIN, порядок связывания, производительность и предотвращение декартова взрыва.",
+                summaryEN: "Complex queries chaining multiple joins, join ordering, query plan impact, and avoiding cartesian explosion.",
                 contentMarkdownRU: ##"""
-# Оконные функции в SQL
+### Каскадное связывание нескольких таблиц
 
-В отличие от `GROUP BY`, оконные функции вычисляют агрегатные и ранжирующие значения, **сохраняя каждую индивидуальную строку** выборки.
+В реальных базах данных бизнес-запросы требуют объединения 3, 5 или более таблиц:
+```sql
+SELECT 
+    c.name AS customer_name,
+    o.id AS order_id,
+    p.title AS product_name,
+    oi.quantity,
+    oi.price
+FROM customers c
+INNER JOIN orders o ON c.id = o.customer_id
+INNER JOIN order_items oi ON o.id = oi.order_id
+INNER JOIN products p ON oi.product_id = p.id
+WHERE o.status = 'COMPLETED';
+```
 
-## Синтаксис OVER
-Окно вычисления задается с помощью конструкции `OVER(...)`:
-- `PARTITION BY <колонка>` — секционирует строки (как локальный GROUP BY).
-- `ORDER BY <колонка>` — упорядочивает строки внутри каждого окна.
+### Предотвращение декартова взрыва (Fan-out)
+Если объединять таблицу с двумя независимыми дочерними таблицами один-ко-многим одновременно (например, `User` с `UserEmails` и `UserRoles`), количество результирующих строк станет произведением: $N \times M$!
+Для таких агрегаций лучше использовать раздельные подзапросы или оконные функции.
+"""##,
+                contentMarkdownEN: ##"""
+### Chaining Multiple Tables
+Complex operational queries frequently span 3 or more relations. Maintain clean table aliases (`c`, `o`, `oi`, `p`) to retain clarity.
 
-## Нумерация строк: ROW_NUMBER()
+Avoid joining multiple independent 1:N relations in a single query to prevent exponential row fan-out.
+"""##,
+                codeSnippet: ##"""
+CREATE TABLE brands (id INTEGER PRIMARY KEY, brand_name TEXT);
+CREATE TABLE items (id INTEGER PRIMARY KEY, brand_id INTEGER, title TEXT);
+CREATE TABLE reviews (id INTEGER PRIMARY KEY, item_id INTEGER, rating INTEGER);
+
+INSERT INTO brands VALUES (1, 'Sony');
+INSERT INTO items VALUES (10, 1, 'Наушники WH-1000');
+INSERT INTO reviews VALUES (101, 10, 5), (102, 10, 4);
+
+SELECT b.brand_name, i.title, AVG(r.rating) AS avg_stars
+FROM brands b
+JOIN items i ON b.id = i.brand_id
+JOIN reviews r ON i.id = r.item_id
+GROUP BY b.brand_name, i.title;
+"""##,
+                xpReward: 45,
+                quiz: [
+                    QuizQuestion(
+                        questionRU: "Что может произойти при одновременном связывании таблицы с двумя независимыми дочерними таблицами 1:N?",
+                        questionEN: "What issue can occur when joining one table to two independent 1:N child tables simultaneously?",
+                        optionsRU: ["Декартово умножение строк (Fan-out) и дублирование данных", "СУБД автоматически удалит дубликаты", "Запрос завершится ошибкой синтаксиса", "Память СУБД уменьшится вдвое"],
+                        optionsEN: ["Cartesian fan-out multiplying rows and inflating aggregates", "The database automatically deduplicates rows", "A syntax error will be raised", "Database memory footprint halves"],
+                        correctIndex: 0,
+                        explanationRU: "Одновременный JOIN независимых списков приводит к перемножению строк и искажению сумм.",
+                        explanationEN: "Joining independent 1:N lists multiplies records (N x M), distorting COUNT and SUM aggregates."
+                    )
+                ]
+            ),
+
+            Lesson(
+                id: "sql_right_full_outer_join",
+                category: .sqlAdvancedJoins,
+                titleRU: "RIGHT JOIN и FULL OUTER JOIN: теория и эмуляция",
+                titleEN: "RIGHT JOIN & FULL OUTER JOIN: Emulation & Logic",
+                summaryRU: "Симметрия RIGHT JOIN, полное объединение FULL JOIN, диаграммы Венна и эмуляция FULL JOIN через UNION в SQLite.",
+                summaryEN: "RIGHT JOIN symmetry, FULL OUTER JOIN semantics, Venn diagrams, and emulating FULL JOIN via UNION in SQLite.",
+                contentMarkdownRU: ##"""
+### RIGHT JOIN и FULL JOIN
+
+- `RIGHT JOIN` — зеркальная копия `LEFT JOIN`: сохраняет все строки из правой таблицы, дополняя несовпадающие поля левой значениями `NULL`. В практике любой `RIGHT JOIN` легко переписывается как `LEFT JOIN` сменой порядка таблиц.
+- `FULL OUTER JOIN` — объединяет результаты `LEFT JOIN` и `RIGHT JOIN`: сохраняет строки из обеих таблиц, заполняя пропуски с любой стороны значениями `NULL`.
+
+### Поддержка в SQLite
+Диалект SQLite исторически поддерживает `LEFT JOIN`, но не имеет ключевого слова `FULL OUTER JOIN`.
+
+### Эмуляция FULL OUTER JOIN в SQLite
+Для реализации полного внешнего соединения используется объединение `LEFT JOIN` с анти-джойном через `UNION ALL`:
+```sql
+SELECT a.id, a.val, b.val 
+FROM table_a a 
+LEFT JOIN table_b b ON a.id = b.id
+UNION ALL
+SELECT a.id, a.val, b.val 
+FROM table_b b 
+LEFT JOIN table_a a ON b.id = a.id 
+WHERE a.id IS NULL;
+```
+"""##,
+                contentMarkdownEN: ##"""
+### RIGHT & FULL OUTER JOIN
+`RIGHT JOIN` mirrors `LEFT JOIN` by preserving right-hand records.
+
+`FULL OUTER JOIN` retains records from both relations, setting attributes to `NULL` whenever corresponding matches are absent. In SQLite, simulate FULL JOIN via `UNION ALL` combining a LEFT JOIN with an anti-join.
+"""##,
+                codeSnippet: ##"""
+CREATE TABLE team_a (id INTEGER PRIMARY KEY, name TEXT);
+CREATE TABLE team_b (id INTEGER PRIMARY KEY, name TEXT);
+
+INSERT INTO team_a VALUES (1, 'Антон'), (2, 'Борис');
+INSERT INTO team_b VALUES (2, 'Борис'), (3, 'Виктор');
+
+-- Эмуляция FULL JOIN в SQLite
+SELECT a.name AS player_a, b.name AS player_b 
+FROM team_a a 
+LEFT JOIN team_b b ON a.name = b.name
+UNION ALL
+SELECT a.name AS player_a, b.name AS player_b 
+FROM team_b b 
+LEFT JOIN team_a a ON b.name = a.name 
+WHERE a.name IS NULL;
+"""##,
+                xpReward: 45,
+                quiz: [
+                    QuizQuestion(
+                        questionRU: "Как в SQLite можно получить результат FULL OUTER JOIN при отсутствии нативного оператора?",
+                        questionEN: "How can you achieve FULL OUTER JOIN in SQLite given the absence of native keyword support?",
+                        optionsRU: ["Объединить LEFT JOIN и выборку отсутствующих строк через UNION ALL", "Использовать оператор INTERSECT", "FULL JOIN принципиально невозможен", "Использовать только INNER JOIN"],
+                        optionsEN: ["Combine LEFT JOIN with missing right rows via UNION ALL", "Use INTERSECT operator", "FULL JOIN is impossible", "Use only INNER JOIN"],
+                        correctIndex: 0,
+                        explanationRU: "Эмуляция FULL JOIN в SQLite строится через UNION ALL левого соединения и отсекающего анти-соединения.",
+                        explanationEN: "Emulating FULL JOIN in SQLite is achieved by combining a LEFT JOIN with an anti-join using UNION ALL."
+                    )
+                ]
+            ),
+
+            Lesson(
+                id: "sql_cross_join_cartesian",
+                category: .sqlAdvancedJoins,
+                titleRU: "Декартово произведение: CROSS JOIN",
+                titleEN: "Cartesian Product: CROSS JOIN",
+                summaryRU: "Полное перемножение множеств, сценарии применения (матрицы дат, комбинации параметров) и случайные декартовы взрывы.",
+                summaryEN: "Cartesian product evaluation, valid use cases (date grids, parameter permutations), and accidental cross joins.",
+                contentMarkdownRU: ##"""
+### Оператор CROSS JOIN
+
+`CROSS JOIN` выполняет декартово произведение двух отношений: каждая строка первой таблицы соединяется с каждой строкой второй таблицы.
+
+Если в таблице $A$ содержится $M$ строк, а в таблице $B$ содержится $N$ строк, результат `CROSS JOIN` содержит ровно:
+$$M \times N \text{ строк}$$
+
+### Когда CROSS JOIN полезен на практике?
+1. **Генерация матриц вариантов**: размеры одежды (S, M, L) $\times$ цвета (красный, синий, черный).
+2. **Заполнение пропусков во временных рядах**: декартово произведение списка магазинов и календаря дат для выявления дней с нулевыми продажами.
+3. **Генерация тестовых данных**.
+"""##,
+                contentMarkdownEN: ##"""
+### CROSS JOIN Semantics
+`CROSS JOIN` produces the mathematical Cartesian product where each tuple in relation A merges with every tuple in relation B, yielding $M \times N$ rows.
+
+Valuable for generating permutation matrices and zero-filling temporal data.
+"""##,
+                codeSnippet: ##"""
+CREATE TABLE sizes (size TEXT);
+CREATE TABLE colors (color TEXT);
+
+INSERT INTO sizes VALUES ('S'), ('M'), ('L');
+INSERT INTO colors VALUES ('Черный'), ('Белый');
+
+-- Генерируем полный ассортиментный каталог (3 x 2 = 6 вариантов)
+SELECT s.size, c.color, 'Футболка Basic' AS item
+FROM sizes s 
+CROSS JOIN colors c;
+"""##,
+                xpReward: 40,
+                quiz: [
+                    QuizQuestion(
+                        questionRU: "Сколько строк вернет запрос `SELECT * FROM a CROSS JOIN b;`, если в таблице a 10 строк, а в b — 50?",
+                        questionEN: "How many rows does `SELECT * FROM a CROSS JOIN b;` yield if table a has 10 rows and b has 50?",
+                        optionsRU: ["500 строк (10 * 50)", "60 строк (10 + 50)", "50 строк", "10 строк"],
+                        optionsEN: ["500 rows (10 * 50)", "60 rows (10 + 50)", "50 rows", "10 rows"],
+                        correctIndex: 0,
+                        explanationRU: "Декартово произведение перемножает количество строк двух таблиц: 10 * 50 = 500.",
+                        explanationEN: "The Cartesian product multiplies row counts ($10 \times 50 = 500$)."
+                    )
+                ]
+            ),
+
+            Lesson(
+                id: "sql_self_join_hierarchy",
+                category: .sqlAdvancedJoins,
+                titleRU: "SELF JOIN: объединение таблицы с самой собой",
+                titleEN: "SELF JOIN: Hierarchies & Graph Pairs",
+                summaryRU: "Соединение сущности с самой собой, древовидные структуры (начальник - подчиненный), обязательность разных алиасов.",
+                summaryEN: "Joining a relation against itself, organizational hierarchies (manager-employee), and alias disambiguation.",
+                contentMarkdownRU: ##"""
+### Оператор SELF JOIN
+
+`SELF JOIN` — это обычное соединение таблицы с самой собой. В SQL нет отдельного ключевого слова `SELF JOIN`, используется `INNER JOIN` или `LEFT JOIN`, где таблица указывается дважды с **разными псевдонимами** (aliases):
+
+```sql
+SELECT 
+    emp.name AS employee_name,
+    mgr.name AS manager_name
+FROM employees emp
+LEFT JOIN employees mgr ON emp.manager_id = mgr.id;
+```
+
+### Сценарии применения
+1. **Иерархии**: сотрудники и их руководители, категории товаров и их родительские категории.
+2. **Сравнение смежных строк**: сопоставление заказов одного и того же клиента за разные даты.
+3. **Поиск дубликатов**: поиск пользователей с одинаковым email, но разными ID.
+"""##,
+                contentMarkdownEN: ##"""
+### SELF JOIN Applications
+A `SELF JOIN` queries a single table against itself using distinct table aliases.
+
+Common applications include adjacency list hierarchies (employee-to-manager), entity parent-child categories, and identifying matching duplicate values across differing rows.
+"""##,
+                codeSnippet: ##"""
+CREATE TABLE staff_tree (
+    id INTEGER PRIMARY KEY,
+    name TEXT,
+    manager_id INTEGER
+);
+
+INSERT INTO staff_tree VALUES 
+(1, 'Генеральный директор', NULL),
+(2, 'Техлид', 1),
+(3, 'Разработчик', 2);
+
+-- Отображаем сотрудника и его непосредственного руководителя
+SELECT 
+    e.name AS employee, 
+    COALESCE(m.name, 'Верховный руководитель') AS reports_to
+FROM staff_tree e 
+LEFT JOIN staff_tree m ON e.manager_id = m.id;
+"""##,
+                xpReward: 45,
+                quiz: [
+                    QuizQuestion(
+                        questionRU: "Что является обязательным требованием при выполнении SELF JOIN в SQL?",
+                        questionEN: "What is an indispensable requirement when executing a SELF JOIN in SQL?",
+                        optionsRU: ["Использование разных псевдонимов (aliases) для каждой копии таблицы", "Таблица должна содержать более 1000 строк", "Обязательное использование оператора WHERE вместо ON", "Колонки должны иметь тип FLOAT"],
+                        optionsEN: ["Assigning distinct table aliases to each table reference", "The table must exceed 1000 records", "Mandatory use of WHERE instead of ON", "Columns must be FLOAT types"],
+                        correctIndex: 0,
+                        explanationRU: "Чтобы СУБД знала, к какому экземпляру таблицы относится колонка, требуются уникальные алиасы.",
+                        explanationEN: "Explicit unique aliases are mandatory to disambiguate column references across both instances."
+                    )
+                ]
+            ),
+
+            Lesson(
+                id: "sql_scalar_subqueries",
+                category: .sqlSubqueries,
+                titleRU: "Скалярные подзапросы в SELECT и WHERE",
+                titleEN: "Scalar Subqueries in SELECT & WHERE",
+                summaryRU: "Подзапросы, возвращающие строго одно значение, вычисление отклонений от среднего и правила валидности.",
+                summaryEN: "Single-value scalar subqueries, calculating deviations from global averages, and cardinality rules.",
+                contentMarkdownRU: ##"""
+### Скалярные подзапросы (Scalar Subqueries)
+
+Скалярный подзапрос — это вложенный запрос `(SELECT ...)`, который возвращает **строго одно значение** (одну строку и одну колонку):
+
+### Использование в блоке WHERE
+Например, выбор всех сотрудников с зарплатой выше средней по компании:
+```sql
+SELECT name, salary 
+FROM employees 
+WHERE salary > (SELECT AVG(salary) FROM employees);
+```
+
+### Использование в блоке SELECT
+Скалярный подзапрос можно использовать как виртуальную колонку:
+```sql
+SELECT 
+    name,
+    salary,
+    (SELECT MAX(salary) FROM employees) - salary AS salary_gap
+FROM employees;
+```
+
+> [!CAUTION]
+> Если скалярный подзапрос возвращает более одной строки, СУБД прерывает выполнение с ошибкой: `subquery must return only one column, at most one row`.
+"""##,
+                contentMarkdownEN: ##"""
+### Scalar Subqueries
+A scalar subquery evaluates to an exact single-row, single-column value.
+
+Commonly placed within `WHERE` comparison expressions or directly in `SELECT` lists. If a scalar subquery yields multiple rows, execution aborts with a runtime error.
+"""##,
+                codeSnippet: ##"""
+CREATE TABLE products_catalog (
+    id INTEGER PRIMARY KEY,
+    title TEXT,
+    price REAL
+);
+
+INSERT INTO products_catalog VALUES 
+(1, 'Базовый курс', 2000.0),
+(2, 'Продвинутый курс', 5000.0),
+(3, 'Архитектурный буткемп', 12000.0);
+
+-- Выбираем курсы, цена которых выше средней стоимости
+SELECT title, price 
+FROM products_catalog 
+WHERE price > (SELECT AVG(price) FROM products_catalog);
+"""##,
+                xpReward: 45,
+                quiz: [
+                    QuizQuestion(
+                        questionRU: "Что произойдет, если скалярный подзапрос в блоке WHERE `WHERE price > (SELECT ...)` вернет 3 строки?",
+                        questionEN: "What happens if a scalar subquery in `WHERE price > (SELECT ...)` yields 3 rows?",
+                        optionsRU: ["СУБД выбросит ошибку времени выполнения", "База автоматически возьмет среднее из трех чисел", "Будет использована первая строка", "Запрос вернет все строки"],
+                        optionsEN: ["The database engine aborts with a runtime error", "The engine automatically averages all 3 values", "The first value is used silently", "All rows are returned"],
+                        correctIndex: 0,
+                        explanationRU: "Оператор сравнения ожидает ровно одно скалярное значение; множественный возврат вызывает ошибку.",
+                        explanationEN: "Scalar comparison operators strictly require single values; multi-row returns cause runtime failures."
+                    )
+                ]
+            ),
+
+            Lesson(
+                id: "sql_correlated_subqueries",
+                category: .sqlSubqueries,
+                titleRU: "Коррелированные подзапросы (Correlated Subqueries)",
+                titleEN: "Correlated Subqueries & Outer Scope",
+                summaryRU: "Вложенные запросы с зависимостью от внешней строки, сложность O(N * M) и оптимизация через JOIN.",
+                summaryEN: "Subqueries bound to outer table row contexts, O(N * M) performance costs, and rewrite optimizations via JOIN.",
+                contentMarkdownRU: ##"""
+### Коррелированный подзапрос
+
+В отличие от автономного подзапроса, коррелированный подзапрос **ссылается на колонку из внешней таблицы**:
+```sql
+-- Выбор сотрудников с зарплатой выше средней В ИХ ОТДЕЛЕ
+SELECT e.name, e.department_id, e.salary 
+FROM employees e 
+WHERE e.salary > (
+    SELECT AVG(sub.salary) 
+    FROM employees sub 
+    WHERE sub.department_id = e.department_id -- ссылка на e.department_id!
+);
+```
+
+### Алгоритмическая сложность
+Автономный подзапрос вычисляется один раз. Коррелированный подзапрос вычисляется **для каждой строки** внешнего запроса ($O(N \times M)$). На больших таблицах это может вызывать серьезные замедления.
+
+Для ускорения коррелированные подзапросы часто переписывают на `JOIN` с предварительно агрегированным подзапросом или оконную функцию `AVG() OVER (PARTITION BY ...)`.
+"""##,
+                contentMarkdownEN: ##"""
+### Correlated Subquery Mechanics
+Correlated subqueries depend upon values from the outer query context, re-evaluating for every candidate row ($O(N \times M)$ complexity).
+
+Modern SQL practices often replace correlated subqueries with window functions or derived table joins to reduce latency.
+"""##,
+                codeSnippet: ##"""
+CREATE TABLE department_staff (
+    id INTEGER PRIMARY KEY,
+    name TEXT,
+    dept TEXT,
+    salary REAL
+);
+
+INSERT INTO department_staff VALUES 
+(1, 'Анна', 'IT', 120000.0),
+(2, 'Борис', 'IT', 95000.0),
+(3, 'Вера', 'HR', 60000.0),
+(4, 'Глеб', 'HR', 75000.0);
+
+-- Находим самого высокооплачиваемого сотрудника в каждом отделе
+SELECT name, dept, salary 
+FROM department_staff e 
+WHERE salary = (
+    SELECT MAX(salary) 
+    FROM department_staff sub 
+    WHERE sub.dept = e.dept
+);
+"""##,
+                xpReward: 50,
+                quiz: [
+                    QuizQuestion(
+                        questionRU: "Сколько раз вычисляется коррелированный подзапрос в худшем случае без оптимизации?",
+                        questionEN: "How many times is an unoptimized correlated subquery evaluated in the worst case?",
+                        optionsRU: ["Для каждой строки внешнего запроса", "Ровно один раз в начале запроса", "Два раза", "Зависит от количества колонок"],
+                        optionsEN: ["Once for every candidate row in the outer query", "Exactly once at query startup", "Twice", "Depends on column count"],
+                        correctIndex: 0,
+                        explanationRU: "Коррелированный подзапрос параметризуется полями текущей внешней строки и вычисляется для каждой строки.",
+                        explanationEN: "Because it references the outer row's parameters, it executes once per candidate outer tuple."
+                    )
+                ]
+            ),
+
+            Lesson(
+                id: "sql_exists_not_exists",
+                category: .sqlSubqueries,
+                titleRU: "Проверка существования: EXISTS и NOT EXISTS",
+                titleEN: "Existence Checks: EXISTS & NOT EXISTS",
+                summaryRU: "Предикаты EXISTS, механизм раннего выхода (Short-circuit), безопасность при работе с NULL в отличие от IN.",
+                summaryEN: "EXISTS predicates, short-circuit execution semantics, and NULL-safety advantages over NOT IN.",
+                contentMarkdownRU: ##"""
+### Операторы EXISTS и NOT EXISTS
+
+Оператор `EXISTS` проверяет, возвращает ли подзапрос **хотя бы одну строку**:
+- Если найдена хотя бы 1 строка $\rightarrow$ возвращает `TRUE`.
+- Если подзапрос вернул 0 строк $\rightarrow$ возвращает `FALSE`.
+
+```sql
+SELECT c.name FROM clients c 
+WHERE EXISTS (
+    SELECT 1 FROM orders o 
+    WHERE o.client_id = c.id AND o.amount > 50000
+);
+```
+
+### Преимущество производительности: Short-Circuit
+СУБД останавливает выполнение подзапроса `EXISTS` сразу же, как только найдена первая подходящая запись. Поэтому внутри `SELECT` пишут `SELECT 1` (конкретные колонки не имеют значения).
+
+### Безопасность NOT EXISTS против NOT IN
+`NOT IN` вернет пустой результат, если в подзапросе встретится хотя бы один `NULL`. `NOT EXISTS` устойчив к `NULL` и всегда работает корректно!
+"""##,
+                contentMarkdownEN: ##"""
+### EXISTS and NOT EXISTS
+`EXISTS` evaluates whether a subquery returns one or more rows, short-circuiting immediately upon locating the first match.
+
+Always prefer `NOT EXISTS` over `NOT IN` when subqueries might contain `NULL` values, preventing three-valued logic anomalies.
+"""##,
+                codeSnippet: ##"""
+CREATE TABLE authors_list (id INTEGER PRIMARY KEY, name TEXT);
+CREATE TABLE published_books (id INTEGER PRIMARY KEY, author_id INTEGER, title TEXT);
+
+INSERT INTO authors_list VALUES (1, 'Толстой'), (2, 'Чехов'), (3, 'Неизвестный');
+INSERT INTO published_books VALUES (10, 1, 'Анна Каренина'), (20, 2, 'Вишневый сад');
+
+-- Находим авторов, у которых ЕСТЬ опубликованные книги
+SELECT name FROM authors_list a 
+WHERE EXISTS (
+    SELECT 1 FROM published_books b WHERE b.author_id = a.id
+);
+"""##,
+                xpReward: 45,
+                quiz: [
+                    QuizQuestion(
+                        questionRU: "В чем преимущество производительности оператора EXISTS при проверке наличия данных?",
+                        questionEN: "What is the performance advantage of EXISTS when checking for record presence?",
+                        optionsRU: ["СУБД делает ранний выход (Short-circuit) при обнаружении первой подходящей строки", "EXISTS переносит всю таблицу в оперативную память", "EXISTS создает временные индексы", "EXISTS отключает блокировки таблиц"],
+                        optionsEN: ["The engine short-circuits evaluation as soon as the first matching row is found", "Loads the whole table into RAM", "Builds temporary indexes", "Disables all table locks"],
+                        correctIndex: 0,
+                        explanationRU: "EXISTS прекращает сканирование сразу же при обнаружении первой совпавшей строки.",
+                        explanationEN: "EXISTS halts subquery scanning immediately upon encountering the first qualifying tuple."
+                    )
+                ]
+            ),
+
+            Lesson(
+                id: "sql_union_union_all",
+                category: .sqlSetOperations,
+                titleRU: "Объединение множеств: UNION и UNION ALL",
+                titleEN: "Set Union: UNION vs UNION ALL",
+                summaryRU: "Конкатенация выборок, затраты на дедупликацию в UNION, совместимость типов колонок и правила производительности.",
+                summaryEN: "Combining query result sets, deduplication overhead in UNION, column schema matching, and performance rules.",
+                contentMarkdownRU: ##"""
+### Операторы UNION и UNION ALL
+
+Операторы `UNION` и `UNION ALL` объединяют результаты двух или более независимых запросов `SELECT` в единый вертикальный набор строк:
+
+```sql
+SELECT name, email FROM active_users
+UNION ALL
+SELECT name, email FROM archived_users;
+```
+
+### Ключевое отличие: Дедупликация
+- `UNION` — удаляет дублирующиеся строки из итоговой выборки. Для этого СУБД выполняет **тяжелую сортировку или хеширование** всего объема данных.
+- `UNION ALL` — сохраняет все строки в исходном виде без проверки на дубликаты. Работает на порядки быстрее.
+
+> [!TIP]
+> Всегда используйте `UNION ALL` по умолчанию, за исключением случаев, когда удаление дубликатов является строгим бизнес-требованием.
+
+### Требования к запросам
+1. Одинаковое количество столбцов в каждом `SELECT`.
+2. Совместимые типы данных соответствующих колонок.
+3. Имена результирующих колонок берутся из **первого** запроса `SELECT`.
+"""##,
+                contentMarkdownEN: ##"""
+### Combining Results: UNION vs UNION ALL
+- `UNION`: Merges sets and performs explicit deduplication (incurring memory sort/hash overhead).
+- `UNION ALL`: Performs simple row concatenation without deduplication, delivering optimal performance.
+
+Projected queries must feature identical column counts and compatible data types.
+"""##,
+                codeSnippet: ##"""
+CREATE TABLE retail_clients (id INTEGER, email TEXT);
+CREATE TABLE online_clients (id INTEGER, email TEXT);
+
+INSERT INTO retail_clients VALUES (1, 'ivan@mail.ru'), (2, 'olga@yandex.ru');
+INSERT INTO online_clients VALUES (3, 'ivan@mail.ru'), (4, 'anna@gmail.com');
+
+-- UNION удаляет дубликат ivan@mail.ru
+SELECT email FROM retail_clients
+UNION
+SELECT email FROM online_clients;
+"""##,
+                xpReward: 40,
+                quiz: [
+                    QuizQuestion(
+                        questionRU: "Почему в промышленном SQL рекомендуется предпочитать UNION ALL вместо UNION?",
+                        questionEN: "Why is UNION ALL favored over UNION in production SQL?",
+                        optionsRU: ["UNION ALL не тратит ресурсы на сортировку и удаление дубликатов, работая быстрее", "UNION не поддерживается стандартом SQL", "UNION ALL позволяет соединять разные базы данных", "UNION всегда вызывает ошибку при NULL"],
+                        optionsEN: ["UNION ALL avoids costly sorting and deduplication, executing significantly faster", "UNION is non-standard", "UNION ALL connects different databases", "UNION crashes on NULL values"],
+                        correctIndex: 0,
+                        explanationRU: "UNION требует полной сортировки или построения хеш-таблицы для дедупликации, а UNION ALL просто склеивает потоки данных.",
+                        explanationEN: "UNION incurs expensive memory sorts or hash aggregation to eliminate duplicates."
+                    )
+                ]
+            ),
+
+            Lesson(
+                id: "sql_intersect_except",
+                category: .sqlSetOperations,
+                titleRU: "Пересечение и разность: INTERSECT и EXCEPT",
+                titleEN: "Set Theory: INTERSECT & EXCEPT",
+                summaryRU: "Реализация пересечения множеств INTERSECT, разность множеств EXCEPT (MINUS) и сравнение списков данных.",
+                summaryEN: "Set intersection with INTERSECT, set difference via EXCEPT (MINUS), and dataset reconciliation.",
+                contentMarkdownRU: ##"""
+### Операции теории множеств: INTERSECT и EXCEPT
+
+Стандарт SQL предоставляет операторы для точного моделирования операций теории множеств над таблицами:
+
+### INTERSECT (Пересечение)
+Возвращает только те строки, которые присутствуют **и в первом, и во втором** наборе данных:
+```sql
+-- Клиенты, которые совершали покупки И в 2025, И в 2026 году
+SELECT customer_id FROM sales_2025
+INTERSECT
+SELECT customer_id FROM sales_2026;
+```
+
+### EXCEPT / MINUS (Разность)
+Возвращает строки из первого набора данных, которых **нет во втором**:
+```sql
+-- Студенты, записавшиеся на лекции, но не пришедшие на экзамен
+SELECT student_id FROM enrolled_students
+EXCEPT
+SELECT student_id FROM exam_attendees;
+```
+В некоторых СУБД (например, Oracle) оператор `EXCEPT` называется `MINUS`.
+"""##,
+                contentMarkdownEN: ##"""
+### Relational Set Operations: INTERSECT & EXCEPT
+- `INTERSECT`: Yields distinct rows present in *both* query result sets.
+- `EXCEPT` (or `MINUS` in Oracle): Returns records from the first result set that do not appear in the second.
+"""##,
+                codeSnippet: ##"""
+CREATE TABLE skills_required (skill TEXT);
+CREATE TABLE candidate_skills (skill TEXT);
+
+INSERT INTO skills_required VALUES ('SQL'), ('Swift'), ('Algorithms'), ('Git');
+INSERT INTO candidate_skills VALUES ('SQL'), ('Swift'), ('Python');
+
+-- Навыки, которых кандидату не хватает для вакансии
+SELECT skill FROM skills_required
+EXCEPT
+SELECT skill FROM candidate_skills;
+"""##,
+                xpReward: 45,
+                quiz: [
+                    QuizQuestion(
+                        questionRU: "Что вернет запрос с оператором EXCEPT (A EXCEPT B)?",
+                        questionEN: "What does a query with EXCEPT (A EXCEPT B) return?",
+                        optionsRU: ["Строки из набора A, которых нет в наборе B", "Строки, которые есть в обоих наборах", "Все строки из обоих наборов", "Строки из набора B, которых нет в A"],
+                        optionsEN: ["Rows from set A that do not exist in set B", "Rows present in both sets", "All combined rows from both sets", "Rows from set B absent from A"],
+                        correctIndex: 0,
+                        explanationRU: "Оператор EXCEPT вычитает строки второго множества из первого.",
+                        explanationEN: "EXCEPT computes set difference, filtering out any tuples of A that match items in B."
+                    )
+                ]
+            ),
+
+            Lesson(
+                id: "sql_cte_with",
+                category: .sqlCTE,
+                titleRU: "Обобщенные таблицы: CTE и предложение WITH",
+                titleEN: "Common Table Expressions: CTE & WITH",
+                summaryRU: "Устранение лестниц вложенных подзапросов, временные именованные наборы данных и улучшение читаемости кода.",
+                summaryEN: "Flattening nested subquery pyramids, named temporary result sets, and query maintainability.",
+                contentMarkdownRU: ##"""
+### Обобщенные табличные выражения (CTE)
+
+CTE (Common Table Expression) — это временный именованный результирующий набор, существующий только во время выполнения одного SQL-запроса:
+
+```sql
+WITH HighEarners AS (
+    SELECT id, name, department_id, salary 
+    FROM employees 
+    WHERE salary > 100000
+)
+SELECT department_id, COUNT(*) 
+FROM HighEarners 
+GROUP BY department_id;
+```
+
+### Преимущества CTE перед подзапросами
+1. **Читаемость (Readability)**: код выполняется сверху вниз, а не «изнутри наружу».
+2. **Переиспользуемость (DRY)**: к одному CTE можно обращаться несколько раз в основном запросе (например, в JOIN и WHERE).
+3. **Оптимизация**: многие современные СУБД (PostgreSQL 12+, SQLite 3.35+) умеют оптимизировать и встраивать CTE инлайн (inlining).
+"""##,
+                contentMarkdownEN: ##"""
+### Common Table Expressions (CTE)
+Defined using `WITH`, CTEs provide named temporary result sets bound to a single query execution scope.
+
+They eliminate nested subquery anti-patterns, rendering complex analytical pipelines human-readable and modular.
+"""##,
+                codeSnippet: ##"""
+CREATE TABLE staff_salaries (
+    id INTEGER PRIMARY KEY,
+    name TEXT,
+    salary REAL
+);
+
+INSERT INTO staff_salaries VALUES 
+(1, 'Кирилл', 80000.0),
+(2, 'Дарья', 150000.0),
+(3, 'Роман', 60000.0);
+
+WITH SalaryStats AS (
+    SELECT AVG(salary) AS avg_sal FROM staff_salaries
+)
+SELECT 
+    s.name, 
+    s.salary, 
+    ROUND(s.salary - st.avg_sal, 2) AS diff_from_mean
+FROM staff_salaries s
+CROSS JOIN SalaryStats st;
+"""##,
+                xpReward: 45,
+                quiz: [
+                    QuizQuestion(
+                        questionRU: "Каким ключевым словом объявляется обобщенное табличное выражение (CTE)?",
+                        questionEN: "Which keyword introduces a Common Table Expression (CTE)?",
+                        optionsRU: ["WITH", "CTE", "AS", "TEMPORARY"],
+                        optionsEN: ["WITH", "CTE", "AS", "TEMPORARY"],
+                        correctIndex: 0,
+                        explanationRU: "CTE объявляются в начале запроса с помощью предложения WITH.",
+                        explanationEN: "Common Table Expressions are declared via the WITH clause."
+                    )
+                ]
+            ),
+
+            Lesson(
+                id: "sql_multiple_ctes",
+                category: .sqlCTE,
+                titleRU: "Цепочки CTE и декомпозиция аналитики",
+                titleEN: "Chaining Multiple CTEs: Analytic Pipelines",
+                summaryRU: "Связывание нескольких CTE через запятую, построение поэтапных конвейеров трансформации данных.",
+                summaryEN: "Chaining sequential CTEs with commas, staged data transformation pipelines, and debugging intermediate steps.",
+                contentMarkdownRU: ##"""
+### Построение конвейеров из нескольких CTE
+
+Предложение `WITH` позволяет объявлять **несколько CTE подряд через запятую**. Каждое последующее CTE может ссылаться на любые ранее объявленные:
+
+```sql
+WITH 
+-- Шаг 1: Очистка и фильтрация заказов
+ValidOrders AS (
+    SELECT user_id, amount 
+    FROM orders 
+    WHERE status = 'PAID' AND amount > 0
+),
+-- Шаг 2: Агрегация по пользователям
+UserMetrics AS (
+    SELECT user_id, SUM(amount) AS total_spend, COUNT(*) AS orders_count
+    FROM ValidOrders 
+    GROUP BY user_id
+)
+-- Шаг 3: Финальный отчет с обогащением
+SELECT u.name, m.total_spend, m.orders_count 
+FROM users u 
+INNER JOIN UserMetrics m ON u.id = m.user_id 
+WHERE m.total_spend >= 50000;
+```
+
+Такая структура превращает многостраничный аналитический запрос в элегантную последовательность понятных шагов.
+"""##,
+                contentMarkdownEN: ##"""
+### Chaining Multiple CTEs
+Chain multiple CTEs separated by commas under a single `WITH` keyword. Subsequent CTEs can freely query previous CTEs, mirroring Unix pipelines.
+"""##,
+                codeSnippet: ##"""
+CREATE TABLE raw_logs (user_id INTEGER, action TEXT, ts DATE);
+INSERT INTO raw_logs VALUES 
+(1, 'view', '2026-03-01'), (1, 'click', '2026-03-01'), (1, 'buy', '2026-03-01'),
+(2, 'view', '2026-03-01');
+
+WITH 
+Views AS (
+    SELECT user_id, COUNT(*) AS views FROM raw_logs WHERE action = 'view' GROUP BY user_id
+),
+Buys AS (
+    SELECT user_id, COUNT(*) AS purchases FROM raw_logs WHERE action = 'buy' GROUP BY user_id
+)
+SELECT v.user_id, v.views, COALESCE(b.purchases, 0) AS purchases
+FROM Views v 
+LEFT JOIN Buys b ON v.user_id = b.user_id;
+"""##,
+                xpReward: 50,
+                quiz: [
+                    QuizQuestion(
+                        questionRU: "Нужно ли повторять слово WITH при объявлении второго CTE в цепочке?",
+                        questionEN: "Must you repeat the WITH keyword when declaring a second CTE in a chain?",
+                        optionsRU: ["Нет, CTE перечисляются через запятую под одним словом WITH", "Да, каждое CTE требует отдельного слова WITH", "Да, если второе CTE использует JOIN", "Да, в SQLite"],
+                        optionsEN: ["No, multiple CTEs are separated by commas under one WITH clause", "Yes, every CTE requires its own WITH", "Yes, when using JOINs", "Yes, in SQLite"],
+                        correctIndex: 0,
+                        explanationRU: "Слово WITH пишется один раз, а последующие блоки разделяются запятыми.",
+                        explanationEN: "A single WITH keyword precedes comma-separated CTE definitions."
+                    )
+                ]
+            ),
+
+            Lesson(
+                id: "sql_recursive_cte",
+                category: .sqlCTE,
+                titleRU: "Рекурсивные CTE: иерархии, деревья и графы",
+                titleEN: "Recursive CTE: Hierarchies, Trees & Sequences",
+                summaryRU: "Синтаксис RECURSIVE, якорная часть (Anchor), рекурсивная часть, условие остановки и генерация рядов чисел.",
+                summaryEN: "RECURSIVE syntax, anchor member, recursive term, termination conditions, and number/date generation.",
+                contentMarkdownRU: ##"""
+### Рекурсивные запросы (WITH RECURSIVE)
+
+Рекурсивный CTE позволяет обходить древовидные структуры (дерево категорий, организация компании, графы маршрутов) произвольной глубины.
+
+### Структура рекурсивного CTE
+1. **Якорный запрос (Anchor member)** — базовый запрос, задающий начальное состояние (корень дерева).
+2. **Оператор `UNION ALL`** — склеивает уровни рекурсии.
+3. **Рекурсивный запрос (Recursive member)** — ссылается на само CTE и соединяется со следующими узлами дерева.
+4. **Условие остановки** — возвращает пустой набор, когда достигнуты листья дерева.
+
+```sql
+-- Генерация последовательности чисел от 1 до 5
+WITH RECURSIVE Numbers AS (
+    SELECT 1 AS n              -- Якорь
+    UNION ALL 
+    SELECT n + 1 FROM Numbers  -- Рекурсия
+    WHERE n < 5                -- Условие остановки
+)
+SELECT * FROM Numbers;
+```
+"""##,
+                contentMarkdownEN: ##"""
+### Recursive CTEs
+Recursive CTEs traverse hierarchical graphs and generate sequences.
+
+They consist of an **anchor member** defining starting nodes, `UNION ALL`, and a **recursive member** querying the CTE itself until an exit condition evaluates to empty.
+"""##,
+                codeSnippet: ##"""
+-- Обход организационной иерархии сверху вниз
+CREATE TABLE org_units (id INTEGER PRIMARY KEY, name TEXT, parent_id INTEGER);
+INSERT INTO org_units VALUES 
+(1, 'Штаб-квартира', NULL),
+(2, 'Филиал Север', 1),
+(3, 'Офис Архангельск', 2);
+
+WITH RECURSIVE Tree AS (
+    SELECT id, name, 0 AS depth 
+    FROM org_units WHERE parent_id IS NULL
+    UNION ALL
+    SELECT c.id, c.name, t.depth + 1
+    FROM org_units c
+    JOIN Tree t ON c.parent_id = t.id
+)
+SELECT depth, name FROM Tree ORDER BY depth;
+"""##,
+                xpReward: 55,
+                quiz: [
+                    QuizQuestion(
+                        questionRU: "Что произойдет, если в рекурсивной части CTE забыть указать условие остановки WHERE?",
+                        questionEN: "What happens if a recursive CTE omits a termination condition in its WHERE clause?",
+                        optionsRU: ["Запрос уйдет в бесконечный цикл до превышения лимита глубины рекурсии", "СУБД выдаст ошибку синтаксиса при компиляции", "Запрос вернет ровно 1 строку", "Ничего, база сама догадается остановиться"],
+                        optionsEN: ["Execution enters an infinite loop until the max recursion limit is exceeded", "The compiler raises a syntax error", "Returns exactly 1 row", "The engine automatically stops"],
+                        correctIndex: 0,
+                        explanationRU: "Без условия остановки рекурсия выполняется бесконечно, пока не сработает системный лимит глубины.",
+                        explanationEN: "Missing termination predicates result in infinite recursion until hitting safety bounds."
+                    )
+                ]
+            ),
+
+            Lesson(
+                id: "sql_window_intro_over",
+                category: .sqlWindow,
+                titleRU: "Оконные функции: предложение OVER и PARTITION BY",
+                titleEN: "Window Functions: OVER & PARTITION BY",
+                summaryRU: "Отличие оконных функций от GROUP BY: сохранение детальных строк, секционирование данных и накопительные суммы.",
+                summaryEN: "Window functions vs GROUP BY: preserving individual row identity, partitioning, and cumulative aggregates.",
+                contentMarkdownRU: ##"""
+### Оконные функции против GROUP BY
+
+Главное ограничение `GROUP BY` — он «схлопывает» исходные строки.
+**Оконная функция вычисляет агрегат по набору строк, но СОХРАНЯЕТ каждую отдельную строку в результате!**
+
+### Предложение OVER()
+Специфицирует «окно» строк, видимое текущей строке:
 ```sql
 SELECT 
     name, 
     department, 
     salary,
-    ROW_NUMBER() OVER (PARTITION BY department ORDER BY salary DESC) AS dept_rank
+    -- Средняя зарплата по всей компании (общее окно)
+    AVG(salary) OVER () AS company_avg,
+    -- Средняя зарплата внутри своего отдела (секция)
+    AVG(salary) OVER (PARTITION BY department) AS dept_avg
 FROM employees;
 ```
 
-## Ранжирование: RANK() и DENSE_RANK()
-```sql
-SELECT 
-    name, 
-    score,
-    RANK() OVER (ORDER BY score DESC) AS rank_pos
-FROM students_results;
-```
+### Секционирование (PARTITION BY)
+`PARTITION BY` разделяет набор данных на независимые группы. Оконная функция вычисляется изолированно для каждой группы, не затрагивая другие.
+"""##,
+                contentMarkdownEN: ##"""
+### Window Functions: OVER & PARTITION BY
+Unlike `GROUP BY` which collapses rows into buckets, window functions calculate aggregates while preserving each individual row's identity.
 
-## Накопительный итог (Running Total)
-```sql
+`OVER (PARTITION BY col)` isolates computation across logical slices.
+"""##,
+                codeSnippet: ##"""
+CREATE TABLE team_payroll (
+    id INTEGER PRIMARY KEY,
+    employee TEXT,
+    team TEXT,
+    salary REAL
+);
+
+INSERT INTO team_payroll VALUES 
+(1, 'Максим', 'iOS', 140000.0),
+(2, 'София', 'iOS', 160000.0),
+(3, 'Егор', 'Android', 130000.0);
+
 SELECT 
-    date, 
-    amount,
-    SUM(amount) OVER (ORDER BY date) AS cumulative_sales
-FROM daily_revenue;
+    employee, team, salary,
+    ROUND(AVG(salary) OVER (PARTITION BY team), 2) AS team_average,
+    ROUND(salary - AVG(salary) OVER (PARTITION BY team), 2) AS diff_from_team_avg
+FROM team_payroll;
+"""##,
+                xpReward: 50,
+                quiz: [
+                    QuizQuestion(
+                        questionRU: "В чем главное отличие оконной функции от обычной группировки GROUP BY?",
+                        questionEN: "What is the key difference between a window function and GROUP BY?",
+                        optionsRU: ["Оконная функция сохраняет все исходные строки, а GROUP BY схлопывает их", "Оконные функции работают только с датами", "GROUP BY не поддерживает агрегаты SUM и AVG", "Оконные функции можно вызывать только в WHERE"],
+                        optionsEN: ["Window functions preserve all base tuples, whereas GROUP BY collapses rows", "Window functions only work on dates", "GROUP BY disallows SUM and AVG", "Window functions are restricted to WHERE"],
+                        correctIndex: 0,
+                        explanationRU: "Оконные функции вычисляют агрегаты, возвращая для каждой строки таблицы ее индивидуальный результат.",
+                        explanationEN: "Window functions calculate aggregated metrics alongside individual tuple data."
+                    )
+                ]
+            ),
+
+            Lesson(
+                id: "sql_ranking_functions",
+                category: .sqlWindow,
+                titleRU: "Функции ранжирования: ROW_NUMBER, RANK, DENSE_RANK",
+                titleEN: "Ranking Functions: ROW_NUMBER, RANK & DENSE_RANK",
+                summaryRU: "Детальное сравнение алгоритмов нумерации, обработка коллизий (равных значений), пропуски номеров и Top-N запросы.",
+                summaryEN: "Comprehensive comparison of ranking algorithms, tie-breaker handling, rank gaps, and Top-N query patterns.",
+                contentMarkdownRU: ##"""
+### Функции ранжирования
+
+Когда в `OVER` указывается `ORDER BY`, СУБД упорядочивает строки внутри окна и позволяет присвоить им ранги:
+
+1. **`ROW_NUMBER()`**:
+   - Присваивает строго уникальный порядковый номер строкам (1, 2, 3, 4...).
+   - Если значения равны, порядок недетерминирован (без доп. полей).
+
+2. **`RANK()`**:
+   - Присваивает одинаковый ранг одинаковым значениям, но **делает пропуски**:
+   - Пример очков: `[100, 90, 90, 80]` $\rightarrow$ ранги: `1, 2, 2, 4` (номер 3 пропущен!).
+
+3. **`DENSE_RANK()`**:
+   - Присваивает одинаковый ранг одинаковым значениям **без пропусков**:
+   - Пример очков: `[100, 90, 90, 80]` $\rightarrow$ ранги: `1, 2, 2, 3`.
+
+### Паттерн Top-N в каждой категории
+```sql
+WITH RankedSales AS (
+    SELECT 
+        product, category, sales_volume,
+        DENSE_RANK() OVER (PARTITION BY category ORDER BY sales_volume DESC) AS rnk
+    FROM catalog
+)
+SELECT * FROM RankedSales WHERE rnk <= 3; -- Топ 3 товара в каждой категории!
 ```
 """##,
                 contentMarkdownEN: ##"""
-# Window Functions in SQL
+### Ranking Functions
+- `ROW_NUMBER()`: Unique sequential integer per row (1, 2, 3, 4).
+- `RANK()`: Identical ranks for equal values, introducing gaps (1, 2, 2, 4).
+- `DENSE_RANK()`: Identical ranks without numeric gaps (1, 2, 2, 3).
+"""##,
+                codeSnippet: ##"""
+CREATE TABLE runner_times (
+    id INTEGER PRIMARY KEY,
+    athlete TEXT,
+    seconds REAL
+);
+
+INSERT INTO runner_times VALUES 
+(1, 'Смирнов', 10.1),
+(2, 'Кузнецов', 10.3),
+(3, 'Попов', 10.3),
+(4, 'Васильев', 10.8);
+
+SELECT 
+    athlete, seconds,
+    ROW_NUMBER() OVER (ORDER BY seconds ASC) AS row_num,
+    RANK() OVER (ORDER BY seconds ASC) AS rnk,
+    DENSE_RANK() OVER (ORDER BY seconds ASC) AS dense_rnk
+FROM runner_times;
+"""##,
+                xpReward: 50,
+                quiz: [
+                    QuizQuestion(
+                        questionRU: "Какие ранги присвоит функция DENSE_RANK() элементам со значениями [50, 40, 40, 30] при ORDER BY DESC?",
+                        questionEN: "Which ranks does DENSE_RANK() assign to values [50, 40, 40, 30] ordered DESC?",
+                        optionsRU: ["1, 2, 2, 3", "1, 2, 2, 4", "1, 2, 3, 4", "1, 1, 2, 3"],
+                        optionsEN: ["1, 2, 2, 3", "1, 2, 2, 4", "1, 2, 3, 4", "1, 1, 2, 3"],
+                        correctIndex: 0,
+                        explanationRU: "DENSE_RANK присваивает дубликатам одинаковый номер, но не пропускает последующий номер 3.",
+                        explanationEN: "DENSE_RANK assigns duplicate values identical ranks without skipping following numbers."
+                    )
+                ]
+            ),
+
+            Lesson(
+                id: "sql_ntile_distribution",
+                category: .sqlWindow,
+                titleRU: "Квантили и перцентили: NTILE()",
+                titleEN: "Quantiles & Buckets: NTILE()",
+                summaryRU: "Разбиение выборки на N равных корзин, расчет квартилей и децилей, скоринг клиентов (RFM анализ).",
+                summaryEN: "Partitioning records into N equal buckets, quartile/decile analysis, and customer RFM scoring models.",
+                contentMarkdownRU: ##"""
+### Функция NTILE(n)
+
+Функция `NTILE(n)` делит упорядоченный набор строк на $n$ максимально равных по размеру групп (корзин) и возвращает номер корзины (от $1$ до $n$) для каждой строки:
+
+- `NTILE(4)` — квартили (топ 25%, следующие 25% и т.д.).
+- `NTILE(10)` — децили (топ 10%).
+- `NTILE(100)` — перцентили.
+
+### Сценарий: RFM-сегментация клиентов
+```sql
+SELECT 
+    client_id,
+    monetary_value,
+    NTILE(4) OVER (ORDER BY monetary_value DESC) AS revenue_tier
+FROM customer_spending;
+```
+Клиенты с `revenue_tier = 1` представляют топ-25% самых ценных покупателей бизнеса.
+"""##,
+                contentMarkdownEN: ##"""
+### NTILE(n) Bucket Segmentation
+`NTILE(n)` distributes ordered rows across $n$ equal-sized buckets, returning the bucket index (1 to $n$).
+
+Essential for quartile analysis and percentile segmentation in business intelligence.
+"""##,
+                codeSnippet: ##"""
+CREATE TABLE exam_scores (
+    student_id INTEGER PRIMARY KEY,
+    name TEXT,
+    points INTEGER
+);
+
+INSERT INTO exam_scores VALUES 
+(1, 'Алина', 98), (2, 'Борис', 85),
+(3, 'Вадим', 74), (4, 'Галина', 62);
+
+-- Разбиваем студентов на 2 группы (NTILE 2): отличники и отстающие
+SELECT name, points,
+       NTILE(2) OVER (ORDER BY points DESC) AS tier_group
+FROM exam_scores;
+"""##,
+                xpReward: 45,
+                quiz: [
+                    QuizQuestion(
+                        questionRU: "Что возвращает функция NTILE(4)?",
+                        questionEN: "What does NTILE(4) compute?",
+                        optionsRU: ["Номер квартиля (от 1 до 4) для каждой строки выборки", "Количество строк, деленное на 4", "Остаток от деления ID на 4", "Сумму первых 4 колонок"],
+                        optionsEN: ["The quartile bucket index (1 to 4) for each row", "Total rows divided by 4", "Modulo 4 of the primary key", "Sum of first 4 columns"],
+                        correctIndex: 0,
+                        explanationRU: "NTILE(4) делит отсортированный набор строк на 4 равные группы (квартили).",
+                        explanationEN: "NTILE(4) assigns records into 4 balanced quantile buckets."
+                    )
+                ]
+            ),
+
+            Lesson(
+                id: "sql_lag_lead_offsets",
+                category: .sqlWindowValues,
+                titleRU: "Оконные смещения: LAG() и LEAD()",
+                titleEN: "Window Offsets: LAG() & LEAD()",
+                summaryRU: "Доступ к предыдущей и следующей строке без самообъединений (Self-Join), расчет темпов роста MoM и YoY.",
+                summaryEN: "Accessing preceding and succeeding rows without self-joins, period-over-period delta tracking (MoM, YoY).",
+                contentMarkdownRU: ##"""
+### Функции LAG() и LEAD()
+
+Позволяют заглянуть в смежные строки относительно текущей позиции:
+- `LAG(col, offset, default)` — значение из строки **выше** (предыдущая строка).
+- `LEAD(col, offset, default)` — значение из строки **ниже** (следующая строка).
+
+Параметры:
+1. `col` — имя столбца или выражение.
+2. `offset` (опционально, по умолчанию 1) — на сколько строк смещаться.
+3. `default` (опционально, по умолчанию `NULL`) — значение-заглушка для первой/последней строки.
+
+### Анализ динамики продаж (Month-over-Month)
+```sql
+SELECT 
+    month,
+    revenue,
+    LAG(revenue, 1) OVER (ORDER BY month) AS prev_month_revenue,
+    revenue - LAG(revenue, 1) OVER (ORDER BY month) AS mom_growth
+FROM monthly_sales;
+```
+"""##,
+                contentMarkdownEN: ##"""
+### Temporal Deltas: LAG & LEAD
+- `LAG(expr, offset, default)`: Fetches data from previous rows.
+- `LEAD(expr, offset, default)`: Fetches data from future rows.
+
+Eliminates slow self-joins when calculating period-over-period growth.
+"""##,
+                codeSnippet: ##"""
+CREATE TABLE daily_stock (
+    day_num INTEGER PRIMARY KEY,
+    price REAL
+);
+
+INSERT INTO daily_stock VALUES 
+(1, 100.0), (2, 105.0), (3, 103.0), (4, 112.0);
+
+SELECT 
+    day_num, price,
+    LAG(price, 1, price) OVER (ORDER BY day_num) AS prev_day_price,
+    ROUND(price - LAG(price, 1, price) OVER (ORDER BY day_num), 2) AS price_delta
+FROM daily_stock;
+"""##,
+                xpReward: 50,
+                quiz: [
+                    QuizQuestion(
+                        questionRU: "Какая функция возвращает значение из предшествующей строки относительно текущей?",
+                        questionEN: "Which window function accesses values from a preceding row?",
+                        optionsRU: ["LAG()", "LEAD()", "FIRST_VALUE()", "PRIOR()"],
+                        optionsEN: ["LAG()", "LEAD()", "FIRST_VALUE()", "PRIOR()"],
+                        correctIndex: 0,
+                        explanationRU: "Функция LAG() считывает значение из строки, находящейся выше на указанное смещение.",
+                        explanationEN: "LAG() looks backward into previous rows within the current window."
+                    )
+                ]
+            ),
+
+            Lesson(
+                id: "sql_first_last_value",
+                category: .sqlWindowValues,
+                titleRU: "Граничные значения окна: FIRST_VALUE и LAST_VALUE",
+                titleEN: "Window Boundaries: FIRST_VALUE & LAST_VALUE",
+                summaryRU: "Выборка первого и последнего значения в секции, ловушка дефолтного фрейма в LAST_VALUE и явные рамки.",
+                summaryEN: "Boundary value extraction, the default frame trap in LAST_VALUE, and explicit window frame declarations.",
+                contentMarkdownRU: ##"""
+### Функции FIRST_VALUE() и LAST_VALUE()
+
+- `FIRST_VALUE(col)` — первое значение в упорядоченном окне.
+- `LAST_VALUE(col)` — последнее значение в упорядоченном окне.
+
+### Опасная ловушка с LAST_VALUE()!
+По умолчанию в SQL при наличии `ORDER BY` рамка окна не простирается до конца таблицы, а заканчивается на текущей строке (`RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW`).
+Из-за этого `LAST_VALUE(col)` по умолчанию возвращает значение **текущей** строки!
+
+Для корректной работы `LAST_VALUE` необходимо явно расширить рамку до конца секции:
+```sql
+SELECT 
+    employee, salary,
+    FIRST_VALUE(salary) OVER (
+        PARTITION BY dept ORDER BY salary DESC
+    ) AS highest_salary,
+    LAST_VALUE(salary) OVER (
+        PARTITION BY dept ORDER BY salary DESC
+        ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+    ) AS lowest_salary
+FROM company_payroll;
+```
+"""##,
+                contentMarkdownEN: ##"""
+### Window Extents: FIRST_VALUE & LAST_VALUE
+- `FIRST_VALUE()`: Captures initial value within frame boundaries.
+- `LAST_VALUE()`: Captures terminal frame value.
+
+Be alert to default SQL framing (`RANGE UNBOUNDED PRECEDING AND CURRENT ROW`). Always declare `ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING` when invoking `LAST_VALUE()`.
+"""##,
+                codeSnippet: ##"""
+CREATE TABLE racers (
+    id INTEGER PRIMARY KEY,
+    racer_name TEXT,
+    lap_time REAL
+);
+
+INSERT INTO racers VALUES 
+(1, 'Молния', 72.4),
+(2, 'Шумахер', 74.1),
+(3, 'Хэмилтон', 75.8);
+
+SELECT 
+    racer_name, lap_time,
+    FIRST_VALUE(lap_time) OVER (ORDER BY lap_time ASC) AS best_lap,
+    ROUND(lap_time - FIRST_VALUE(lap_time) OVER (ORDER BY lap_time ASC), 2) AS gap_to_leader
+FROM racers;
+"""##,
+                xpReward: 50,
+                quiz: [
+                    QuizQuestion(
+                        questionRU: "Какую рамку окна (frame) нужно явно указать для LAST_VALUE, чтобы получить последнее значение всей секции?",
+                        questionEN: "Which window frame clause must be specified for LAST_VALUE to reach the final row of a partition?",
+                        optionsRU: ["ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING", "ROWS BETWEEN 1 PRECEDING AND 1 FOLLOWING", "RANGE CURRENT ROW", "LIMIT 1"],
+                        optionsEN: ["ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING", "ROWS BETWEEN 1 PRECEDING AND 1 FOLLOWING", "RANGE CURRENT ROW", "LIMIT 1"],
+                        correctIndex: 0,
+                        explanationRU: "По умолчанию окно ограничено текущей строкой, поэтому для конца секции нужно UNBOUNDED FOLLOWING.",
+                        explanationEN: "UNBOUNDED FOLLOWING extends the evaluation window to the final partition boundary."
+                    )
+                ]
+            ),
+
+            Lesson(
+                id: "sql_window_frames_rows",
+                category: .sqlWindowValues,
+                titleRU: "Рамки окон: ROWS BETWEEN и скользящие агрегаты",
+                titleEN: "Window Framing: ROWS BETWEEN & Moving Averages",
+                summaryRU: "Скользящее среднее (Moving Average), накопительные суммы (Running Total), ROWS vs RANGE, PRECEDING и FOLLOWING.",
+                summaryEN: "Moving averages, cumulative running totals, ROWS vs RANGE semantics, PRECEDING and FOLLOWING offsets.",
+                contentMarkdownRU: ##"""
+### Рамки окон (Window Frames)
+
+Предложение рамки окна уточняет, какие именно строки вокруг текущей участвуют в вычислении:
+
+```sql
+SUM(amount) OVER (
+    ORDER BY date 
+    ROWS BETWEEN 2 PRECEDING AND CURRENT ROW
+)
+```
+
+### Ключевые спецификаторы фрейма
+- `UNBOUNDED PRECEDING` — от самой первой строки секции.
+- `N PRECEDING` — $N$ строк назад.
+- `CURRENT ROW` — текущая строка.
+- `N FOLLOWING` — $N$ строк вперед.
+- `UNBOUNDED FOLLOWING` — до последней строки секции.
+
+### Скользящее 7-дневное среднее (7-day Moving Average)
+Сглаживает недельные колебания метрик (выручка, посещаемость):
+```sql
+SELECT 
+    date, daily_orders,
+    AVG(daily_orders) OVER (
+        ORDER BY date 
+        ROWS BETWEEN 6 PRECEDING AND CURRENT ROW
+    ) AS moving_avg_7d
+FROM metrics;
+```
+"""##,
+                contentMarkdownEN: ##"""
+### Window Frame Clauses
+Window frames restrict aggregate scope relative to current position.
+
+Use `ROWS BETWEEN N PRECEDING AND CURRENT ROW` for moving averages and smoothed metric indicators.
+"""##,
+                codeSnippet: ##"""
+CREATE TABLE daily_traffic (
+    day_id INTEGER PRIMARY KEY,
+    visitors INTEGER
+);
+
+INSERT INTO daily_traffic VALUES 
+(1, 100), (2, 120), (3, 110), (4, 150), (5, 140);
+
+-- Накопительный итог (Running Total) и скользящее среднее по 3 дням
+SELECT 
+    day_id, visitors,
+    SUM(visitors) OVER (ORDER BY day_id ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS running_total,
+    ROUND(AVG(visitors) OVER (ORDER BY day_id ROWS BETWEEN 2 PRECEDING AND CURRENT ROW), 1) AS moving_avg_3d
+FROM daily_traffic;
+"""##,
+                xpReward: 50,
+                quiz: [
+                    QuizQuestion(
+                        questionRU: "Какое выражение задает окно из 3 строк: предыдущая, текущая и следующая?",
+                        questionEN: "Which frame definition specifies a 3-row sliding window: preceding, current, and succeeding?",
+                        optionsRU: ["ROWS BETWEEN 1 PRECEDING AND 1 FOLLOWING", "ROWS BETWEEN 3 PRECEDING AND CURRENT ROW", "RANGE BETWEEN 1 AND 3", "ROWS 3"],
+                        optionsEN: ["ROWS BETWEEN 1 PRECEDING AND 1 FOLLOWING", "ROWS BETWEEN 3 PRECEDING AND CURRENT ROW", "RANGE BETWEEN 1 AND 3", "ROWS 3"],
+                        correctIndex: 0,
+                        explanationRU: "1 PRECEDING захватывает 1 строку назад, а 1 FOLLOWING — 1 строку вперед, суммарно 3 строки.",
+                        explanationEN: "1 PRECEDING AND 1 FOLLOWING spans the immediate prior, current, and next records."
+                    )
+                ]
+            ),
+
+            Lesson(
+                id: "sql_case_when_logic",
+                category: .sqlExpressionsMath,
+                titleRU: "Условные выражения: CASE WHEN ... THEN ... ELSE",
+                titleEN: "Conditional Logic: CASE WHEN Expressions",
+                summaryRU: "Ветвление логики в SQL, простой и поисковый CASE, поворот данных (Pivot) через условные агрегаты.",
+                summaryEN: "Conditional branching in queries, simple vs searched CASE, and matrix pivoting via conditional aggregates.",
+                contentMarkdownRU: ##"""
+### Конструкция CASE WHEN
+
+Выражение `CASE` — аналог `if / else` или `switch` в языках программирования. Возвращает значение в зависимости от истинности условий:
 
 ```sql
 SELECT 
-    employee_name,
-    salary,
-    ROW_NUMBER() OVER (ORDER BY salary DESC) as rank
-FROM company_salaries;
+    name,
+    score,
+    CASE 
+        WHEN score >= 90 THEN 'Отлично'
+        WHEN score >= 75 THEN 'Хорошо'
+        WHEN score >= 60 THEN 'Удовлетворительно'
+        ELSE 'Неудовлетворительно'
+    END AS grade
+FROM test_results;
+```
+
+### Поворот данных (Pivot) через условный SUM(CASE)
+Мощная техника агрегации строк в столбцы без сторонних расширений:
+```sql
+SELECT 
+    store_id,
+    SUM(CASE WHEN quarter = 'Q1' THEN revenue ELSE 0 END) AS q1_rev,
+    SUM(CASE WHEN quarter = 'Q2' THEN revenue ELSE 0 END) AS q2_rev
+FROM retail_sales 
+GROUP BY store_id;
 ```
 """##,
-                codeSnippet: ##"""
-SELECT name, salary,
-       ROW_NUMBER() OVER (ORDER BY salary DESC) AS rank
-FROM employees;
+                contentMarkdownEN: ##"""
+### The CASE Expression
+Provides inline branching logic within queries.
+
+Combine `SUM(CASE WHEN ...)` to pivot rows into columns natively across all standard SQL database engines.
 """##,
-                xpReward: 50
+                codeSnippet: ##"""
+CREATE TABLE orders_status (
+    id INTEGER PRIMARY KEY,
+    amount REAL,
+    is_delivered INTEGER
+);
+
+INSERT INTO orders_status VALUES 
+(1, 4500.0, 1), (2, 8900.0, 0), (3, 1200.0, 1);
+
+SELECT 
+    id, amount,
+    CASE 
+        WHEN is_delivered = 1 THEN 'Доставлен'
+        ELSE 'В пути'
+    END AS delivery_status
+FROM orders_status;
+"""##,
+                xpReward: 40,
+                quiz: [
+                    QuizQuestion(
+                        questionRU: "Каким ключевым словом обязана завершаться конструкция CASE в SQL?",
+                        questionEN: "Which keyword must terminate a CASE expression in SQL?",
+                        optionsRU: ["END", "STOP", "FINISH", "BREAK"],
+                        optionsEN: ["END", "STOP", "FINISH", "BREAK"],
+                        correctIndex: 0,
+                        explanationRU: "В синтаксисе SQL каждое выражение CASE завершается обязательным ключевым словом END.",
+                        explanationEN: "CASE statements strictly conclude with the END keyword."
+                    )
+                ]
+            ),
+
+            Lesson(
+                id: "sql_null_coalesce_nullif",
+                category: .sqlExpressionsMath,
+                titleRU: "Защита от NULL: COALESCE, IFNULL и NULLIF",
+                titleEN: "NULL Protection: COALESCE, IFNULL & NULLIF",
+                summaryRU: "Выбор первого непустого значения, дефолтные подстановки, предотвращение деления на ноль через NULLIF.",
+                summaryEN: "First non-null selection, fallback defaults, and zero-division prevention using NULLIF.",
+                contentMarkdownRU: ##"""
+### Функции COALESCE и IFNULL
+
+- `COALESCE(val1, val2, ...)` — принимает произвольное количество аргументов и возвращает **первое значение, не равное NULL**.
+```sql
+SELECT 
+    name, 
+    COALESCE(mobile_phone, work_phone, home_phone, 'Номер не указан') AS contact_phone
+FROM client_profiles;
+```
+- `IFNULL(val1, val2)` — двухпараметрический аналог в SQLite / MySQL.
+
+### Функция NULLIF: защита от деления на ноль
+`NULLIF(a, b)` возвращает `NULL`, если $a = b$. Иначе возвращает $a$.
+В SQL деление на ноль приводит к фатальной ошибке. `NULLIF` элегантно защищает вычисления:
+```sql
+-- Если total_clicks = 0, NULLIF вернет NULL, а результат деления станет безопасным NULL!
+SELECT 
+    campaign_name,
+    conversions * 1.0 / NULLIF(total_clicks, 0) AS conversion_rate
+FROM marketing_metrics;
+```
+"""##,
+                contentMarkdownEN: ##"""
+### COALESCE and NULLIF
+- `COALESCE(a, b, ...)` returns the first non-null expression in its argument list.
+- `NULLIF(a, b)` returns `NULL` when $a = b$, providing bulletproof protection against zero-division runtime errors.
+"""##,
+                codeSnippet: ##"""
+CREATE TABLE customer_emails (
+    id INTEGER PRIMARY KEY,
+    username TEXT,
+    primary_email TEXT,
+    backup_email TEXT
+);
+
+INSERT INTO customer_emails VALUES 
+(1, 'Антон', NULL, 'anton_backup@gmail.com'),
+(2, 'Дарья', 'daria@corp.com', NULL),
+(3, 'Игорь', NULL, NULL);
+
+SELECT 
+    username,
+    COALESCE(primary_email, backup_email, 'no_email@domain.com') AS effective_email
+FROM customer_emails;
+"""##,
+                xpReward: 40,
+                quiz: [
+                    QuizQuestion(
+                        questionRU: "Что вернет вызов `NULLIF(100, 100)`?",
+                        questionEN: "What does `NULLIF(100, 100)` return?",
+                        optionsRU: ["NULL", "100", "0", "TRUE"],
+                        optionsEN: ["NULL", "100", "0", "TRUE"],
+                        correctIndex: 0,
+                        explanationRU: "NULLIF возвращает NULL, если оба переданных аргумента равны.",
+                        explanationEN: "NULLIF yields NULL whenever its two arguments are equivalent."
+                    )
+                ]
+            ),
+
+            Lesson(
+                id: "sql_string_math_functions",
+                category: .sqlExpressionsMath,
+                titleRU: "Встроенные функции: строки, числа и даты",
+                titleEN: "Built-in Functions: Strings, Math & Dates",
+                summaryRU: "Преобразование строк (SUBSTR, TRIM, UPPER, REPLACE), математика (ROUND, ABS) и работа с датами в SQLite.",
+                summaryEN: "String manipulations (SUBSTR, TRIM, UPPER, REPLACE), math primitives (ROUND, ABS), and SQLite date formatting.",
+                contentMarkdownRU: ##"""
+### Строковые функции
+- `LENGTH(str)` — длина строки в символах.
+- `UPPER(str)` / `LOWER(str)` — приведение регистра.
+- `SUBSTR(str, start, len)` — извлечение подстроки (индексация с 1!).
+- `TRIM(str)` — удаление пробелов по краям.
+- `REPLACE(str, from, to)` — замена подстроки.
+- Конкатенация: оператор `||` (например, `first_name || ' ' || last_name`).
+
+### Математические функции
+- `ROUND(val, decimals)` — округление числа до указанного знака.
+- `ABS(val)` — абсолютная величина (модуль).
+
+### Работа с датами и временем в SQLite
+В SQLite нет отдельного типа данных `DATE`. Даты хранятся как строки `ISO-8601` (`YYYY-MM-DD HH:MM:SS`) или unix-метки:
+```sql
+SELECT 
+    DATE('now') AS today,
+    STRFTIME('%Y', 'now') AS current_year,
+    DATE('now', '-7 days') AS one_week_ago;
+```
+"""##,
+                contentMarkdownEN: ##"""
+### Core Scalar Functions
+- String concatenation: `||` operator.
+- Substrings: `SUBSTR(str, start, len)` (1-indexed).
+- SQLite date formatting: `DATE('now')`, `STRFTIME('%Y-%m', created_at)`.
+"""##,
+                codeSnippet: ##"""
+CREATE TABLE user_profiles_raw (
+    id INTEGER PRIMARY KEY,
+    raw_name TEXT,
+    balance REAL
+);
+
+INSERT INTO user_profiles_raw VALUES 
+(1, '  алексей иванов  ', 1450.789);
+
+SELECT 
+    id,
+    UPPER(TRIM(raw_name)) AS cleaned_name,
+    ROUND(balance, 2) AS formatted_balance,
+    SUBSTR(TRIM(raw_name), 1, 1) AS first_letter
+FROM user_profiles_raw;
+"""##,
+                xpReward: 40,
+                quiz: [
+                    QuizQuestion(
+                        questionRU: "Какой оператор в стандарте SQL и SQLite выполняет конкатенацию (склеивание) строк?",
+                        questionEN: "Which operator performs string concatenation in SQL standard and SQLite?",
+                        optionsRU: ["Двойная вертикальная черта `||`", "Знак плюса `+`", "Амперсанд `&`", "Точка `.`"],
+                        optionsEN: ["Double pipe `||`", "Plus sign `+`", "Ampersand `&`", "Dot `.`"],
+                        correctIndex: 0,
+                        explanationRU: "В стандарте SQL и SQLite конкатенация строк выполняется оператором `||`.",
+                        explanationEN: "String concatenation in standard SQL and SQLite uses the `||` operator."
+                    )
+                ]
+            ),
+
+            Lesson(
+                id: "sql_ddl_create_table",
+                category: .sqlDdlDml,
+                titleRU: "DDL: CREATE TABLE и строгая типизация",
+                titleEN: "DDL: CREATE TABLE & Data Typing",
+                summaryRU: "Data Definition Language, типы хранения SQLite (INTEGER, REAL, TEXT, BLOB), strict tables и схема данных.",
+                summaryEN: "Data Definition Language, SQLite affinity classes (INTEGER, REAL, TEXT, BLOB), strict mode, and table schemas.",
+                contentMarkdownRU: ##"""
+### Data Definition Language (DDL)
+
+DDL — подмножество языка SQL для создания, изменения и удаления структур хранения данных (таблиц, представлений, индексов).
+
+### Команда CREATE TABLE
+```sql
+CREATE TABLE IF NOT EXISTS accounts (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    account_number TEXT NOT NULL UNIQUE,
+    balance REAL DEFAULT 0.0,
+    is_blocked INTEGER DEFAULT 0,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+### Классы хранения в SQLite (Type Affinity)
+В отличие от строгих СУБД (PostgreSQL), SQLite использует динамическую типизацию (Type Affinity), поддерживая 5 базовых классов:
+1. `NULL` — неопределенное значение.
+2. `INTEGER` — целое число со знаком (1, 2, 3, 4, 6 или 8 байт).
+3. `REAL` — число с плавающей точкой двойной точности (IEEE 8-byte).
+4. `TEXT` — строка текста (UTF-8, UTF-16).
+5. `BLOB` — массив сырых байтов (изображения, ключи, файлы).
+"""##,
+                contentMarkdownEN: ##"""
+### Data Definition Language: CREATE TABLE
+DDL commands manage database structure schemas.
+
+SQLite classifies storage into 5 native storage classes: `NULL`, `INTEGER`, `REAL`, `TEXT`, and `BLOB`.
+"""##,
+                codeSnippet: ##"""
+CREATE TABLE products_inventory (
+    sku TEXT PRIMARY KEY,
+    name TEXT NOT NULL,
+    stock_quantity INTEGER NOT NULL DEFAULT 0,
+    unit_price REAL NOT NULL
+);
+
+INSERT INTO products_inventory VALUES 
+('SKU-100', 'Механическая клавиатура', 15, 7500.0);
+
+SELECT * FROM products_inventory;
+"""##,
+                xpReward: 40,
+                quiz: [
+                    QuizQuestion(
+                        questionRU: "Какой класс хранения в SQLite предназначен для хранения бинарных данных (картинок, файлов)?",
+                        questionEN: "Which SQLite storage class holds binary objects like images or serialized payloads?",
+                        optionsRU: ["BLOB", "BINARY", "BYTEA", "RAW"],
+                        optionsEN: ["BLOB", "BINARY", "BYTEA", "RAW"],
+                        correctIndex: 0,
+                        explanationRU: "BLOB (Binary Large Object) хранит массив произвольных сырых байтов.",
+                        explanationEN: "BLOB stores raw binary byte streams without transformation."
+                    )
+                ]
+            ),
+
+            Lesson(
+                id: "sql_table_constraints",
+                category: .sqlDdlDml,
+                titleRU: "Ограничения целостности: NOT NULL, UNIQUE, CHECK",
+                titleEN: "Integrity Constraints: NOT NULL, UNIQUE & CHECK",
+                summaryRU: "Защита от некорректных данных на уровне схемы БД, валидация бизнес-правил через CHECK и дефолты DEFAULT.",
+                summaryEN: "Schema-level data hygiene, business rule validation via CHECK, unique indices, and DEFAULT values.",
+                contentMarkdownRU: ##"""
+### Ограничения целостности (Constraints)
+
+Ограничения предотвращают попадание некорректных данных в базу на уровне ядра СУБД, снимая эту ответственность с кода приложения:
+
+1. **`NOT NULL`** — запрещает пустые значения `NULL` в столбце.
+2. **`UNIQUE`** — гарантирует отсутствие дублирующихся значений во всей таблице. Автоматически создает B-Tree индекс.
+3. **`DEFAULT <val>`** — подставляет значение по умолчанию, если оно не передано в INSERT.
+4. **`CHECK (выражение)`** — валидирует произвольное логическое условие:
+```sql
+CREATE TABLE hotel_bookings (
+    id INTEGER PRIMARY KEY,
+    guests_count INTEGER NOT NULL CHECK (guests_count > 0 AND guests_count <= 10),
+    check_in DATE NOT NULL,
+    check_out DATE NOT NULL,
+    discount_pct REAL DEFAULT 0.0 CHECK (discount_pct BETWEEN 0.0 AND 100.0),
+    CHECK (check_out > check_in) -- Ограничение на уровне всей таблицы!
+);
+```
+"""##,
+                contentMarkdownEN: ##"""
+### Table Constraints
+- `NOT NULL`: Prevents missing data entries.
+- `UNIQUE`: Guarantees distinct values across table records.
+- `CHECK (expr)`: Enforces business logic rules directly in the database engine.
+"""##,
+                codeSnippet: ##"""
+CREATE TABLE user_cards (
+    card_id INTEGER PRIMARY KEY,
+    holder_name TEXT NOT NULL,
+    limit_amount REAL CHECK (limit_amount >= 0.0),
+    status TEXT CHECK (status IN ('ACTIVE', 'FROZEN', 'CLOSED'))
+);
+
+INSERT INTO user_cards VALUES (1, 'Иван Смирнов', 50000.0, 'ACTIVE');
+
+SELECT * FROM user_cards;
+"""##,
+                xpReward: 45,
+                quiz: [
+                    QuizQuestion(
+                        questionRU: "Какое ограничение позволяет задать проверку условия (например, balance >= 0)?",
+                        questionEN: "Which constraint allows specifying validation predicates like `balance >= 0`?",
+                        optionsRU: ["CHECK", "VERIFY", "VALIDATE", "RULE"],
+                        optionsEN: ["CHECK", "VERIFY", "VALIDATE", "RULE"],
+                        correctIndex: 0,
+                        explanationRU: "Ограничение CHECK проверяет истинность заданного логического выражения при любой вставке или обновлении строки.",
+                        explanationEN: "CHECK constraints evaluate arbitrary boolean predicates prior to committing inserts or updates."
+                    )
+                ]
+            ),
+
+            Lesson(
+                id: "sql_alter_drop_table",
+                category: .sqlDdlDml,
+                titleRU: "Модификация схемы: ALTER TABLE и DROP TABLE",
+                titleEN: "Schema Evolution: ALTER TABLE & DROP TABLE",
+                summaryRU: "Добавление колонок ADD COLUMN, переименование RENAME, удаление таблиц DROP и особенности миграций в SQLite.",
+                summaryEN: "Adding columns with ADD COLUMN, table/column renaming, DROP TABLE, and SQLite migration constraints.",
+                contentMarkdownRU: ##"""
+### Модификация схемы данных
+
+Бизнес-логика эволюционирует, требуя изменения существующей структуры таблиц:
+
+### Команда ALTER TABLE
+- Добавление новой колонки:
+  ```sql
+  ALTER TABLE users ADD COLUMN phone TEXT DEFAULT NULL;
+  ```
+- Переименование таблицы:
+  ```sql
+  ALTER TABLE old_orders RENAME TO orders_v2;
+  ```
+- Переименование колонки (SQLite 3.25+):
+  ```sql
+  ALTER TABLE users RENAME COLUMN email TO primary_email;
+  ```
+
+### Ограничения SQLite при изменении схемы
+Исторически SQLite не поддерживает прямое удаление или модификацию типов существующих колонок через `ALTER TABLE DROP COLUMN`.
+Для сложной миграции используется классический паттерн:
+1. Создать новую таблицу `new_table` с нужной структурой.
+2. Скопировать данные: `INSERT INTO new_table SELECT ... FROM old_table;`
+3. Удалить старую таблицу: `DROP TABLE old_table;`
+4. Переименовать: `ALTER TABLE new_table RENAME TO old_table;`
+"""##,
+                contentMarkdownEN: ##"""
+### Schema Evolution: ALTER & DROP
+- `ALTER TABLE t ADD COLUMN col ...`: Appends new attributes.
+- `ALTER TABLE t RENAME TO new_name`: Renames relations.
+- `DROP TABLE IF EXISTS t`: Safely removes entire relations.
+"""##,
+                codeSnippet: ##"""
+CREATE TABLE temporary_metrics (id INTEGER PRIMARY KEY, val REAL);
+INSERT INTO temporary_metrics VALUES (1, 42.0);
+
+-- Добавляем новую колонку с дефолтным значением
+ALTER TABLE temporary_metrics ADD COLUMN category TEXT DEFAULT 'GENERAL';
+
+SELECT * FROM temporary_metrics;
+"""##,
+                xpReward: 40,
+                quiz: [
+                    QuizQuestion(
+                        questionRU: "Какая команда используется для добавления нового столбца в существующую таблицу?",
+                        questionEN: "Which command appends a new column to an existing table?",
+                        optionsRU: ["ALTER TABLE table_name ADD COLUMN column_name type;", "UPDATE TABLE table_name ADD column_name;", "CREATE COLUMN column_name IN table_name;", "MODIFY TABLE table_name INSERT COLUMN;"],
+                        optionsEN: ["ALTER TABLE table_name ADD COLUMN column_name type;", "UPDATE TABLE table_name ADD column_name;", "CREATE COLUMN column_name IN table_name;", "MODIFY TABLE table_name INSERT COLUMN;"],
+                        correctIndex: 0,
+                        explanationRU: "Для расширения структуры таблицы используется ALTER TABLE ... ADD COLUMN.",
+                        explanationEN: "ALTER TABLE table_name ADD COLUMN is standard SQL for schema column extensions."
+                    )
+                ]
+            ),
+
+            Lesson(
+                id: "sql_insert_bulk",
+                category: .sqlDmlModifications,
+                titleRU: "DML: Вставка строк INSERT INTO и пакетная запись",
+                titleEN: "DML: INSERT INTO & Bulk Inserts",
+                summaryRU: "Вставка одиночных строк, множественный Multi-row INSERT, вставка результатов запроса INSERT INTO ... SELECT.",
+                summaryEN: "Single-row inserts, multi-row bulk insertions, and populating tables from queries with INSERT INTO SELECT.",
+                contentMarkdownRU: ##"""
+### Data Manipulation Language: INSERT INTO
+
+Команда `INSERT INTO` добавляет новые записи в таблицу:
+
+```sql
+INSERT INTO clients (name, email, balance) 
+VALUES ('Иван Петров', 'ivan@mail.ru', 10000.0);
+```
+
+### Пакетная вставка (Bulk Insert)
+Вставка нескольких сотен строк отдельными вызовами `INSERT` порождает огромные накладные расходы на диск.
+Множественный `INSERT` выполняет вставку одного составного пакета в единой операции:
+```sql
+INSERT INTO log_entries (level, message) VALUES 
+('INFO', 'Сервер запущен'),
+('WARN', 'Высокое потребление памяти'),
+('ERROR', 'Таймаут шлюза платежей');
+```
+
+### Вставка из другого запроса (INSERT INTO ... SELECT)
+```sql
+INSERT INTO archived_orders (id, amount, archived_date)
+SELECT id, amount, CURRENT_TIMESTAMP 
+FROM orders 
+WHERE status = 'CLOSED' AND created_at < '2025-01-01';
+```
+"""##,
+                contentMarkdownEN: ##"""
+### DML: Data Insertion
+`INSERT INTO` inserts candidate rows into tables.
+
+Bulk multi-row inserts group multiple value tuples into a single statement, maximizing throughput. Populate tables from existing relations using `INSERT INTO ... SELECT`.
+"""##,
+                codeSnippet: ##"""
+CREATE TABLE tags (
+    id INTEGER PRIMARY KEY,
+    name TEXT UNIQUE
+);
+
+-- Пакетная вставка 3 тегов одной операцией
+INSERT INTO tags (name) VALUES 
+('swift'), ('ios'), ('database');
+
+SELECT * FROM tags;
+"""##,
+                xpReward: 40,
+                quiz: [
+                    QuizQuestion(
+                        questionRU: "Какая конструкция позволяет скопировать строки из одной таблицы в другую?",
+                        questionEN: "Which syntax copies data directly between tables?",
+                        optionsRU: ["INSERT INTO target_table SELECT ... FROM source_table", "COPY FROM source_table TO target_table", "IMPORT TABLE source_table", "MERGE INTO target_table"],
+                        optionsEN: ["INSERT INTO target_table SELECT ... FROM source_table", "COPY FROM source_table TO target_table", "IMPORT TABLE source_table", "MERGE INTO target_table"],
+                        correctIndex: 0,
+                        explanationRU: "Конструкция INSERT INTO ... SELECT считывает строки запросом и тут же сохраняет их в целевую таблицу.",
+                        explanationEN: "INSERT INTO ... SELECT transfers query results directly into destination schemas."
+                    )
+                ]
+            ),
+
+            Lesson(
+                id: "sql_update_delete_safe",
+                category: .sqlDmlModifications,
+                titleRU: "Безопасное изменение UPDATE и удаление DELETE",
+                titleEN: "Safe Modifications: UPDATE & DELETE Practices",
+                summaryRU: "Опасность выполнения без WHERE, паттерн предварительной проверки через SELECT, мягкое удаление (Soft Delete).",
+                summaryEN: "Unbounded statement hazards, SELECT verification pattern, and Soft Delete architectural design.",
+                contentMarkdownRU: ##"""
+### Операторы UPDATE и DELETE
+
+- `UPDATE` модифицирует существующие значения в строках.
+- `DELETE FROM` физически удаляет строки из таблицы.
+
+### ЗОЛОТОЕ ПРАВИЛО ПРОМЫШЛЕННОГО SQL:
+> [!CAUTION]
+> Выполнение `UPDATE` или `DELETE` без блока `WHERE` необратимо перезапишет или удалит **абсолютно все строки** во всей таблице!
+
+Паттерн безопасного изменения:
+Перед тем как запустить тяжелый `UPDATE` или `DELETE`, всегда запустите `SELECT` с тем же самым `WHERE`, чтобы точно убедиться в выборке нужных строк:
+```sql
+-- Шаг 1: проверяем, что отбираются ровно 3 нужных пользователя
+SELECT COUNT(*) FROM users WHERE is_inactive = 1 AND registered_at < '2020-01-01';
+
+-- Шаг 2: выполняем безопасное удаление
+DELETE FROM users WHERE is_inactive = 1 AND registered_at < '2020-01-01';
+```
+
+### Паттерн Мягкого Удаления (Soft Delete)
+Вместо физического `DELETE` строки помечают флагом `is_deleted = 1` или `deleted_at = CURRENT_TIMESTAMP`, сохраняя историю и аудит.
+"""##,
+                contentMarkdownEN: ##"""
+### Safe Modification Practices
+`UPDATE` and `DELETE` without `WHERE` clauses mutate every tuple in the relation.
+
+Always execute a preview `SELECT` with matching predicate bounds prior to modifying data. Many systems employ **Soft Delete** (`deleted_at TIMESTAMP`) to preserve historical auditability.
+"""##,
+                codeSnippet: ##"""
+CREATE TABLE inventory_items (
+    id INTEGER PRIMARY KEY,
+    title TEXT,
+    price REAL,
+    is_archived INTEGER DEFAULT 0
+);
+
+INSERT INTO inventory_items VALUES 
+(1, 'Чехол для iPhone', 1500.0, 0),
+(2, 'Кабель USB-C', 800.0, 0);
+
+-- Повышаем цену на 10% только для активных чехлов
+UPDATE inventory_items 
+SET price = ROUND(price * 1.10, 2) 
+WHERE id = 1;
+
+SELECT * FROM inventory_items;
+"""##,
+                xpReward: 40,
+                quiz: [
+                    QuizQuestion(
+                        questionRU: "Что произойдет при вызове команды `DELETE FROM accounts;` без указания блока WHERE?",
+                        questionEN: "What happens if `DELETE FROM accounts;` is executed without a WHERE clause?",
+                        optionsRU: ["Удалятся абсолютно все записи во всей таблице accounts", "СУБД выдаст предупреждение и ничего не сделает", "Удалится только первая строка", "Удалится сама таблица из базы"],
+                        optionsEN: ["All rows in the accounts table will be deleted", "The engine prompts a warning and aborts", "Only the first record is removed", "The table itself is dropped"],
+                        correctIndex: 0,
+                        explanationRU: "Без фильтра WHERE команда DELETE уничтожит все строки в таблице.",
+                        explanationEN: "Omitting WHERE clauses targets all tuples in the specified table."
+                    )
+                ]
+            ),
+
+            Lesson(
+                id: "sql_upsert_on_conflict",
+                category: .sqlDmlModifications,
+                titleRU: "UPSERT: обработка конфликтов ON CONFLICT",
+                titleEN: "UPSERT: Conflict Resolution (ON CONFLICT)",
+                summaryRU: "Идемпотентная вставка, вставка или обновление (Insert or Update), синтаксис ON CONFLICT DO UPDATE и DO NOTHING.",
+                summaryEN: "Idempotent insertions, insert-or-update semantics, ON CONFLICT DO UPDATE, and DO NOTHING clauses.",
+                contentMarkdownRU: ##"""
+### Механизм UPSERT (Update on Insert)
+
+Частая задача: вставить запись, а если запись с таким ключом уже существует — обновить ее поля, не вызывая ошибку нарушения уникальности (`UNIQUE constraint failed`).
+
+### Синтаксис ON CONFLICT
+Начиная с версии 3.24, SQLite поддерживает стандартный синтаксис `UPSERT`:
+
+1. **`DO NOTHING`** — молча пропустить вставку при конфликте:
+```sql
+INSERT INTO users (id, email) VALUES (101, 'alex@mail.ru')
+ON CONFLICT (id) DO NOTHING;
+```
+
+2. **`DO UPDATE`** — обновить поля существующей строки. Спец-таблица `excluded` содержит переданные новые значения:
+```sql
+INSERT INTO page_counters (page_url, visits_count) 
+VALUES ('/home', 1)
+ON CONFLICT (page_url) DO UPDATE SET 
+    visits_count = page_counters.visits_count + excluded.visits_count;
+```
+"""##,
+                contentMarkdownEN: ##"""
+### UPSERT: ON CONFLICT Resolution
+Enables atomic insert-or-update operations without requiring race-prone read-then-write sequences.
+
+- `ON CONFLICT (key) DO NOTHING`: Silently skips duplicate inserts.
+- `ON CONFLICT (key) DO UPDATE SET ...`: Updates existing fields referencing `excluded.column`.
+"""##,
+                codeSnippet: ##"""
+CREATE TABLE user_settings (
+    user_id INTEGER PRIMARY KEY,
+    theme TEXT,
+    notifications_enabled INTEGER
+);
+
+INSERT INTO user_settings VALUES (1, 'Light', 1);
+
+-- Идемпотентный UPSERT: если пользователь уже есть, обновляем его тему
+INSERT INTO user_settings (user_id, theme, notifications_enabled) 
+VALUES (1, 'Dark', 1)
+ON CONFLICT (user_id) DO UPDATE SET 
+    theme = excluded.theme;
+
+SELECT * FROM user_settings;
+"""##,
+                xpReward: 45,
+                quiz: [
+                    QuizQuestion(
+                        questionRU: "Какая псевдо-таблица в выражении ON CONFLICT DO UPDATE хранит значения, которые мы пытались вставить?",
+                        questionEN: "Which pseudo-table references values attempted for insertion inside ON CONFLICT DO UPDATE?",
+                        optionsRU: ["excluded", "inserted", "new", "conflict"],
+                        optionsEN: ["excluded", "inserted", "new", "conflict"],
+                        correctIndex: 0,
+                        explanationRU: "Ключевое слово excluded ссылается на значения, которые были переданы в оператор INSERT.",
+                        explanationEN: "The `excluded` table alias provides access to the pending values proposed by the INSERT statement."
+                    )
+                ]
+            ),
+
+            Lesson(
+                id: "sql_btree_indexes",
+                category: .sqlIndexesPerf,
+                titleRU: "Индексы B-Tree: как база находит строки за O(log N)",
+                titleEN: "B-Tree Indexes: O(log N) Search Trees",
+                summaryRU: "Внутреннее устройство B-Tree индексов, Full Table Scan vs Index Seek, цена поддержки индексов при записи.",
+                summaryEN: "B-Tree index internals, Full Table Scan vs Index Seek, and write throughput trade-offs on indexed tables.",
+                contentMarkdownRU: ##"""
+### Как работают B-Tree индексы
+
+Без индекса, чтобы найти одну запись в таблице на 10 000 000 строк, СУБД вынуждена прочитать весь файл с диска от начала до конца — это называется **Full Table Scan** ($O(N)$).
+
+### Индекс — это сбалансированное дерево (B-Tree)
+Индекс — это отдельная структура данных на диске, хранящая отсортированные значения ключа и ссылки на физические страницы таблицы:
+- Время поиска сокращается с $O(N)$ до $O(\log N)$ (бинарный поиск по дереву).
+- При 10 миллионах строк B-Tree находит запись всего за 3–4 дисковых чтения!
+
+```sql
+CREATE INDEX idx_users_email ON users(email);
+```
+
+### Плата за индексы
+> [!WARNING]
+> Индексы ускоряют операции чтения (`SELECT`), но **замедляют операции записи** (`INSERT`, `UPDATE`, `DELETE`), поскольку при каждой модификации строки СУБД обязана перестраивать и балансировать дерево индексов.
+"""##,
+                contentMarkdownEN: ##"""
+### B-Tree Index Fundamentals
+Without indexes, locating a single tuple mandates a sequential **Full Table Scan** ($O(N)$).
+
+B-Tree indexes maintain balanced, sorted keys mapped to row locations, collapsing lookup complexity to $O(\log N)$. However, each additional index incurs disk overhead and slows down `INSERT`/`UPDATE` throughput.
+"""##,
+                codeSnippet: ##"""
+CREATE TABLE customer_directory (
+    id INTEGER PRIMARY KEY,
+    passport_code TEXT,
+    full_name TEXT
+);
+
+-- Создаем B-Tree индекс для ускорения мгновенного поиска по коду паспорта
+CREATE INDEX idx_customers_passport ON customer_directory(passport_code);
+
+INSERT INTO customer_directory VALUES (1, '4500-123456', 'Сергей Павлов');
+
+SELECT full_name FROM customer_directory WHERE passport_code = '4500-123456';
+"""##,
+                xpReward: 45,
+                quiz: [
+                    QuizQuestion(
+                        questionRU: "Какова алгоритмическая сложность поиска строки в таблице по сбалансированному B-Tree индексу?",
+                        questionEN: "What is the algorithmic search complexity of an indexed lookup using a balanced B-Tree?",
+                        optionsRU: ["O(log N)", "O(N)", "O(1)", "O(N^2)"],
+                        optionsEN: ["O(log N)", "O(N)", "O(1)", "O(N^2)"],
+                        correctIndex: 0,
+                        explanationRU: "B-Tree обеспечивает логарифмическое время поиска O(log N).",
+                        explanationEN: "Balanced trees provide logarithmic O(log N) access time."
+                    )
+                ]
+            ),
+
+            Lesson(
+                id: "sql_composite_unique_indexes",
+                category: .sqlIndexesPerf,
+                titleRU: "Составные индексы и порядок колонок (Leftmost Prefix)",
+                titleEN: "Composite Indexes & Leftmost Prefix Rule",
+                summaryRU: "Многоколоночные индексы, правило левого префикса, покрывающие индексы (Covering Index) и оптимизация.",
+                summaryEN: "Multi-column composite indexes, leftmost prefix rule, covering indexes, and index selectivity.",
+                contentMarkdownRU: ##"""
+### Составные индексы (Composite Indexes)
+
+Составной индекс строится по двум или более столбцам:
+```sql
+CREATE INDEX idx_users_country_city ON users(country, city);
+```
+
+### Главное правило: Левый префикс (Leftmost Prefix)
+Индекс, созданный по `(A, B)`, физически упорядочен сначала по `A`, а затем внутри одинаковых `A` — по `B`.
+- `WHERE A = 1 AND B = 2` $\rightarrow$ индекс используется полностью.
+- `WHERE A = 1` $\rightarrow$ индекс используется (левый префикс совпал).
+- `WHERE B = 2` $\rightarrow$ **индекс НЕ МОЖЕТ быть использован!** (потому что колонка B отсортирована только внутри групп A).
+
+Порядок колонок при создании составного индекса имеет решающее значение!
+
+### Покрывающий индекс (Covering Index)
+Если запрос `SELECT col1, col2 FROM t WHERE col1 = 'val'` запрашивает только те колонки, которые уже содержатся в самом индексе, СУБД вообще не обращается к основной таблице, считывая всё прямо из дерева индекса (Index Only Scan).
+"""##,
+                contentMarkdownEN: ##"""
+### Composite Indexes & Leftmost Prefix
+A composite index on `(A, B)` sorts by `A`, then `B`. Queries filtering on `A` or `(A, B)` leverage the index, but queries filtering solely on `B` cannot utilize it.
+
+A **Covering Index** contains all attributes requested by the query, bypassing the base table completely.
+"""##,
+                codeSnippet: ##"""
+CREATE TABLE flights (
+    flight_id INTEGER PRIMARY KEY,
+    origin TEXT,
+    destination TEXT,
+    departure_time DATETIME
+);
+
+-- Составной индекс: origin (левый префикс), destination
+CREATE INDEX idx_flights_route ON flights(origin, destination);
+
+INSERT INTO flights VALUES 
+(1, 'SVO', 'LED', '2026-04-01 10:00:00'),
+(2, 'SVO', 'AER', '2026-04-01 12:00:00');
+
+-- Запрос идеально попадает в индекс
+SELECT flight_id FROM flights WHERE origin = 'SVO' AND destination = 'LED';
+"""##,
+                xpReward: 50,
+                quiz: [
+                    QuizQuestion(
+                        questionRU: "Сможет ли оптимизатор использовать составной индекс CREATE INDEX idx ON t(A, B) для запроса `WHERE B = 10`?",
+                        questionEN: "Can the query planner use an index on `(A, B)` for a query filtering only on `WHERE B = 10`?",
+                        optionsRU: ["Нет, так как нарушено правило левого префикса (колонка A не указана)", "Да, в любом случае", "Да, если колонка B числовая", "Да, но только в SQLite"],
+                        optionsEN: ["No, because it violates the leftmost prefix rule (attribute A is omitted)", "Yes, regardless", "Yes, if B is numeric", "Yes, in SQLite only"],
+                        correctIndex: 0,
+                        explanationRU: "Дерево отсортировано по первому столбцу A, поэтому прямой поиск только по B невозможен.",
+                        explanationEN: "Without the leading key attribute, the index tree cannot be traversed via binary search."
+                    )
+                ]
+            ),
+
+            Lesson(
+                id: "sql_explain_query_plan",
+                category: .sqlIndexesPerf,
+                titleRU: "Анализ запросов: EXPLAIN QUERY PLAN",
+                titleEN: "Query Execution Plans: EXPLAIN QUERY PLAN",
+                summaryRU: "Инспекция работы планировщика, обнаружение SCAN TABLE vs SEARCH TABLE USING INDEX, тюнинг производительности.",
+                summaryEN: "Query planner inspection, diagnosing SCAN TABLE vs SEARCH TABLE USING INDEX, and bottleneck elimination.",
+                contentMarkdownRU: ##"""
+### Команда EXPLAIN QUERY PLAN
+
+Команда `EXPLAIN QUERY PLAN` показывает, какой именно алгоритм и какие индексы СУБД планирует задействовать для выполнения запроса:
+
+```sql
+EXPLAIN QUERY PLAN 
+SELECT * FROM employees WHERE email = 'dev@corp.com';
+```
+
+### Главные маркеры в плане SQLite:
+1. `SCAN TABLE employees` — **тревожный сигнал!** База делает полный перебор всей таблицы (Full Table Scan).
+2. `SEARCH TABLE employees USING INDEX idx_email` — **отлично!** База выполняет быстрый логарифмический поиск по B-Tree индексу.
+3. `SEARCH TABLE employees USING INTEGER PRIMARY KEY (rowid=?)` — **максимальная скорость!** Прямое позиционирование по первичному ключу за $O(1)$.
+4. `USE TEMP B-TREE FOR ORDER BY` — база создает временный индекс в памяти для сортировки.
+"""##,
+                contentMarkdownEN: ##"""
+### Reading Execution Plans
+Prefixing queries with `EXPLAIN QUERY PLAN` reveals planner strategy:
+- `SCAN TABLE`: Sequential scan of every page ($O(N)$).
+- `SEARCH TABLE USING INDEX`: Targeted logarithmic lookup via B-Tree ($O(\log N)$).
+- `USE TEMP B-TREE`: In-memory sorting overhead indicating missing index on `ORDER BY` attributes.
+"""##,
+                codeSnippet: ##"""
+CREATE TABLE audit_records (
+    id INTEGER PRIMARY KEY,
+    action_type TEXT,
+    created_at DATE
+);
+
+CREATE INDEX idx_audit_created ON audit_records(created_at);
+
+-- Проверяем план выполнения запроса
+EXPLAIN QUERY PLAN 
+SELECT * FROM audit_records WHERE created_at >= '2026-01-01';
+"""##,
+                xpReward: 50,
+                quiz: [
+                    QuizQuestion(
+                        questionRU: "Что означает появление надписи 'SCAN TABLE' в выводе команды EXPLAIN QUERY PLAN?",
+                        questionEN: "What does 'SCAN TABLE' signify in an EXPLAIN QUERY PLAN readout?",
+                        optionsRU: ["Полное сканирование всех строк таблицы без использования индексов (Full Scan)", "Быстрый поиск по B-Tree индексу", "Синтаксическую ошибку в запросе", "Таблица заблокирована другой транзакцией"],
+                        optionsEN: ["Full table scan examining every row without index assistance", "Fast B-Tree index seek", "A query syntax error", "The table is locked by another transaction"],
+                        correctIndex: 0,
+                        explanationRU: "SCAN TABLE означает полный перебор физических страниц таблицы, что указывает на отсутствие подходящего индекса.",
+                        explanationEN: "SCAN TABLE confirms a sequential unindexed scan across the entire dataset."
+                    )
+                ]
+            ),
+
+            Lesson(
+                id: "sql_acid_properties",
+                category: .sqlTransactions,
+                titleRU: "Свойства ACID и Надежность транзакций",
+                titleEN: "ACID Properties & Transaction Reliability",
+                summaryRU: "Атомарность (A), Согласованность (C), Изоляция (I), Долговечность (D) и предотвращение порчи данных.",
+                summaryEN: "Atomicity, Consistency, Isolation, Durability, and database data corruption prevention guarantees.",
+                contentMarkdownRU: ##"""
+### Транзакции и гарантии ACID
+
+Транзакция — это последовательность SQL-операций, выполняемых как единое неделимое целое.
+
+### 4 столпа надежности (ACID):
+1. **A — Atomicity (Атомарность)**:
+   «Все или ничего». Если из 10 операций транзакции 9 прошли успешно, а 10-я упала, изменения всех 9 операций полностью откатываются (`ROLLBACK`). База никогда не остается в промежуточном состоянии.
+2. **C — Consistency (Согласованность)**:
+   Транзакция переводит базу из одного валидного состояния в другое, не нарушая ограничений целостности (`FOREIGN KEY`, `CHECK`, `NOT NULL`).
+3. **I — Isolation (Изоляция)**:
+   Параллельно выполняющиеся транзакции не должны влиять друг на друга.
+4. **D — Durability (Долговечность)**:
+   Если транзакция зафиксирована (`COMMIT`), ее данные гарантированно сохранены на диск (через WAL/журнал упреждающей записи) и не пропадут даже при внезапном отключении питания сервера.
+"""##,
+                contentMarkdownEN: ##"""
+### ACID Transaction Guarantees
+- **Atomicity**: All-or-nothing execution. Failures trigger full rollback.
+- **Consistency**: Invariants and constraints remain valid before and after transactions.
+- **Isolation**: Concurrent transactions cannot observe uncommitted intermediate states.
+- **Durability**: Committed updates persist across system crashes via Write-Ahead Logging (WAL).
+"""##,
+                codeSnippet: ##"""
+CREATE TABLE bank_wallets (
+    account_id INTEGER PRIMARY KEY,
+    owner TEXT,
+    balance REAL CHECK (balance >= 0)
+);
+
+INSERT INTO bank_wallets VALUES (1, 'Алиса', 1000.0), (2, 'Боб', 500.0);
+
+-- Атомарный перевод средств: списание и зачисление
+BEGIN TRANSACTION;
+UPDATE bank_wallets SET balance = balance - 200.0 WHERE account_id = 1;
+UPDATE bank_wallets SET balance = balance + 200.0 WHERE account_id = 2;
+COMMIT;
+
+SELECT * FROM bank_wallets;
+"""##,
+                xpReward: 50,
+                quiz: [
+                    QuizQuestion(
+                        questionRU: "Какое свойство ACID гарантирует принцип 'все или ничего' (откат всех изменений при любой ошибке)?",
+                        questionEN: "Which ACID property guarantees 'all-or-nothing' execution where failures rollback all changes?",
+                        optionsRU: ["Атомарность (Atomicity)", "Изоляция (Isolation)", "Долговечность (Durability)", "Согласованность (Consistency)"],
+                        optionsEN: ["Atomicity", "Isolation", "Durability", "Consistency"],
+                        correctIndex: 0,
+                        explanationRU: "Атомарность (Atomicity) гарантирует неделимость транзакции.",
+                        explanationEN: "Atomicity enforces that atomic operations either complete entirely or roll back cleanly."
+                    )
+                ]
+            ),
+
+            Lesson(
+                id: "sql_transactions_savepoints",
+                category: .sqlTransactions,
+                titleRU: "Транзакции: BEGIN, COMMIT, ROLLBACK и Savepoints",
+                titleEN: "Transaction Control: COMMIT, ROLLBACK & Savepoints",
+                summaryRU: "Управление транзакциями, аварийный откат ROLLBACK, точки сохранения SAVEPOINT для частичных откатов.",
+                summaryEN: "Managing transaction state, emergency ROLLBACK, and nested partial rollbacks using SAVEPOINTs.",
+                contentMarkdownRU: ##"""
+### Управление транзакциями
+
+В стандарте SQL команды управления транзакциями включают:
+- `BEGIN TRANSACTION` — открытие явной транзакции.
+- `COMMIT` — успешная фиксация всех изменений на диск.
+- `ROLLBACK` — отмена всех изменений с момента открытия транзакции.
+
+### Точки сохранения (SAVEPOINT)
+Точки сохранения позволяют создавать контрольные метки внутри длинной транзакции и откатывать только часть операций, не сбрасывая всю транзакцию:
+
+```sql
+BEGIN TRANSACTION;
+
+INSERT INTO orders VALUES (101, 'Клиент 1');
+SAVEPOINT step1;
+
+INSERT INTO orders VALUES (102, 'Клиент 2 (ошибочный)');
+-- Откатываемся только до шага step1:
+ROLLBACK TO step1;
+
+-- Заказ 101 остался в транзакции и будет зафиксирован!
+COMMIT;
+```
+"""##,
+                contentMarkdownEN: ##"""
+### Transaction Control & Savepoints
+- `BEGIN TRANSACTION`: Opens transaction boundary.
+- `COMMIT`: Persists state changes permanently.
+- `ROLLBACK`: Discards pending mutations.
+- `SAVEPOINT name`: Marks an intermediate checkpoint allowing partial rollback (`ROLLBACK TO name`).
+"""##,
+                codeSnippet: ##"""
+CREATE TABLE game_inventory (item_id INTEGER PRIMARY KEY, item_name TEXT);
+
+BEGIN TRANSACTION;
+INSERT INTO game_inventory VALUES (1, 'Меч героя');
+
+SAVEPOINT checkpoint_chest;
+INSERT INTO game_inventory VALUES (2, 'Проклятое кольцо');
+
+-- Отменяем только взятие проклятого кольца
+ROLLBACK TO checkpoint_chest;
+
+COMMIT;
+
+SELECT * FROM game_inventory;
+"""##,
+                xpReward: 50,
+                quiz: [
+                    QuizQuestion(
+                        questionRU: "Какая команда позволяет отменить изменения только до определенной промежуточной точки транзакции?",
+                        questionEN: "Which statement rolls back state changes to a specific intermediate checkpoint?",
+                        optionsRU: ["ROLLBACK TO savepoint_name", "UNDO TO savepoint_name", "RESET TRANSACTION", "CANCEL CHECKPOINT"],
+                        optionsEN: ["ROLLBACK TO savepoint_name", "UNDO TO savepoint_name", "RESET TRANSACTION", "CANCEL CHECKPOINT"],
+                        correctIndex: 0,
+                        explanationRU: "Команда ROLLBACK TO отменяет операции только до указанного SAVEPOINT.",
+                        explanationEN: "ROLLBACK TO resets the transaction state specifically to the named savepoint."
+                    )
+                ]
+            ),
+
+            Lesson(
+                id: "sql_views_virtual",
+                category: .sqlViewsTriggers,
+                titleRU: "Представления: CREATE VIEW и абстракции",
+                titleEN: "Views: CREATE VIEW & Security Layering",
+                summaryRU: "Виртуальные таблицы, сокрытие сложности длинных JOIN, разграничение прав доступа и материализованные представления.",
+                summaryEN: "Virtual tables, hiding JOIN complexity, role-based column access control, and materialized views concept.",
+                contentMarkdownRU: ##"""
+### Представления (Views)
+
+Представление (`VIEW`) — это виртуальная таблица, определенная сохраненным SQL-запросом.
+В отличие от обычной таблицы, `VIEW` **не хранит данные физически на диске**. При каждом обращении к представлению СУБД прозрачно подставляет и выполняет лежащий в его основе запрос.
+
+```sql
+CREATE VIEW active_client_orders AS 
+SELECT 
+    c.name AS client_name,
+    c.email,
+    o.id AS order_id,
+    o.amount
+FROM clients c 
+INNER JOIN orders o ON c.id = o.client_id 
+WHERE o.status = 'PAID';
+```
+
+### Преимущества представлений
+1. **Упрощение кода**: разработчики вызывают `SELECT * FROM active_client_orders;` вместо пятиэтажных `JOIN`.
+2. **Безопасность (Security)**: можно предоставить пользователям доступ к `VIEW`, скрыв конфиденциальные столбцы (пароли, зарплаты).
+"""##,
+                contentMarkdownEN: ##"""
+### SQL Views
+A `VIEW` represents a stored query presenting a virtual table. Views contain no physical data on disk; queries referencing them re-evaluate the underlying query.
+
+Views encapsulate complex joins and provide a security abstraction restricting sensitive column access.
+"""##,
+                codeSnippet: ##"""
+CREATE TABLE employees_private (
+    id INTEGER PRIMARY KEY,
+    name TEXT,
+    salary REAL,
+    dept TEXT
+);
+
+INSERT INTO employees_private VALUES 
+(1, 'Евгений', 180000.0, 'Архитектура'),
+(2, 'Марина', 120000.0, 'Дизайн');
+
+-- Публичное представление без конфиденциального поля зарплаты
+CREATE VIEW public_staff_directory AS 
+SELECT id, name, dept FROM employees_private;
+
+SELECT * FROM public_staff_directory;
+"""##,
+                xpReward: 45,
+                quiz: [
+                    QuizQuestion(
+                        questionRU: "Хранит ли обычное представление (VIEW) копию данных на диске?",
+                        questionEN: "Does a standard SQL VIEW duplicate and store table data on disk?",
+                        optionsRU: ["Нет, VIEW — это сохраненный запрос, вычисляемый динамически", "Да, данные дублируются при создании VIEW", "Да, если во VIEW есть JOIN", "Да, в SQLite"],
+                        optionsEN: ["No, a VIEW is a saved query evaluated dynamically upon request", "Yes, data is cloned on creation", "Yes, when joins are involved", "Yes, in SQLite"],
+                        correctIndex: 0,
+                        explanationRU: "Обычное представление не хранит данные, являясь динамической виртуальной проекцией.",
+                        explanationEN: "Standard views are virtual query definitions, persisting zero physical tuple data."
+                    )
+                ]
+            ),
+
+            Lesson(
+                id: "sql_triggers_automation",
+                category: .sqlViewsTriggers,
+                titleRU: "Триггеры: CREATE TRIGGER и автоматизация",
+                titleEN: "Triggers: CREATE TRIGGER & Audit Automations",
+                summaryRU: "Реакция на события INSERT/UPDATE/DELETE, время срабатывания BEFORE/AFTER, псевдо-записи OLD и NEW, аудит изменений.",
+                summaryEN: "Event handlers on INSERT/UPDATE/DELETE, BEFORE vs AFTER timings, OLD and NEW row states, and change log audits.",
+                contentMarkdownRU: ##"""
+### Триггеры в реляционных БД
+
+Триггер — это процедурный блок кода, автоматически выполняемый ядром СУБД при наступлении определенного события в таблице:
+- События: `INSERT`, `UPDATE`, `DELETE`.
+- Время срабатывания: `BEFORE` (до изменения) или `AFTER` (после успешного изменения).
+- Область: `FOR EACH ROW` — срабатывает для каждой затронутой строки.
+
+### Псевдо-записи OLD и NEW
+Внутри тела триггера доступны виртуальные строки:
+- `NEW.column` — новое значение (доступно в `INSERT` и `UPDATE`).
+- `OLD.column` — старое значение до изменения (доступно в `UPDATE` и `DELETE`).
+
+### Сценарий: Неизменяемый журнал аудита (Audit Trail)
+```sql
+CREATE TRIGGER audit_price_changes 
+AFTER UPDATE OF price ON products 
+FOR EACH ROW 
+WHEN OLD.price != NEW.price 
+BEGIN 
+    INSERT INTO price_audit_log (product_id, old_val, new_val, changed_at)
+    VALUES (OLD.id, OLD.price, NEW.price, CURRENT_TIMESTAMP);
+END;
+```
+"""##,
+                contentMarkdownEN: ##"""
+### Database Triggers
+Triggers are automated database procedures executing in response to table modifications (`INSERT`, `UPDATE`, `DELETE`).
+
+- `BEFORE`: Execute validations or transform values prior to mutation.
+- `AFTER`: Populate audit trails or synchronize secondary tables.
+- Access pre- and post-mutation attributes via `OLD` and `NEW` records.
+"""##,
+                codeSnippet: ##"""
+CREATE TABLE products_catalog_t (
+    id INTEGER PRIMARY KEY,
+    name TEXT,
+    price REAL
+);
+
+CREATE TABLE audit_log (
+    id INTEGER PRIMARY KEY,
+    msg TEXT
+);
+
+-- Триггер автоматического логирования добавления товаров
+CREATE TRIGGER trg_product_added 
+AFTER INSERT ON products_catalog_t 
+BEGIN 
+    INSERT INTO audit_log (msg) 
+    VALUES ('Добавлен товар: ' || NEW.name);
+END;
+
+INSERT INTO products_catalog_t VALUES (1, 'Монитор 4K', 45000.0);
+
+SELECT * FROM audit_log;
+"""##,
+                xpReward: 50,
+                quiz: [
+                    QuizQuestion(
+                        questionRU: "Какая псевдо-запись содержит значение столбца до выполнения операции UPDATE в теле триггера?",
+                        questionEN: "Which record identifier holds column values prior to an UPDATE operation inside a trigger?",
+                        optionsRU: ["OLD", "NEW", "PREVIOUS", "BEFORE"],
+                        optionsEN: ["OLD", "NEW", "PREVIOUS", "BEFORE"],
+                        correctIndex: 0,
+                        explanationRU: "Псевдо-запись OLD хранит состояние строки до модификации.",
+                        explanationEN: "The OLD pseudo-record stores the original tuple values prior to modification."
+                    )
+                ]
             )
 
         ]

@@ -6,8 +6,11 @@ public struct CurriculumView: View {
     @ObservedObject var nav = AppNavigationState.shared
     private let lessons = CurriculumStore.shared.lessons
     
-    @State private var selectedLanguage: TargetLanguage = .swift
-    @State private var selectedTrack: CurriculumTrack = .swiftCore
+    @AppStorage("curriculum_selected_language") private var storedLanguageRaw: String = TargetLanguage.sql.rawValue
+    @AppStorage("curriculum_selected_track") private var storedTrackRaw: String = CurriculumTrack.sqlCore.rawValue
+    
+    @State private var selectedLanguage: TargetLanguage = .sql
+    @State private var selectedTrack: CurriculumTrack = .sqlCore
     
     public init() {}
     
@@ -45,6 +48,16 @@ public struct CurriculumView: View {
             .navigationDestination(item: $nav.presentedLesson) { lesson in
                 LessonDetailView(lesson: lesson)
             }
+            .onAppear {
+                if let lang = TargetLanguage(rawValue: storedLanguageRaw) {
+                    selectedLanguage = lang
+                }
+                if let track = CurriculumTrack(rawValue: storedTrackRaw), track.language == selectedLanguage {
+                    selectedTrack = track
+                } else if let firstTrack = CurriculumTrack.allCases.first(where: { $0.language == selectedLanguage }) {
+                    selectedTrack = firstTrack
+                }
+            }
         }
     }
     
@@ -56,8 +69,10 @@ public struct CurriculumView: View {
                     Button(action: {
                         withAnimation(.spring(response: 0.3, dampingFraction: 0.75)) {
                             selectedLanguage = item
+                            storedLanguageRaw = item.rawValue
                             if let firstTrack = CurriculumTrack.allCases.first(where: { $0.language == item }) {
                                 selectedTrack = firstTrack
+                                storedTrackRaw = firstTrack.rawValue
                             }
                         }
                     }) {
@@ -100,6 +115,7 @@ public struct CurriculumView: View {
                         Button(action: {
                             withAnimation(.spring(response: 0.25, dampingFraction: 0.8)) {
                                 selectedTrack = track
+                                storedTrackRaw = track.rawValue
                             }
                         }) {
                             Text(track.title(for: lang.currentLanguage))
@@ -164,9 +180,13 @@ public struct CurriculumView: View {
         case .csharpAdvanced:
             cardSubtitle = lang.localized("Асинхронность Task/async/await, многопоточность lock/Semaphore, DI и сборщик мусора GC.", "Async Task/async/await, multithreading lock/Semaphore, Dependency Injection, and GC.")
         case .sqlCore:
-            cardSubtitle = lang.localized("Реляционная модель, выборка SELECT, фильтрация WHERE, агрегации и группировка GROUP BY.", "Relational model, SELECT queries, WHERE filtering, aggregations, and GROUP BY.")
-        case .sqlAdvanced:
-            cardSubtitle = lang.localized("Объединения таблиц JOIN, вложенные подзапросы, DDL/DML и оконные функции OVER.", "Table JOINs, subqueries, DDL/DML schema operations, and OVER window functions.")
+            cardSubtitle = lang.localized("Реляционная модель, выборка SELECT, фильтрация WHERE, сортировка ORDER BY, пагинация LIMIT и агрегации GROUP BY.", "Relational model, SELECT queries, WHERE filtering, ORDER BY, LIMIT pagination, and GROUP BY aggregations.")
+        case .sqlJoins:
+            cardSubtitle = lang.localized("Связи 1:1, 1:N, N:M, ключи PRIMARY/FOREIGN KEY, все виды JOIN (INNER, LEFT, RIGHT, FULL, CROSS) и подзапросы.", "Relationships 1:1, 1:N, N:M, PRIMARY/FOREIGN keys, all JOIN types (INNER, LEFT, RIGHT, FULL, CROSS), and subqueries.")
+        case .sqlAnalytics:
+            cardSubtitle = lang.localized("CTE (WITH / RECURSIVE), оконные функции ROW_NUMBER, RANK, DENSE_RANK, скользящие агрегаты и CASE WHEN.", "CTEs (WITH / RECURSIVE), window ranking ROW_NUMBER, RANK, running totals, frame clauses, and CASE WHEN logic.")
+        case .sqlSystems:
+            cardSubtitle = lang.localized("DDL (CREATE/ALTER TABLE, Constraints), DML (INSERT/UPDATE/UPSERT), B-Tree индексы, EXPLAIN, транзакции ACID и триггеры.", "DDL (CREATE/ALTER TABLE, Constraints), DML (INSERT/UPDATE/UPSERT), B-Tree indexing, EXPLAIN, ACID transactions, and triggers.")
         }
         
         return VStack(alignment: .leading, spacing: 14) {
