@@ -168,13 +168,27 @@ public final class PlaygroundEngine {
                 outputLines.append("\(closingIndent)}")
             }
             
+            // Ignore Python imports
+            if trimmed.hasPrefix("import ") || trimmed.hasPrefix("from ") {
+                continue
+            }
+            
+            // Class definition: class Name: -> struct Name {
+            if trimmed.hasPrefix("class ") && trimmed.hasSuffix(":") {
+                let className = String(trimmed.dropFirst(6).dropLast()).trimmingCharacters(in: .whitespaces)
+                let indentSpaces = String(repeating: " ", count: currentIndent)
+                outputLines.append("\(indentSpaces)struct \(className) {")
+                indentStack.append(currentIndent + 4)
+                continue
+            }
+
             // Function definition: def name(params):
             if trimmed.hasPrefix("def ") && trimmed.hasSuffix(":") {
                 let sig = String(trimmed.dropFirst(4).dropLast()).trimmingCharacters(in: .whitespaces)
                 if let openP = sig.firstIndex(of: "("), let closeP = sig.lastIndex(of: ")") {
                     let funcName = String(sig[..<openP]).trimmingCharacters(in: .whitespaces)
                     let paramsStr = String(sig[sig.index(after: openP)..<closeP]).trimmingCharacters(in: .whitespaces)
-                    let pTokens = paramsStr.components(separatedBy: ",").map { $0.trimmingCharacters(in: .whitespaces) }.filter { !$0.isEmpty }
+                    let pTokens = paramsStr.components(separatedBy: ",").map { $0.trimmingCharacters(in: .whitespaces) }.filter { !$0.isEmpty && $0 != "self" }
                     let swiftParams = pTokens.map { "_ \($0): Any" }.joined(separator: ", ")
                     
                     let indentSpaces = String(repeating: " ", count: currentIndent)
@@ -192,6 +206,27 @@ public final class PlaygroundEngine {
             lineContent = lineContent.replacingOccurrences(of: " or ", with: " || ")
             if lineContent.hasPrefix("not ") {
                 lineContent = "!" + lineContent.dropFirst(4)
+            }
+            
+            // Convert f-strings: f"..." -> "\(var)"
+            if lineContent.contains("f\"") || lineContent.contains("f'") {
+                lineContent = lineContent.replacingOccurrences(of: "f\"", with: "\"").replacingOccurrences(of: "f'", with: "'")
+                var converted = ""
+                var insideInterpolation = false
+                var insideString = false
+                for char in lineContent {
+                    if char == "\"" || char == "'" { insideString.toggle() }
+                    if insideString && char == "{" {
+                        converted.append("\\(")
+                        insideInterpolation = true
+                    } else if insideString && insideInterpolation && char == "}" {
+                        converted.append(")")
+                        insideInterpolation = false
+                    } else {
+                        converted.append(char)
+                    }
+                }
+                lineContent = converted
             }
             
             let indentSpaces = String(repeating: " ", count: currentIndent)
@@ -218,12 +253,54 @@ public final class PlaygroundEngine {
                 continue
             }
             
+            // Ignore using / namespace
+            if trimmed.hasPrefix("using ") || trimmed.hasPrefix("namespace ") {
+                continue
+            }
+            
+            // Class declaration -> struct
+            if trimmed.hasPrefix("public class ") {
+                trimmed = "struct " + trimmed.dropFirst(13)
+            } else if trimmed.hasPrefix("class ") {
+                trimmed = "struct " + trimmed.dropFirst(6)
+            }
+            
+            // Convert C# type declarations to var
+            let csharpTypes = ["int ", "double ", "float ", "string ", "bool ", "long ", "decimal ", "char "]
+            for cType in csharpTypes {
+                if trimmed.hasPrefix(cType) {
+                    trimmed = "var " + trimmed.dropFirst(cType.count)
+                    break
+                }
+            }
+            
             // Console.WriteLine / Write
             if trimmed.contains("Console.WriteLine(") {
                 trimmed = trimmed.replacingOccurrences(of: "Console.WriteLine(", with: "print(")
             }
             if trimmed.contains("Console.Write(") {
                 trimmed = trimmed.replacingOccurrences(of: "Console.Write(", with: "print(")
+            }
+            
+            // Convert C# string interpolation: $"... {var} ..." -> "... \(var) ..."
+            if trimmed.contains("$\"") {
+                trimmed = trimmed.replacingOccurrences(of: "$\"", with: "\"")
+                var converted = ""
+                var insideInterpolation = false
+                var insideString = false
+                for char in trimmed {
+                    if char == "\"" { insideString.toggle() }
+                    if insideString && char == "{" {
+                        converted.append("\\(")
+                        insideInterpolation = true
+                    } else if insideString && insideInterpolation && char == "}" {
+                        converted.append(")")
+                        insideInterpolation = false
+                    } else {
+                        converted.append(char)
+                    }
+                }
+                trimmed = converted
             }
             
             // Replace C# method signature: e.g. public static int Add(int a, int b) {
@@ -541,6 +618,11 @@ final class SwiftMiniInterpreter {
             stmt = stmt.trimmingCharacters(in: .whitespaces)
         }
         
+        // Ignore imports / using directives / no-ops
+        if stmt.hasPrefix("import ") || stmt.hasPrefix("using ") || stmt.hasPrefix("from ") || stmt == "pass" {
+            return
+        }
+        
         // Return statement
         if stmt.hasPrefix("return") {
             hasReturned = true
@@ -626,18 +708,17 @@ final class SwiftMiniInterpreter {
                 return
             }
             
-            guard let record = environment[lhs] else {
-                error = RuntimeError(line: lineNumber, message: "Cannot find '\(lhs)' in scope")
-                return
-            }
-            
-            if record.isConstant {
-                error = RuntimeError(line: lineNumber, message: "Cannot assign to value: '\(lhs)' is a 'let' constant")
-                return
-            }
-            
             let val = evaluateExpression(exprStr, lineNumber: lineNumber)
-            environment[lhs] = VariableRecord(value: val, isConstant: false)
+            if let record = environment[lhs] {
+                if record.isConstant {
+                    error = RuntimeError(line: lineNumber, message: "Cannot assign to value: '\(lhs)' is a 'let' constant")
+                    return
+                }
+                environment[lhs] = VariableRecord(value: val, isConstant: false)
+            } else {
+                // Dynamically allocate variable in scope (essential for Python and top-level scripts)
+                environment[lhs] = VariableRecord(value: val, isConstant: false)
+            }
             return
         }
         

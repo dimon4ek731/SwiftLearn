@@ -41,11 +41,16 @@ public final class IDEProjectManager: ObservableObject {
         }
         
         // Load Projects
-        let loadedProjects: [IDEProject]
+        var loadedProjects: [IDEProject]
         if let data = UserDefaults.standard.data(forKey: projectsKey),
            let decoded = try? JSONDecoder().decode([IDEProject].self, from: data),
            !decoded.isEmpty {
             loadedProjects = decoded
+            for template in IDEProject.defaultTemplates {
+                if !loadedProjects.contains(where: { $0.name == template.name }) {
+                    loadedProjects.append(template)
+                }
+            }
         } else {
             loadedProjects = IDEProject.defaultTemplates
         }
@@ -105,11 +110,35 @@ public final class IDEProjectManager: ObservableObject {
         projects[pIdx].removeFile(id: id)
     }
     
-    public func createProject(name: String, description: String, template: IDEProject? = nil) {
-        let baseFiles = template?.files ?? [IDEFile(name: "main.swift", content: "// New Swift Project\nprint(\"Hello, World!\")\n")]
+    public func createProject(name: String, description: String, language: TargetLanguage = .swift, template: IDEProject? = nil) {
+        let projLanguage = template?.language ?? language
+        let baseFiles: [IDEFile]
+        if let templateFiles = template?.files, !templateFiles.isEmpty {
+            baseFiles = templateFiles
+        } else {
+            let defaultFileName: String
+            let defaultContent: String
+            switch projLanguage {
+            case .swift:
+                defaultFileName = "main.swift"
+                defaultContent = "// Swift Project\nprint(\"Hello, Swift!\")\n"
+            case .python:
+                defaultFileName = "main.py"
+                defaultContent = "# Python Project\nprint(\"Hello, Python!\")\n"
+            case .csharp:
+                defaultFileName = "Program.cs"
+                defaultContent = "// C# .NET Project\nusing System;\n\nConsole.WriteLine(\"Hello, C#!\");\n"
+            case .sql:
+                defaultFileName = "main.sql"
+                defaultContent = "-- SQL Script\nSELECT 'Hello, SQL Database!' AS greeting;\n"
+            }
+            baseFiles = [IDEFile(name: defaultFileName, content: defaultContent)]
+        }
+        
         let newProject = IDEProject(
             name: name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "New Project" : name,
             descriptionText: description,
+            language: projLanguage,
             files: baseFiles
         )
         projects.insert(newProject, at: 0)
@@ -129,6 +158,7 @@ public final class IDEProjectManager: ObservableObject {
         let copy = IDEProject(
             name: "\(original.name) (Copy)",
             descriptionText: original.descriptionText,
+            language: original.language,
             files: original.files.map { IDEFile(name: $0.name, content: $0.content) }
         )
         projects.insert(copy, at: 0)

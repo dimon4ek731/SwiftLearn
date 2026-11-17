@@ -60,13 +60,15 @@ public struct IDEMainView: View {
             }
         }
         .alert(lang.localized("Новый файл", "New File"), isPresented: $showingNewFileAlert) {
-            TextField("FileName.swift", text: $newFileName)
+            let ext = ideManager.activeProject?.language.fileExtension ?? "swift"
+            TextField("file.\(ext)", text: $newFileName)
             Button(lang.localized("Отмена", "Cancel"), role: .cancel) {
                 newFileName = ""
             }
             Button(lang.localized("Создать", "Create")) {
                 if !newFileName.isEmpty {
-                    ideManager.addFile(name: newFileName, content: "// \(newFileName)\n")
+                    let commentPrefix = (ideManager.activeProject?.language == .python) ? "#" : (ideManager.activeProject?.language == .sql ? "--" : "//")
+                    ideManager.addFile(name: newFileName, content: "\(commentPrefix) \(newFileName)\n")
                     newFileName = ""
                     syncEditorWithActiveFile()
                 }
@@ -85,6 +87,21 @@ public struct IDEMainView: View {
                         .font(.subheadline.bold())
                         .foregroundColor(.primary)
                         .lineLimit(1)
+                    
+                    // Language Badge
+                    let langType = ideManager.activeProject?.language ?? .swift
+                    HStack(spacing: 3) {
+                        Image(systemName: langType.icon)
+                            .font(.system(size: 8, weight: .bold))
+                        Text(langType.displayName)
+                            .font(.system(size: 9, weight: .bold))
+                    }
+                    .padding(.horizontal, 6)
+                    .padding(.vertical, 2)
+                    .background(Color(red: 0.14, green: 0.38, blue: 0.82).opacity(0.12))
+                    .foregroundColor(Color(red: 0.14, green: 0.38, blue: 0.82))
+                    .clipShape(Capsule())
+                    
                     Image(systemName: "chevron.down")
                         .font(.system(size: 10, weight: .bold))
                         .foregroundColor(.secondary)
@@ -141,6 +158,16 @@ public struct IDEMainView: View {
                 if let files = ideManager.activeProject?.files {
                     ForEach(files) { file in
                         let isActive = file.id == ideManager.activeProject?.activeFileId
+                        let fileIcon: (icon: String, color: Color) = {
+                            let ext = file.name.components(separatedBy: ".").last?.lowercased() ?? ""
+                            switch ext {
+                            case "swift": return ("swift", .orange)
+                            case "py": return ("chevron.left.forwardslash.chevron.right", Color(red: 0.20, green: 0.45, blue: 0.85))
+                            case "cs": return ("curlybraces", Color(red: 0.55, green: 0.25, blue: 0.85))
+                            case "sql": return ("cylinder.split.1x2", Color(red: 0.16, green: 0.58, blue: 0.40))
+                            default: return ("doc.text", .secondary)
+                            }
+                        }()
                         
                         Button(action: {
                             saveCurrentContent()
@@ -148,9 +175,9 @@ public struct IDEMainView: View {
                             syncEditorWithActiveFile()
                         }) {
                             HStack(spacing: 6) {
-                                Image(systemName: "swift")
+                                Image(systemName: fileIcon.icon)
                                     .font(.caption2)
-                                    .foregroundColor(isActive ? .orange : .secondary)
+                                    .foregroundColor(isActive ? fileIcon.color : .secondary)
                                 
                                 Text(file.name)
                                     .font(.system(size: 12, weight: isActive ? .bold : .regular, design: .monospaced))
@@ -249,17 +276,62 @@ public struct IDEMainView: View {
                     }
                 }
                 
-                quickInsertButton("{ }", insert: " {\n    \n}")
-                quickInsertButton("( )", insert: "()")
-                quickInsertButton("[ ]", insert: "[]")
-                quickInsertButton("\" \"", insert: "\"\"")
-                quickInsertButton("->", insert: " -> ")
-                quickInsertButton("func", insert: "func ")
-                quickInsertButton("var", insert: "var ")
-                quickInsertButton("let", insert: "let ")
-                quickInsertButton("print", insert: "print()")
-                quickInsertButton("struct", insert: "struct ")
-                quickInsertButton("Tab", insert: "    ")
+                // Language-Aware Shortcut Buttons
+                let activeLang = ideManager.activeProject?.language ?? .swift
+                switch activeLang {
+                case .python:
+                    quickInsertButton("def", insert: "def ")
+                    quickInsertButton("class", insert: "class ")
+                    quickInsertButton("import", insert: "import ")
+                    quickInsertButton("print", insert: "print()")
+                    quickInsertButton("if", insert: "if ")
+                    quickInsertButton("else:", insert: "else:\n    ")
+                    quickInsertButton("for", insert: "for  in :")
+                    quickInsertButton("in", insert: " in ")
+                    quickInsertButton(":", insert: ":")
+                    quickInsertButton("( )", insert: "()")
+                    quickInsertButton("[ ]", insert: "[]")
+                    quickInsertButton("\" \"", insert: "\"\"")
+                    quickInsertButton("Tab", insert: "    ")
+                    
+                case .csharp:
+                    quickInsertButton("Console.WriteLine", insert: "Console.WriteLine();")
+                    quickInsertButton("class", insert: "class ")
+                    quickInsertButton("public", insert: "public ")
+                    quickInsertButton("var", insert: "var ")
+                    quickInsertButton("void", insert: "void ")
+                    quickInsertButton("new", insert: "new ")
+                    quickInsertButton("{ }", insert: " {\n    \n}")
+                    quickInsertButton("( )", insert: "()")
+                    quickInsertButton("[ ]", insert: "[]")
+                    quickInsertButton(";", insert: ";")
+                    quickInsertButton("Tab", insert: "    ")
+                    
+                case .sql:
+                    quickInsertButton("SELECT", insert: "SELECT ")
+                    quickInsertButton("FROM", insert: "FROM ")
+                    quickInsertButton("WHERE", insert: "WHERE ")
+                    quickInsertButton("JOIN", insert: "JOIN ")
+                    quickInsertButton("GROUP BY", insert: "GROUP BY ")
+                    quickInsertButton("ORDER BY", insert: "ORDER BY ")
+                    quickInsertButton("LIMIT", insert: "LIMIT ")
+                    quickInsertButton("COUNT(*)", insert: "COUNT(*)")
+                    quickInsertButton(";", insert: ";")
+                    quickInsertButton("Tab", insert: "    ")
+                    
+                case .swift:
+                    quickInsertButton("{ }", insert: " {\n    \n}")
+                    quickInsertButton("( )", insert: "()")
+                    quickInsertButton("[ ]", insert: "[]")
+                    quickInsertButton("\" \"", insert: "\"\"")
+                    quickInsertButton("->", insert: " -> ")
+                    quickInsertButton("func", insert: "func ")
+                    quickInsertButton("var", insert: "var ")
+                    quickInsertButton("let", insert: "let ")
+                    quickInsertButton("print", insert: "print()")
+                    quickInsertButton("struct", insert: "struct ")
+                    quickInsertButton("Tab", insert: "    ")
+                }
                 
                 Button(action: { showingConsole.toggle() }) {
                     Image(systemName: showingConsole ? "rectangle.bottomthird.inset.filled" : "rectangle.bottomthird.inset.split")
@@ -416,10 +488,11 @@ public struct IDEMainView: View {
         isExecuting = true
         showingConsole = true
         
+        let projectLanguage = ideManager.activeProject?.language ?? .swift
         let codeToExecute = ideManager.activeProject?.combinedCodeForExecution() ?? currentCode
         
         Task {
-            let result = await PlaygroundEngine.shared.execute(code: codeToExecute)
+            let result = await PlaygroundEngine.shared.execute(code: codeToExecute, language: projectLanguage)
             await MainActor.run {
                 self.executionResult = result
                 self.isExecuting = false

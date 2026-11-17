@@ -365,9 +365,9 @@ public final class CodeEditorContainerView: UIView {
             return
         }
         
-        // 1. Comments
+        // 1. Comments (supports Swift/C# //, Python #, SQL --, and C-style /* */)
         applyRegex(
-            pattern: "(//.*$)|(/\\*[\\s\\S]*?\\*/)",
+            pattern: "(//.*$)|(#.*$)|(--.*$)|(/\\*[\\s\\S]*?\\*/)",
             options: [.anchorsMatchLines],
             in: nsString,
             fullRange: fullRange
@@ -378,9 +378,9 @@ public final class CodeEditorContainerView: UIView {
             ], range: range)
         }
         
-        // 2. Strings
+        // 2. Strings (supports single quotes, double quotes, and triple quotes)
         applyRegex(
-            pattern: "\"(\\\\.|[^\"])*\"|\"\"\"[\\s\\S]*?\"\"\"",
+            pattern: "\"(\\\\.|[^\"])*\"|'(\\\\.|[^'])*'|\"\"\"[\\s\\S]*?\"\"\"|'''[\\s\\S]*?'''",
             options: [],
             in: nsString,
             fullRange: fullRange

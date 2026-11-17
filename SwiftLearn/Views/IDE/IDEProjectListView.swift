@@ -8,6 +8,7 @@ public struct IDEProjectListView: View {
     @State private var showingNewProjectModal: Bool = false
     @State private var newProjectName: String = ""
     @State private var newProjectDesc: String = ""
+    @State private var selectedLanguage: TargetLanguage = .swift
     @State private var selectedTemplateIndex: Int = 0
     @State private var projectToExport: URL? = nil
     @State private var showingExportSheet: Bool = false
@@ -33,7 +34,11 @@ public struct IDEProjectListView: View {
                     }
                 }
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button(action: { showingNewProjectModal = true }) {
+                    Button(action: {
+                        selectedLanguage = ideManager.activeProject?.language ?? .swift
+                        selectedTemplateIndex = 0
+                        showingNewProjectModal = true
+                    }) {
                         Image(systemName: "plus")
                     }
                 }
@@ -69,10 +74,23 @@ public struct IDEProjectListView: View {
                 }
                 
                 VStack(alignment: .leading, spacing: 3) {
-                    HStack {
+                    HStack(spacing: 6) {
                         Text(project.name)
                             .font(.headline)
                             .foregroundColor(.primary)
+                        
+                        // Language Badge
+                        HStack(spacing: 3) {
+                            Image(systemName: project.language.icon)
+                                .font(.system(size: 8, weight: .bold))
+                            Text(project.language.displayName)
+                                .font(.system(size: 9, weight: .bold))
+                        }
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 2)
+                        .background(Color(red: 0.14, green: 0.38, blue: 0.82).opacity(0.12))
+                        .foregroundColor(Color(red: 0.14, green: 0.38, blue: 0.82))
+                        .clipShape(Capsule())
                         
                         if isSelected {
                             Text(lang.localized("АКТИВНЫЙ", "ACTIVE"))
@@ -135,16 +153,33 @@ public struct IDEProjectListView: View {
     private var newProjectSheet: some View {
         NavigationStack {
             Form {
+                Section(header: Text(lang.localized("Язык проекта", "Project Language"))) {
+                    Picker(lang.localized("Язык", "Language"), selection: $selectedLanguage) {
+                        ForEach(TargetLanguage.allCases) { item in
+                            HStack {
+                                Image(systemName: item.icon)
+                                Text(item.displayName)
+                            }
+                            .tag(item)
+                        }
+                    }
+                    .pickerStyle(.segmented)
+                    .onChange(of: selectedLanguage) { _, _ in
+                        selectedTemplateIndex = 0
+                    }
+                }
+                
                 Section(header: Text(lang.localized("Данные проекта", "Project Details"))) {
                     TextField(lang.localized("Название проекта", "Project Name"), text: $newProjectName)
                     TextField(lang.localized("Описание (опционально)", "Description (optional)"), text: $newProjectDesc)
                 }
                 
                 Section(header: Text(lang.localized("Шаблон архитектуры", "Architecture Template"))) {
-                    let templates = IDEProject.defaultTemplates
+                    let templates = IDEProject.defaultTemplates.filter { $0.language == selectedLanguage }
                     Picker(lang.localized("Шаблон", "Template"), selection: $selectedTemplateIndex) {
+                        Text(lang.localized("Пустой проект", "Blank Project")).tag(0)
                         ForEach(0..<templates.count, id: \.self) { idx in
-                            Text(templates[idx].name).tag(idx)
+                            Text(templates[idx].name).tag(idx + 1)
                         }
                     }
                     .pickerStyle(.inline)
@@ -160,11 +195,14 @@ public struct IDEProjectListView: View {
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button(lang.localized("Создать", "Create")) {
-                        let templates = IDEProject.defaultTemplates
-                        let template = templates[safe: selectedTemplateIndex]
+                        let templates = IDEProject.defaultTemplates.filter { $0.language == selectedLanguage }
+                        let template: IDEProject? = selectedTemplateIndex > 0 ? templates[safe: selectedTemplateIndex - 1] : nil
+                        
+                        let defaultName = template?.name ?? "My\(selectedLanguage.displayName)App"
                         ideManager.createProject(
-                            name: newProjectName.isEmpty ? "MyProject" : newProjectName,
-                            description: newProjectDesc,
+                            name: newProjectName.isEmpty ? defaultName : newProjectName,
+                            description: newProjectDesc.isEmpty ? (template?.descriptionText ?? "") : newProjectDesc,
+                            language: selectedLanguage,
                             template: template
                         )
                         newProjectName = ""
