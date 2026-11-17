@@ -59,6 +59,8 @@ public struct IDEMainView: View {
                 showingFileExplorer = true
             } else if ProcessInfo.processInfo.arguments.contains("-ideSnippets") {
                 showingSnippets = true
+            } else if ProcessInfo.processInfo.arguments.contains("-newProject") {
+                showingProjectList = true
             }
         }
         .onChange(of: ideManager.activeProjectId) { _, _ in
@@ -113,20 +115,6 @@ public struct IDEMainView: View {
                         .foregroundColor(.primary)
                         .lineLimit(1)
                     
-                    // Language Badge
-                    let langType = ideManager.activeProject?.language ?? .swift
-                    HStack(spacing: 2) {
-                        Image(systemName: langType.icon)
-                            .font(.system(size: 7, weight: .bold))
-                        Text(langType.displayName)
-                            .font(.system(size: 8, weight: .bold))
-                    }
-                    .padding(.horizontal, 5)
-                    .padding(.vertical, 2)
-                    .background(Color(red: 0.14, green: 0.38, blue: 0.82).opacity(0.12))
-                    .foregroundColor(Color(red: 0.14, green: 0.38, blue: 0.82))
-                    .clipShape(Capsule())
-                    
                     Image(systemName: "chevron.down")
                         .font(.system(size: 8, weight: .bold))
                         .foregroundColor(.secondary)
@@ -137,6 +125,41 @@ public struct IDEMainView: View {
                 .clipShape(RoundedRectangle(cornerRadius: 8))
             }
             .layoutPriority(1)
+            
+            // Interactive Language Switcher Badge
+            Menu {
+                ForEach(TargetLanguage.allCases) { langItem in
+                    Button {
+                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                        if let proj = ideManager.activeProject {
+                            ideManager.changeProjectLanguage(id: proj.id, newLanguage: langItem)
+                            replSession.setLanguage(langItem)
+                        }
+                    } label: {
+                        HStack {
+                            Text(langItem.displayName)
+                            if ideManager.activeProject?.language == langItem {
+                                Image(systemName: "checkmark")
+                            }
+                        }
+                    }
+                }
+            } label: {
+                let langType = ideManager.activeProject?.language ?? .swift
+                HStack(spacing: 3) {
+                    Image(systemName: langType.icon)
+                        .font(.system(size: 8, weight: .bold))
+                    Text(langType.displayName)
+                        .font(.system(size: 9, weight: .bold))
+                    Image(systemName: "chevron.down")
+                        .font(.system(size: 7, weight: .bold))
+                }
+                .padding(.horizontal, 6)
+                .padding(.vertical, 4)
+                .background(Color(red: 0.14, green: 0.38, blue: 0.82).opacity(0.12))
+                .foregroundColor(Color(red: 0.14, green: 0.38, blue: 0.82))
+                .clipShape(Capsule())
+            }
             
             Spacer(minLength: 4)
             

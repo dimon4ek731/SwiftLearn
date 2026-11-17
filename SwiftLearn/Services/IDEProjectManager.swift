@@ -165,6 +165,12 @@ public final class IDEProjectManager: ObservableObject {
         activeProjectId = copy.id
     }
     
+    public func changeProjectLanguage(id: UUID, newLanguage: TargetLanguage) {
+        guard let idx = projects.firstIndex(where: { $0.id == id }) else { return }
+        projects[idx].language = newLanguage
+        projects[idx].updatedAt = Date()
+    }
+    
     // MARK: - Export to Laptop / Files / AirDrop
     
     /// Creates a zip archive of the active project and returns its local file URL.

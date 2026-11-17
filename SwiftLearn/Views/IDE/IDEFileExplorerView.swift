@@ -35,17 +35,35 @@ public struct IDEFileExplorerView: View {
                                     Text(project.name)
                                         .font(.headline)
                                     
-                                    HStack(spacing: 3) {
-                                        Image(systemName: project.language.icon)
-                                            .font(.system(size: 8, weight: .bold))
-                                        Text(project.language.displayName)
-                                            .font(.system(size: 9, weight: .bold))
+                                    Menu {
+                                        ForEach(TargetLanguage.allCases) { langItem in
+                                            Button {
+                                                UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                                ideManager.changeProjectLanguage(id: project.id, newLanguage: langItem)
+                                            } label: {
+                                                HStack {
+                                                    Text(langItem.displayName)
+                                                    if project.language == langItem {
+                                                        Image(systemName: "checkmark")
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    } label: {
+                                        HStack(spacing: 3) {
+                                            Image(systemName: project.language.icon)
+                                                .font(.system(size: 8, weight: .bold))
+                                            Text(project.language.displayName)
+                                                .font(.system(size: 9, weight: .bold))
+                                            Image(systemName: "chevron.down")
+                                                .font(.system(size: 7, weight: .bold))
+                                        }
+                                        .padding(.horizontal, 6)
+                                        .padding(.vertical, 2)
+                                        .background(Color(red: 0.14, green: 0.38, blue: 0.82).opacity(0.12))
+                                        .foregroundColor(Color(red: 0.14, green: 0.38, blue: 0.82))
+                                        .clipShape(Capsule())
                                     }
-                                    .padding(.horizontal, 6)
-                                    .padding(.vertical, 2)
-                                    .background(Color(red: 0.14, green: 0.38, blue: 0.82).opacity(0.12))
-                                    .foregroundColor(Color(red: 0.14, green: 0.38, blue: 0.82))
-                                    .clipShape(Capsule())
                                 }
                                 
                                 Text("\(project.files.count) \(lang.localized("файлов в проекте", "files in project"))")

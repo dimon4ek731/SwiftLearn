@@ -83,6 +83,12 @@ public struct IDEProjectListView: View {
                     ShareSheet(items: [url])
                 }
             }
+            .onAppear {
+                if ProcessInfo.processInfo.arguments.contains("-newProject") {
+                    selectedLanguage = .python
+                    showingNewProjectModal = true
+                }
+            }
         }
     }
     
@@ -150,6 +156,24 @@ public struct IDEProjectListView: View {
                 Spacer()
                 
                 Menu {
+                    Menu {
+                        ForEach(TargetLanguage.allCases) { langItem in
+                            Button {
+                                UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                ideManager.changeProjectLanguage(id: project.id, newLanguage: langItem)
+                            } label: {
+                                HStack {
+                                    Text(langItem.displayName)
+                                    if project.language == langItem {
+                                        Image(systemName: "checkmark")
+                                    }
+                                }
+                            }
+                        }
+                    } label: {
+                        Label(lang.localized("Изменить язык проекта", "Change Project Language"), systemImage: "arrow.triangle.2.circlepath")
+                    }
+                    
                     Button(action: {
                         ideManager.duplicateProject(id: project.id)
                     }) {
@@ -186,19 +210,39 @@ public struct IDEProjectListView: View {
         NavigationStack {
             Form {
                 Section(header: Text(lang.localized("Язык проекта", "Project Language"))) {
-                    Picker(lang.localized("Язык", "Language"), selection: $selectedLanguage) {
+                    HStack(spacing: 0) {
                         ForEach(TargetLanguage.allCases) { item in
-                            HStack {
-                                Image(systemName: item.icon)
-                                Text(item.displayName)
+                            let isSelected = selectedLanguage == item
+                            Button {
+                                selectLanguage(item)
+                            } label: {
+                                HStack(spacing: 5) {
+                                    Image(systemName: item.icon)
+                                        .font(.system(size: 11, weight: .semibold))
+                                    Text(item.displayName)
+                                        .font(.system(size: 13, weight: isSelected ? .bold : .medium))
+                                }
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 8)
+                                .background(
+                                    ZStack {
+                                        if isSelected {
+                                            RoundedRectangle(cornerRadius: 8)
+                                                .fill(Color(UIColor.systemBackground))
+                                                .shadow(color: Color.black.opacity(0.12), radius: 3, x: 0, y: 1)
+                                        }
+                                    }
+                                )
+                                .foregroundColor(isSelected ? Color(red: 0.14, green: 0.38, blue: 0.82) : .secondary)
+                                .contentShape(Rectangle())
                             }
-                            .tag(item)
+                            .buttonStyle(.borderless)
                         }
                     }
-                    .pickerStyle(.segmented)
-                    .onChange(of: selectedLanguage) { _, _ in
-                        selectedTemplateIndex = 0
-                    }
+                    .padding(3)
+                    .background(Color(UIColor.tertiarySystemFill))
+                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                    .listRowInsets(EdgeInsets(top: 6, leading: 10, bottom: 6, trailing: 10))
                 }
                 
                 Section(header: Text(lang.localized("Данные проекта", "Project Details"))) {
@@ -243,6 +287,14 @@ public struct IDEProjectListView: View {
                     }
                 }
             }
+        }
+    }
+    
+    private func selectLanguage(_ item: TargetLanguage) {
+        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+        withAnimation(.spring(response: 0.28, dampingFraction: 0.76)) {
+            selectedLanguage = item
+            selectedTemplateIndex = 0
         }
     }
     
