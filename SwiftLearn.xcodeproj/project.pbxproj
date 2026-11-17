@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		CC2000000000000000000001 /* IDEREPLSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC1000000000000000000001 /* IDEREPLSession.swift */; };
+		CC2000000000000000000002 /* IDEREPLView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC1000000000000000000002 /* IDEREPLView.swift */; };
+		CC2000000000000000000003 /* IDEFileExplorerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC1000000000000000000003 /* IDEFileExplorerView.swift */; };
+		CC2000000000000000000004 /* IDESnippetsSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC1000000000000000000004 /* IDESnippetsSheet.swift */; };
 		03DC6BB7CC590B28275370C2 /* UserProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD3A2E649E1CB8B5C22287AB /* UserProfile.swift */; };
 		088E6F12FBB413E3AC2503A3 /* LessonDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEA2D493D92E3BB3FEAA8056 /* LessonDetailView.swift */; };
 		130317D9CACFA595F5E1C549 /* PlaygroundTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18B87446573BB1510CB80CDE /* PlaygroundTemplate.swift */; };
@@ -74,6 +78,10 @@
 		BB1000000000000000000004 /* RosettaStoneView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RosettaStoneView.swift; sourceTree = "<group>"; };
 		BB1000000000000000000005 /* InterviewQAView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InterviewQAView.swift; sourceTree = "<group>"; };
 		BB1000000000000000000006 /* InterviewPrepView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InterviewPrepView.swift; sourceTree = "<group>"; };
+		CC1000000000000000000001 /* IDEREPLSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IDEREPLSession.swift; sourceTree = "<group>"; };
+		CC1000000000000000000002 /* IDEREPLView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IDEREPLView.swift; sourceTree = "<group>"; };
+		CC1000000000000000000003 /* IDEFileExplorerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IDEFileExplorerView.swift; sourceTree = "<group>"; };
+		CC1000000000000000000004 /* IDESnippetsSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IDESnippetsSheet.swift; sourceTree = "<group>"; };
 		18B414C97B28CC62CB1FA896 /* SwiftLearn.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = SwiftLearn.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		18B87446573BB1510CB80CDE /* PlaygroundTemplate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaygroundTemplate.swift; sourceTree = "<group>"; };
 		216F96D9FE1D053E4D96C951 /* StorageService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorageService.swift; sourceTree = "<group>"; };
@@ -183,6 +191,9 @@
 				973090089FDFD65FDE58DCED /* IDEProjectListView.swift */,
 				D147B2282E30FCB260333CD0 /* IDEThemeSettingsView.swift */,
 				945BA1BD880535208993A38B /* SyntaxCodeEditor.swift */,
+				CC1000000000000000000002 /* IDEREPLView.swift */,
+				CC1000000000000000000003 /* IDEFileExplorerView.swift */,
+				CC1000000000000000000004 /* IDESnippetsSheet.swift */,
 			);
 			path = IDE;
 			sourceTree = "<group>";
@@ -247,6 +258,7 @@
 				AA1000000000000000000001 /* TaskStore+Python.swift */,
 				AA1000000000000000000002 /* TaskStore+CSharp.swift */,
 				BB1000000000000000000002 /* InterviewPrepStore.swift */,
+				CC1000000000000000000001 /* IDEREPLSession.swift */,
 				4ACABFC10F07ACC53413761E /* ZipArchiver.swift */,
 			);
 			path = Services;
@@ -393,6 +405,10 @@
 				BFBB7E8A8F7508707564D78E /* CurriculumStore.swift in Sources */,
 				2DD89AA61F9A4C3A6C7B6D7C /* CurriculumView.swift in Sources */,
 				160DEEB9853CA6A609B95BDE /* IDEMainView.swift in Sources */,
+				CC2000000000000000000001 /* IDEREPLSession.swift in Sources */,
+				CC2000000000000000000002 /* IDEREPLView.swift in Sources */,
+				CC2000000000000000000003 /* IDEFileExplorerView.swift in Sources */,
+				CC2000000000000000000004 /* IDESnippetsSheet.swift in Sources */,
 				C52D340666D904732B11D5FD /* IDEProject.swift in Sources */,
 				488E15F50DCA0A09CD6EBAAD /* IDEProjectListView.swift in Sources */,
 				6A2C2ECF78B0877E1DA019AD /* IDEProjectManager.swift in Sources */,

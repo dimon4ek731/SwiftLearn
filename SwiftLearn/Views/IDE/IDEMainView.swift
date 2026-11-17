@@ -12,14 +12,20 @@ public struct IDEMainView: View {
     @State private var executionResult: PlaygroundExecutionResult = .empty
     @State private var activeSuggestion: String? = nil
     
-    // Modals
+    // Modals & Navigation
     @State private var showingProjectList: Bool = false
     @State private var showingExportSheet: Bool = false
     @State private var exportURL: URL? = nil
     @State private var showingNewFileAlert: Bool = false
     @State private var newFileName: String = ""
     @State private var showingConsole: Bool = true
-    @State private var selectedConsoleTab: Int = 0 // 0: Output, 1: Memory
+    @State private var selectedConsoleTab: Int = 0 // 0: Output, 1: Memory, 2: REPL
+    @State private var isConsoleExpanded: Bool = false
+    @State private var showingFileExplorer: Bool = false
+    @State private var showingSnippets: Bool = false
+    
+    // REPL
+    @StateObject private var replSession = IDEREPLSession(language: .swift)
     
     public init() {}
     
@@ -44,7 +50,17 @@ public struct IDEMainView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .clipped()
-        .onAppear(perform: syncEditorWithActiveFile)
+        .onAppear {
+            syncEditorWithActiveFile()
+            if ProcessInfo.processInfo.arguments.contains("-ideRepl") {
+                selectedConsoleTab = 2
+                showingConsole = true
+            } else if ProcessInfo.processInfo.arguments.contains("-ideFileExplorer") {
+                showingFileExplorer = true
+            } else if ProcessInfo.processInfo.arguments.contains("-ideSnippets") {
+                showingSnippets = true
+            }
+        }
         .onChange(of: ideManager.activeProjectId) { _, _ in
             syncEditorWithActiveFile()
         }
@@ -53,6 +69,14 @@ public struct IDEMainView: View {
         }
         .sheet(isPresented: $showingProjectList) {
             IDEProjectListView()
+        }
+        .sheet(isPresented: $showingFileExplorer) {
+            IDEFileExplorerView()
+        }
+        .sheet(isPresented: $showingSnippets) {
+            IDESnippetsSheet(language: ideManager.activeProject?.language ?? .swift) { snippetCode in
+                insertSnippet(snippetCode)
+            }
         }
         .sheet(isPresented: $showingExportSheet) {
             if let url = exportURL {
@@ -78,76 +102,99 @@ public struct IDEMainView: View {
     
     // MARK: - Project Header
     private var projectTopHeader: some View {
-        HStack(spacing: 10) {
+        HStack(spacing: 8) {
             Button(action: { showingProjectList = true }) {
-                HStack(spacing: 6) {
+                HStack(spacing: 5) {
                     Image(systemName: "folder.fill")
                         .foregroundColor(Color(red: 0.14, green: 0.38, blue: 0.82))
+                        .font(.caption)
                     Text(ideManager.activeProject?.name ?? "Project")
-                        .font(.subheadline.bold())
+                        .font(.caption.bold())
                         .foregroundColor(.primary)
                         .lineLimit(1)
                     
                     // Language Badge
                     let langType = ideManager.activeProject?.language ?? .swift
-                    HStack(spacing: 3) {
+                    HStack(spacing: 2) {
                         Image(systemName: langType.icon)
-                            .font(.system(size: 8, weight: .bold))
+                            .font(.system(size: 7, weight: .bold))
                         Text(langType.displayName)
-                            .font(.system(size: 9, weight: .bold))
+                            .font(.system(size: 8, weight: .bold))
                     }
-                    .padding(.horizontal, 6)
+                    .padding(.horizontal, 5)
                     .padding(.vertical, 2)
                     .background(Color(red: 0.14, green: 0.38, blue: 0.82).opacity(0.12))
                     .foregroundColor(Color(red: 0.14, green: 0.38, blue: 0.82))
                     .clipShape(Capsule())
                     
                     Image(systemName: "chevron.down")
-                        .font(.system(size: 10, weight: .bold))
+                        .font(.system(size: 8, weight: .bold))
                         .foregroundColor(.secondary)
                 }
-                .padding(.horizontal, 10)
-                .padding(.vertical, 6)
+                .padding(.horizontal, 8)
+                .padding(.vertical, 5)
                 .background(Color(UIColor.tertiarySystemBackground))
                 .clipShape(RoundedRectangle(cornerRadius: 8))
             }
+            .layoutPriority(1)
             
-            Spacer()
+            Spacer(minLength: 4)
+            
+            // File Explorer Drawer button
+            Button(action: { showingFileExplorer = true }) {
+                Image(systemName: "folder.badge.gearshape")
+                    .font(.caption)
+                    .foregroundColor(Color(red: 0.14, green: 0.38, blue: 0.82))
+                    .padding(6)
+                    .background(Color(UIColor.tertiarySystemBackground))
+                    .clipShape(Circle())
+            }
+            
+            // Code Snippets Drawer button
+            Button(action: { showingSnippets = true }) {
+                Image(systemName: "curlybraces")
+                    .font(.caption)
+                    .foregroundColor(Color(red: 0.14, green: 0.38, blue: 0.82))
+                    .padding(6)
+                    .background(Color(UIColor.tertiarySystemBackground))
+                    .clipShape(Circle())
+            }
             
             // Export button
             Button(action: exportProject) {
                 Image(systemName: "square.and.arrow.up")
-                    .font(.subheadline)
+                    .font(.caption)
                     .foregroundColor(Color(red: 0.14, green: 0.38, blue: 0.82))
-                    .padding(8)
+                    .padding(6)
                     .background(Color(UIColor.tertiarySystemBackground))
                     .clipShape(Circle())
             }
             
             // Run Project Button
             Button(action: runProject) {
-                HStack(spacing: 6) {
+                HStack(spacing: 4) {
                     if isExecuting {
                         ProgressView()
                             .progressViewStyle(CircularProgressViewStyle(tint: .white))
-                            .scaleEffect(0.7)
+                            .scaleEffect(0.6)
                     } else {
                         Image(systemName: "play.fill")
-                            .font(.caption2)
+                            .font(.system(size: 9))
                     }
                     Text(lang.localized("Запуск", "Run"))
-                        .font(.caption.bold())
+                        .font(.caption2.bold())
                 }
-                .padding(.horizontal, 12)
-                .padding(.vertical, 7)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 6)
                 .background(Color(red: 0.14, green: 0.38, blue: 0.82))
                 .foregroundColor(.white)
                 .clipShape(Capsule())
+                .fixedSize(horizontal: true, vertical: false)
             }
             .disabled(isExecuting)
         }
-        .padding(.horizontal)
-        .padding(.vertical, 6)
+        .padding(.horizontal, 10)
+        .padding(.vertical, 5)
         .background(Color(UIColor.secondarySystemBackground))
     }
     
@@ -220,6 +267,20 @@ public struct IDEMainView: View {
                     .foregroundColor(Color(red: 0.14, green: 0.38, blue: 0.82))
                     .clipShape(RoundedRectangle(cornerRadius: 8))
                 }
+                
+                // File Explorer Drawer Button
+                Button(action: { showingFileExplorer = true }) {
+                    HStack(spacing: 4) {
+                        Image(systemName: "list.bullet.rectangle")
+                        Text(lang.localized("Дерево", "Tree"))
+                    }
+                    .font(.caption2.bold())
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 6)
+                    .background(Color(UIColor.secondarySystemBackground))
+                    .foregroundColor(.secondary)
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                }
             }
             .padding(.horizontal)
             .padding(.vertical, 4)
@@ -274,6 +335,21 @@ public struct IDEMainView: View {
                         .clipShape(RoundedRectangle(cornerRadius: 6))
                         .shadow(color: Color.blue.opacity(0.3), radius: 3)
                     }
+                }
+                
+                // Code Snippets Drawer Button
+                Button(action: { showingSnippets = true }) {
+                    HStack(spacing: 4) {
+                        Image(systemName: "curlybraces")
+                            .font(.caption2.bold())
+                        Text(lang.localized("Сниппеты", "Snippets"))
+                            .font(.system(size: 11, weight: .bold))
+                    }
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 5)
+                    .background(Color(red: 0.14, green: 0.38, blue: 0.82).opacity(0.12))
+                    .foregroundColor(Color(red: 0.14, green: 0.38, blue: 0.82))
+                    .clipShape(RoundedRectangle(cornerRadius: 6))
                 }
                 
                 // Language-Aware Shortcut Buttons
@@ -381,19 +457,46 @@ public struct IDEMainView: View {
                 Text("•").foregroundColor(.secondary)
                 
                 Button(action: { selectedConsoleTab = 1 }) {
-                    Text(lang.localized("Инспектор переменных (\(executionResult.variables.count))", "Variable Inspector (\(executionResult.variables.count))"))
+                    Text(lang.localized("Переменные (\(executionResult.variables.count))", "Variables (\(executionResult.variables.count))"))
                         .font(.caption.bold())
                         .foregroundColor(selectedConsoleTab == 1 ? Color(red: 0.14, green: 0.38, blue: 0.82) : .secondary)
+                }
+                
+                Text("•").foregroundColor(.secondary)
+                
+                Button(action: { selectedConsoleTab = 2 }) {
+                    HStack(spacing: 4) {
+                        Image(systemName: "terminal.fill")
+                            .font(.caption2)
+                        Text(lang.localized("REPL", "REPL"))
+                            .font(.caption.bold())
+                    }
+                    .foregroundColor(selectedConsoleTab == 2 ? Color(red: 0.14, green: 0.38, blue: 0.82) : .secondary)
                 }
                 
                 Spacer()
                 
                 Button(action: {
-                    executionResult = .empty
+                    if selectedConsoleTab == 2 {
+                        replSession.reset()
+                    } else {
+                        executionResult = .empty
+                    }
                 }) {
                     Text(lang.localized("Очистить", "Clear"))
                         .font(.caption2)
                         .foregroundColor(.secondary)
+                }
+                
+                Button(action: {
+                    withAnimation(.easeInOut(duration: 0.2)) {
+                        isConsoleExpanded.toggle()
+                    }
+                }) {
+                    Image(systemName: isConsoleExpanded ? "arrow.down.right.and.arrow.up.left" : "arrow.up.left.and.arrow.down.right")
+                        .font(.caption2)
+                        .foregroundColor(.secondary)
+                        .padding(.leading, 4)
                 }
             }
             .padding(.horizontal)
@@ -401,14 +504,20 @@ public struct IDEMainView: View {
             .background(Color(UIColor.secondarySystemBackground))
             
             // Console Content
-            ScrollView {
+            Group {
                 if selectedConsoleTab == 0 {
-                    consoleOutputContent
+                    ScrollView {
+                        consoleOutputContent
+                    }
+                } else if selectedConsoleTab == 1 {
+                    ScrollView {
+                        memoryInspectorContent
+                    }
                 } else {
-                    memoryInspectorContent
+                    IDEREPLView(replSession: replSession)
                 }
             }
-            .frame(height: 120)
+            .frame(height: isConsoleExpanded ? 320 : (selectedConsoleTab == 2 ? 220 : 130))
             .background(Color(UIColor.secondarySystemBackground))
         }
         .background(Color(UIColor.secondarySystemBackground))
@@ -476,6 +585,18 @@ public struct IDEMainView: View {
             currentCode = file.content
             activeFileId = file.id
         }
+        if let lang = ideManager.activeProject?.language {
+            replSession.setLanguage(lang)
+        }
+    }
+    
+    private func insertSnippet(_ snippet: String) {
+        if currentCode.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            currentCode = snippet
+        } else {
+            currentCode += "\n\n" + snippet
+        }
+        ideManager.updateActiveFile(content: currentCode)
     }
     
     private func saveCurrentContent() {

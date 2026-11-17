@@ -93,6 +93,62 @@ public struct ZipArchiver {
         return zipData
     }
     
+    /// Extracts files from uncompressed or standard PKZIP data.
+    public static func extractFiles(from zipData: Data) -> [FileEntry] {
+        var files: [FileEntry] = []
+        var offset = 0
+        let count = zipData.count
+        
+        while offset + 30 <= count {
+            // Check for Local File Header signature (0x04034b50)
+            guard zipData[offset] == 0x50,
+                  zipData[offset + 1] == 0x4B,
+                  zipData[offset + 2] == 0x03,
+                  zipData[offset + 3] == 0x04 else {
+                break
+            }
+            
+            let method = UInt16(zipData[offset + 8]) | (UInt16(zipData[offset + 9]) << 8)
+            let compSize = Int(UInt32(zipData[offset + 18]) | (UInt32(zipData[offset + 19]) << 8) | (UInt32(zipData[offset + 20]) << 16) | (UInt32(zipData[offset + 21]) << 24))
+            let uncompSize = Int(UInt32(zipData[offset + 22]) | (UInt32(zipData[offset + 23]) << 8) | (UInt32(zipData[offset + 24]) << 16) | (UInt32(zipData[offset + 25]) << 24))
+            let fnLen = Int(UInt16(zipData[offset + 26]) | (UInt16(zipData[offset + 27]) << 8))
+            let extraLen = Int(UInt16(zipData[offset + 28]) | (UInt16(zipData[offset + 29]) << 8))
+            
+            let fnStart = offset + 30
+            let fnEnd = fnStart + fnLen
+            guard fnEnd <= count else { break }
+            
+            let fileNameData = zipData.subdata(in: fnStart..<fnEnd)
+            let fileName = String(data: fileNameData, encoding: .utf8) ?? "file"
+            
+            let dataStart = fnEnd + extraLen
+            let dataEnd = dataStart + compSize
+            guard dataEnd <= count else { break }
+            
+            let rawData = zipData.subdata(in: dataStart..<dataEnd)
+            var extractedData: Data? = nil
+            
+            if method == 0 {
+                extractedData = rawData
+            } else if method == 8 {
+                // Try decompressing deflate
+                if #available(iOS 13.0, macOS 10.15, *) {
+                    extractedData = try? (rawData as NSData).decompressed(using: .zlib) as Data
+                }
+            }
+            
+            // Skip directory entries and macOS metadata (__MACOSX, .DS_Store)
+            if !fileName.hasSuffix("/") && !fileName.contains("__MACOSX") && !fileName.hasPrefix(".") {
+                let cleanFileName = (fileName as NSString).lastPathComponent
+                files.append(FileEntry(name: cleanFileName, data: extractedData ?? rawData))
+            }
+            
+            offset = dataEnd
+        }
+        
+        return files
+    }
+    
     // Standard CRC-32 implementation
     private static func crc32(data: Data) -> UInt32 {
         var crc: UInt32 = 0xFFFFFFFF

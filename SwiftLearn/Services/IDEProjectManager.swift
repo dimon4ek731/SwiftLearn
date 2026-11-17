@@ -209,6 +209,72 @@ public final class IDEProjectManager: ObservableObject {
         }
     }
     
+    // MARK: - Import Project from External File / ZIP
+    public func importProject(from url: URL) -> Bool {
+        let isAccessing = url.startAccessingSecurityScopedResource()
+        defer {
+            if isAccessing {
+                url.stopAccessingSecurityScopedResource()
+            }
+        }
+        
+        let ext = url.pathExtension.lowercased()
+        let rawBase = url.deletingPathExtension().lastPathComponent
+        let projectName = rawBase.replacingOccurrences(of: "_", with: " ")
+        
+        if ext == "zip" {
+            guard let data = try? Data(contentsOf: url) else { return false }
+            let entries = ZipArchiver.extractFiles(from: data)
+            guard !entries.isEmpty else { return false }
+            
+            // Detect dominant language from files
+            var lang: TargetLanguage = .swift
+            for entry in entries {
+                let fExt = (entry.name as NSString).pathExtension.lowercased()
+                if fExt == "py" { lang = .python; break }
+                if fExt == "cs" { lang = .csharp; break }
+                if fExt == "sql" { lang = .sql; break }
+                if fExt == "swift" { lang = .swift; break }
+            }
+            
+            let ideFiles = entries.map { entry in
+                let text = String(data: entry.data, encoding: .utf8) ?? ""
+                return IDEFile(name: entry.name, content: text)
+            }
+            
+            let newProject = IDEProject(
+                name: projectName.isEmpty ? "Imported Project" : projectName,
+                descriptionText: "Импортировано из ZIP архива",
+                language: lang,
+                files: ideFiles
+            )
+            projects.insert(newProject, at: 0)
+            activeProjectId = newProject.id
+            return true
+        } else {
+            // Single code file
+            guard let text = try? String(contentsOf: url, encoding: .utf8) else { return false }
+            let lang: TargetLanguage
+            switch ext {
+            case "py": lang = .python
+            case "cs": lang = .csharp
+            case "sql": lang = .sql
+            default: lang = .swift
+            }
+            
+            let file = IDEFile(name: url.lastPathComponent, content: text)
+            let newProject = IDEProject(
+                name: projectName.isEmpty ? "Imported File" : projectName,
+                descriptionText: "Импортировано из файла \(url.lastPathComponent)",
+                language: lang,
+                files: [file]
+            )
+            projects.insert(newProject, at: 0)
+            activeProjectId = newProject.id
+            return true
+        }
+    }
+    
     // MARK: - Persistence
     private func scheduleSaveProjects() {
         saveProjectsWorkItem?.cancel()

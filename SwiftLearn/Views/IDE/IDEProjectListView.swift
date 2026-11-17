@@ -12,6 +12,9 @@ public struct IDEProjectListView: View {
     @State private var selectedTemplateIndex: Int = 0
     @State private var projectToExport: URL? = nil
     @State private var showingExportSheet: Bool = false
+    @State private var showingFileImporter: Bool = false
+    @State private var importErrorMessage: String? = nil
+    @State private var showingImportAlert: Bool = false
     
     public init() {}
     
@@ -34,14 +37,43 @@ public struct IDEProjectListView: View {
                     }
                 }
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button(action: {
-                        selectedLanguage = ideManager.activeProject?.language ?? .swift
-                        selectedTemplateIndex = 0
-                        showingNewProjectModal = true
-                    }) {
-                        Image(systemName: "plus")
+                    HStack(spacing: 12) {
+                        Button(action: { showingFileImporter = true }) {
+                            Image(systemName: "square.and.arrow.down")
+                        }
+                        
+                        Button(action: {
+                            selectedLanguage = ideManager.activeProject?.language ?? .swift
+                            selectedTemplateIndex = 0
+                            showingNewProjectModal = true
+                        }) {
+                            Image(systemName: "plus")
+                        }
                     }
                 }
+            }
+            .fileImporter(
+                isPresented: $showingFileImporter,
+                allowedContentTypes: [.zip, .plainText, .sourceCode]
+            ) { result in
+                switch result {
+                case .success(let url):
+                    let success = ideManager.importProject(from: url)
+                    if success {
+                        dismiss()
+                    } else {
+                        importErrorMessage = lang.localized("Не удалось прочитать или импортировать файл.", "Failed to read or import the selected file.")
+                        showingImportAlert = true
+                    }
+                case .failure(let error):
+                    importErrorMessage = error.localizedDescription
+                    showingImportAlert = true
+                }
+            }
+            .alert(lang.localized("Ошибка импорта", "Import Error"), isPresented: $showingImportAlert) {
+                Button("OK", role: .cancel) {}
+            } message: {
+                Text(importErrorMessage ?? "")
             }
             .sheet(isPresented: $showingNewProjectModal) {
                 newProjectSheet

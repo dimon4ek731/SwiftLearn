@@ -342,6 +342,58 @@ print("Минимальный элемент:", stats.min)
                     )
                 ]
             ),
+            IDEProject(
+                name: "Async Networking Service",
+                descriptionText: "Паттерн асинхронного сервиса с Result type и моделью ответа API",
+                language: .swift,
+                files: [
+                    IDEFile(
+                        name: "NetworkClient.swift",
+                        content: ##"""
+import Foundation
+
+struct UserProfile {
+    let id: Int
+    let name: String
+    let role: String
+}
+
+enum NetworkResult<T> {
+    case success(T)
+    case failure(String)
+}
+
+struct NetworkClient {
+    static func fetchUserProfile(id: Int) -> NetworkResult<UserProfile> {
+        if id > 0 {
+            return .success(UserProfile(id: id, name: "Александр", role: "iOS Архитектор"))
+        } else {
+            return .failure("Некорректный идентификатор пользователя")
+        }
+    }
+}
+"""##
+                    ),
+                    IDEFile(
+                        name: "main.swift",
+                        content: ##"""
+// Имитация сетевого асинхронного вызова
+print("Отправка запроса к API...")
+let result = NetworkClient.fetchUserProfile(id: 101)
+
+switch result {
+case .success(let profile):
+    print("Успешный ответ:")
+    print("- ID:", profile.id)
+    print("- Имя:", profile.name)
+    print("- Роль:", profile.role)
+case .failure(let error):
+    print("Ошибка запроса:", error)
+}
+"""##
+                    )
+                ]
+            ),
 
             // MARK: Python Templates
             IDEProject(
@@ -457,6 +509,44 @@ print("Исходный список:", numbers)
 print("Квадраты четных чисел:", squares)
 print("Сумма квадратов:", sum(squares))
 """
+                    )
+                ]
+            ),
+            IDEProject(
+                name: "Python API Pipeline",
+                descriptionText: "Модель API клиента с парсингом структуры данных и генератором отчетов",
+                language: .python,
+                files: [
+                    IDEFile(
+                        name: "api_client.py",
+                        content: ##"""
+# api_client.py - Мок-клиент внешнего сервиса
+class ApiClient:
+    def __init__(self, base_url):
+        self.base_url = base_url
+    
+    def get_users(self):
+        return [
+            {"id": 1, "name": "Elena", "score": 98},
+            {"id": 2, "name": "Dmitry", "score": 85},
+            {"id": 3, "name": "Ivan", "score": 72}
+        ]
+"""##
+                    ),
+                    IDEFile(
+                        name: "main.py",
+                        content: ##"""
+# main.py - Обработка данных из API
+from api_client import ApiClient
+
+client = ApiClient("https://api.swiftlearn.local")
+users = client.get_users()
+
+print("Загружено пользователей:", len(users))
+for user in users:
+    status = "Отлично" if user["score"] >= 90 else "Хорошо"
+    print(user["name"], "-", user["score"], "баллов (", status, ")")
+"""##
                     )
                 ]
             ),
@@ -606,6 +696,60 @@ Console.WriteLine($"Сдали экзамен (>= 75): {passingCount}");
                     )
                 ]
             ),
+            IDEProject(
+                name: "C# Repository Pattern",
+                descriptionText: "Архитектура слоя доступа к данным (Repository) с универсальной коллекцией",
+                language: .csharp,
+                files: [
+                    IDEFile(
+                        name: "Repository.cs",
+                        content: ##"""
+// Repository.cs
+using System;
+using System.Collections.Generic;
+
+public class Product
+{
+    public int Id;
+    public string Name;
+    public double Price;
+}
+
+public class ProductRepository
+{
+    private List<Product> _items = new List<Product>();
+
+    public void Add(Product product)
+    {
+        _items.Add(product);
+    }
+
+    public List<Product> GetAll()
+    {
+        return _items;
+    }
+}
+"""##
+                    ),
+                    IDEFile(
+                        name: "Program.cs",
+                        content: ##"""
+// Program.cs
+using System;
+
+var repo = new ProductRepository();
+repo.Add(new Product { Id = 1, Name = "MacBook Pro", Price = 1999.0 });
+repo.Add(new Product { Id = 2, Name = "iPad Pro", Price = 999.0 });
+
+Console.WriteLine("Каталог продукции в репозитории:");
+foreach (var p in repo.GetAll())
+{
+    Console.WriteLine($"ID: {p.Id} | {p.Name} | ${p.Price}");
+}
+"""##
+                    )
+                ]
+            ),
 
             // MARK: SQL Templates
             IDEProject(
@@ -703,6 +847,46 @@ SELECT
 FROM MonthlySummary
 ORDER BY sale_month, month_rank;
 """
+                    )
+                ]
+            ),
+            IDEProject(
+                name: "SQL Warehouse Logistics",
+                descriptionText: "База данных склада и инвентаризации с проверкой остатков и статусов",
+                language: .sql,
+                files: [
+                    IDEFile(
+                        name: "schema.sql",
+                        content: ##"""
+-- schema.sql: Складская номенклатура и остатки
+CREATE TABLE inventory (
+    sku TEXT PRIMARY KEY,
+    title TEXT NOT NULL,
+    quantity INTEGER DEFAULT 0,
+    min_threshold INTEGER DEFAULT 10
+);
+
+INSERT INTO inventory (sku, title, quantity, min_threshold) VALUES
+('SKU-A1', 'Lightning Cable', 45, 15),
+('SKU-B2', 'USB-C Fast Charger', 8, 20),
+('SKU-C3', 'MagSafe Battery Pack', 3, 10),
+('SKU-D4', 'AirPods Case', 30, 10);
+"""##
+                    ),
+                    IDEFile(
+                        name: "restock_alerts.sql",
+                        content: ##"""
+-- restock_alerts.sql: Товары требующие срочного пополнения
+SELECT 
+    sku, 
+    title, 
+    quantity, 
+    min_threshold,
+    (min_threshold - quantity) AS units_needed
+FROM inventory
+WHERE quantity < min_threshold
+ORDER BY units_needed DESC;
+"""##
                     )
                 ]
             )
