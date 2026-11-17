@@ -34,7 +34,7 @@ public enum TargetLanguage: String, CaseIterable, Identifiable, Codable {
         switch self {
         case .swift: return "swift"
         case .python: return "chevron.left.forwardslash.chevron.right"
-        case .csharp: return "number"
+        case .csharp: return "curlybraces"
         case .sql: return "cylinder.split.1x2"
         }
     }
@@ -112,7 +112,7 @@ public enum CurriculumTrack: String, CaseIterable, Identifiable, Codable {
         case .pythonAdvanced: return "cube.transparent"
         case .pythonStdlib: return "shippingbox"
         case .pythonSystems: return "bolt.badge.clock"
-        case .csharpCore: return "number"
+        case .csharpCore: return "curlybraces"
         case .csharpAdvanced: return "arrow.triangle.branch"
         case .sqlCore: return "cylinder.split.1x2"
         case .sqlAdvanced: return "chart.bar.xaxis"
@@ -385,7 +385,7 @@ public enum LessonCategory: String, CaseIterable, Identifiable, Codable {
         case .pythonTestingAndPerf: return "speedometer"
             
         // C#
-        case .csharpBasics: return "number"
+        case .csharpBasics: return "curlybraces"
         case .csharpOOP: return "shippingbox"
         case .csharpInterfaces: return "shield.lefthalf.filled"
         case .csharpCollections: return "square.stack.3d.up"
