@@ -534,12 +534,175 @@ class ScoreKeeper {
             hintsRU: ["Защитите счетчик через max(0, score + pts)"],
             hintsEN: ["Clamp score using max(0, ...)"]
         )
+
+        // MARK: - Python Challenges
+        customChallenges["py_basics_types"] = LessonPracticeChallenge(
+            id: "practice_py_basics_types",
+            language: .python,
+            titleRU: "Практика: Арифметика и Типы в Python",
+            titleEN: "Practice: Arithmetic & Types in Python",
+            taskPromptRU: "Напишите функцию `compute_circle_area_approx(radius)`, которая вычисляет площадь круга по формуле `3.14159 * radius * radius` и возвращает результат.",
+            taskPromptEN: "Implement `compute_circle_area_approx(radius)` returning `3.14159 * radius * radius`.",
+            starterCode: ##"""
+def compute_circle_area_approx(radius):
+    # Ваша реализация
+    return 0.0
+"""##,
+            solutionCode: ##"""
+def compute_circle_area_approx(radius):
+    return 3.14159 * radius * radius
+"""##,
+            testCases: [
+                TaskTestCase(title: "Радиус 1", inputDescription: "compute_circle_area_approx(1)", expectedOutput: "3.14159", validationCode: "abs(compute_circle_area_approx(1) - 3.14159) < 0.001"),
+                TaskTestCase(title: "Радиус 10", inputDescription: "compute_circle_area_approx(10)", expectedOutput: "314.159", validationCode: "abs(compute_circle_area_approx(10) - 314.159) < 0.01")
+            ],
+            hintsRU: ["Используйте оператор умножения `*`."],
+            hintsEN: ["Use the multiplication operator `*`."]
+        )
+
+        customChallenges["py_collections_lists_dicts"] = LessonPracticeChallenge(
+            id: "practice_py_collections_lists_dicts",
+            language: .python,
+            titleRU: "Практика: Списки и Подсчет",
+            titleEN: "Practice: Lists & Counting",
+            taskPromptRU: "Напишите функцию `sum_positive(numbers)`, которая возвращает сумму всех положительных чисел из переданного списка `numbers`.",
+            taskPromptEN: "Implement `sum_positive(numbers)` returning the sum of positive integers.",
+            starterCode: ##"""
+def sum_positive(numbers):
+    # Ваша реализация
+    return 0
+"""##,
+            solutionCode: ##"""
+def sum_positive(numbers):
+    total = 0
+    for x in numbers:
+        if x > 0:
+            total += x
+    return total
+"""##,
+            testCases: [
+                TaskTestCase(title: "Смешанный список", inputDescription: "sum_positive([-2, 5, 10, -1])", expectedOutput: "15", validationCode: "sum_positive([-2, 5, 10, -1]) == 15"),
+                TaskTestCase(title: "Только отрицательные", inputDescription: "sum_positive([-1, -2, -3])", expectedOutput: "0", validationCode: "sum_positive([-1, -2, -3]) == 0")
+            ],
+            hintsRU: ["Используйте цикл `for x in numbers:` и проверяйте `if x > 0`."],
+            hintsEN: ["Iterate through numbers and check `if x > 0`."]
+        )
+
+        // MARK: - C# Challenges
+        customChallenges["cs_basics_types"] = LessonPracticeChallenge(
+            id: "practice_cs_basics_types",
+            language: .csharp,
+            titleRU: "Практика: Вычисления в C#",
+            titleEN: "Practice: C# Computations",
+            taskPromptRU: "Реализуйте метод `ConvertCelsiusToFahrenheit(double c)`, возвращающий температуру в градусах Фаренгейта по формуле `(c * 9.0 / 5.0) + 32.0`.",
+            taskPromptEN: "Implement `ConvertCelsiusToFahrenheit(double c)` returning `(c * 9.0 / 5.0) + 32.0`.",
+            starterCode: ##"""
+public static double ConvertCelsiusToFahrenheit(double c) {
+    // Ваша реализация
+    return 0.0;
+}
+"""##,
+            solutionCode: ##"""
+public static double ConvertCelsiusToFahrenheit(double c) {
+    return (c * 9.0 / 5.0) + 32.0;
+}
+"""##,
+            testCases: [
+                TaskTestCase(title: "0 градусов Цельсия", inputDescription: "ConvertCelsiusToFahrenheit(0.0)", expectedOutput: "32.0", validationCode: "ConvertCelsiusToFahrenheit(0.0) == 32.0"),
+                TaskTestCase(title: "100 градусов Цельсия", inputDescription: "ConvertCelsiusToFahrenheit(100.0)", expectedOutput: "212.0", validationCode: "ConvertCelsiusToFahrenheit(100.0) == 212.0")
+            ],
+            hintsRU: ["Используйте `(c * 9.0 / 5.0) + 32.0`."],
+            hintsEN: ["Use `(c * 9.0 / 5.0) + 32.0`."]
+        )
+
+        customChallenges["cs_linq_queries"] = LessonPracticeChallenge(
+            id: "practice_cs_linq_queries",
+            language: .csharp,
+            titleRU: "Практика: Фильтрация в C#",
+            titleEN: "Practice: C# Filtering",
+            taskPromptRU: "Реализуйте метод `SumEvens(int a, int b, int c)`, который суммирует только четные числа из трех переданных аргументов.",
+            taskPromptEN: "Implement `SumEvens(int a, int b, int c)` summing only even numbers.",
+            starterCode: ##"""
+public static int SumEvens(int a, int b, int c) {
+    // Ваша реализация
+    return 0;
+}
+"""##,
+            solutionCode: ##"""
+public static int SumEvens(int a, int b, int c) {
+    int sum = 0;
+    if (a % 2 == 0) sum += a;
+    if (b % 2 == 0) sum += b;
+    if (c % 2 == 0) sum += c;
+    return sum;
+}
+"""##,
+            testCases: [
+                TaskTestCase(title: "Тест 1", inputDescription: "SumEvens(2, 3, 4)", expectedOutput: "6", validationCode: "SumEvens(2, 3, 4) == 6"),
+                TaskTestCase(title: "Тест 2", inputDescription: "SumEvens(1, 3, 5)", expectedOutput: "0", validationCode: "SumEvens(1, 3, 5) == 0")
+            ],
+            hintsRU: ["Проверяйте делимость на 2: `x % 2 == 0`."],
+            hintsEN: ["Check remainder: `x % 2 == 0`."]
+        )
+
     }
     
     private func fallbackChallenge(for lesson: Lesson) -> LessonPracticeChallenge {
         // Generates an interactive tailored challenge based on lesson properties
         let titleRU = "Практическое задание: \(lesson.titleRU)"
         let titleEN = "Hands-on Practice: \(lesson.titleEN)"
+        
+        if lesson.category.language == .python {
+            return LessonPracticeChallenge(
+                id: "practice_\(lesson.id)",
+                language: .python,
+                titleRU: titleRU,
+                titleEN: titleEN,
+                taskPromptRU: "Закрепите тему на практике: напишите функцию `compute_metrics(x, y)`, которая возвращает сумму произведений и разностей: `(x * y) + (x - y)`.",
+                taskPromptEN: "Implement `compute_metrics(x, y)` returning `(x * y) + (x - y)`.",
+                starterCode: ##"""
+def compute_metrics(x, y):
+    # Ваша реализация
+    return 0
+"""##,
+                solutionCode: ##"""
+def compute_metrics(x, y):
+    return (x * y) + (x - y)
+"""##,
+                testCases: [
+                    TaskTestCase(title: "Тест 1", inputDescription: "compute_metrics(4, 2)", expectedOutput: "10", validationCode: "compute_metrics(4, 2) == 10"),
+                    TaskTestCase(title: "Тест 2", inputDescription: "compute_metrics(5, 3)", expectedOutput: "17", validationCode: "compute_metrics(5, 3) == 17")
+                ],
+                hintsRU: ["Используйте операторы `*`, `+` и `-`."],
+                hintsEN: ["Use operators `*`, `+`, and `-`."]
+            )
+        } else if lesson.category.language == .csharp {
+            return LessonPracticeChallenge(
+                id: "practice_\(lesson.id)",
+                language: .csharp,
+                titleRU: titleRU,
+                titleEN: titleEN,
+                taskPromptRU: "Закрепите тему на практике: напишите статический метод `ComputeMetrics(int x, int y)`, возвращающий `(x * y) + (x - y)`.",
+                taskPromptEN: "Implement `ComputeMetrics(int x, int y)` returning `(x * y) + (x - y)`.",
+                starterCode: ##"""
+public static int ComputeMetrics(int x, int y) {
+    // Ваша реализация
+    return 0;
+}
+"""##,
+                solutionCode: ##"""
+public static int ComputeMetrics(int x, int y) {
+    return (x * y) + (x - y);
+}
+"""##,
+                testCases: [
+                    TaskTestCase(title: "Тест 1", inputDescription: "ComputeMetrics(4, 2)", expectedOutput: "10", validationCode: "ComputeMetrics(4, 2) == 10"),
+                    TaskTestCase(title: "Тест 2", inputDescription: "ComputeMetrics(5, 3)", expectedOutput: "17", validationCode: "ComputeMetrics(5, 3) == 17")
+                ],
+                hintsRU: ["Используйте операторы `*`, `+` и `-`."],
+                hintsEN: ["Use operators `*`, `+`, and `-`."]
+            )
+        }
         
         if lesson.category.track == .swiftUI {
             return LessonPracticeChallenge(

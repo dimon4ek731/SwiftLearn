@@ -1302,6 +1302,196 @@ declaration → macro-declaration
 
 """##
             ),
+            OfficialDocTopic(
+                id: "py_doc_tutorial_intro",
+                language: .python,
+                section: .welcome,
+                chapterNumber: 1,
+                titleEN: "Python 3.12: Introduction & Numbers",
+                titleRU: "Python 3.12: Знакомство и Основы",
+                summaryEN: "Official Python 3.12 tutorial covering numbers, strings, lists and the interactive interpreter.",
+                summaryRU: "Официальное руководство Python 3.12: числа, строки, списки и интерактивный интерпретатор.",
+                webSlug: "tutorial/introduction.html",
+                contentMarkdownEN: ##"""
+# Python 3.12 Tutorial: Introduction
+
+Python is an easy to learn, powerful programming language. It has efficient high-level data structures and a simple but effective approach to object-oriented programming.
+
+## Using Python as a Calculator
+```python
+2 + 2 # 4
+50 - 5 * 6 # 20
+8 / 5 # 1.6 - division always returns a float
+17 // 3 # 5 - floor division
+17 % 3 # 2 - remainder
+5 ** 2 # 25 - exponentiation
+```
+
+### Text (Strings)
+Python strings can be enclosed in single or double quotes:
+```python
+text = "Python Programming"
+print(text.upper())
+```
+"""##,
+                contentMarkdownRU: ##"""
+# Официальное руководство Python 3.12: Введение
+
+Python — мощный, легкий в изучении высокоуровневый язык программирования с открытым исходным кодом.
+
+## Использование Python как калькулятора
+```python
+2 + 2 # 4
+8 / 5 # 1.6 (деление возвращает float)
+17 // 3 # 5 (целочисленное деление)
+17 % 3 # 2 (остаток от деления)
+2 ** 10 # 1024 (степень)
+```
+"""##
+            ),
+            OfficialDocTopic(
+                id: "py_doc_control_flow",
+                language: .python,
+                section: .languageGuide,
+                chapterNumber: 2,
+                titleEN: "Control Flow Tools: if, for & Functions",
+                titleRU: "Управляющие конструкции: if, for и Функции",
+                summaryEN: "Official Python guide for conditionals, for-in loops, range, and function definitions.",
+                summaryRU: "Официальное руководство по ветвлению, циклам for, range и функциям.",
+                webSlug: "tutorial/controlflow.html",
+                contentMarkdownEN: ##"""
+# Control Flow Tools in Python
+
+## The if Statement
+```python
+x = 42
+if x < 0:
+    print("Negative")
+elif x == 0:
+    print("Zero")
+else:
+    print("Positive")
+```
+
+## The for Statement
+```python
+words = ["apple", "banana", "cherry"]
+for w in words:
+    print(w, len(w))
+```
+
+## Functions
+```python
+def fibonacci(n):
+    a, b = 0, 1
+    result = []
+    while a < n:
+        result.append(a)
+        a, b = b, a + b
+    return result
+```
+"""##,
+                contentMarkdownRU: ##"""
+# Управляющие конструкции в Python
+
+## Ветвление `if ... elif ... else`
+```python
+if score >= 90:
+    grade = "A"
+elif score >= 80:
+    grade = "B"
+else:
+    grade = "C"
+```
+
+## Итерирование через `for` и `range`
+```python
+for i in range(5):
+    print(i)
+```
+
+## Функции
+```python
+def greet(name: str) -> str:
+    return f"Hello, {name}!"
+```
+"""##
+            ),
+            OfficialDocTopic(
+                id: "cs_doc_tour_intro",
+                language: .csharp,
+                section: .welcome,
+                chapterNumber: 1,
+                titleEN: "Tour of C# & .NET 8 Platform",
+                titleRU: "Обзор языка C# и платформы .NET 8",
+                summaryEN: "Official Microsoft tour of the C# modern programming language, CLR runtime, and cross-platform architecture.",
+                summaryRU: "Официальный тур Microsoft по современному языку C#, среде CLR и кроссплатформенной экосистеме.",
+                webSlug: "tour-of-csharp/",
+                contentMarkdownEN: ##"""
+# Tour of C#
+
+C# (pronounced "See Sharp") is a modern, object-oriented, and type-safe programming language.
+
+```csharp
+// Top-level statements in modern C#:
+Console.WriteLine("Hello, C# 12 and .NET 8!");
+```
+
+## Key Architectural Highlights
+- **Type Safety**: The compiler verifies all types, preventing memory corruption.
+- **Garbage Collection (GC)**: Automatic reclamation of unreferenced memory.
+- **Unified Type System**: Every type directly or indirectly inherits from `System.Object`.
+"""##,
+                contentMarkdownRU: ##"""
+# Обзор языка C#
+
+C# — это современный, строго типизированный объектно-ориентированный язык программирования Microsoft для создания кроссплатформенных приложений .NET.
+
+## Главные преимущества
+- **Безопасность типов**: исключение ошибок несовместимости памяти.
+- **Автоматический сборщик мусора (GC)**: надежная работа без утечек памяти.
+- **Кроссплатформенность .NET Core / .NET 8**: запуск на всех платформах.
+"""##
+            ),
+            OfficialDocTopic(
+                id: "cs_doc_linq",
+                language: .csharp,
+                section: .languageGuide,
+                chapterNumber: 2,
+                titleEN: "Language Integrated Query (LINQ)",
+                titleRU: "Интегрированные запросы LINQ",
+                summaryEN: "Official C# reference for querying collections, databases, and XML declaratively with LINQ.",
+                summaryRU: "Официальное руководство по декларативным запросам к данным, фильтрации и проекции в C# с помощью LINQ.",
+                webSlug: "linq/",
+                contentMarkdownEN: ##"""
+# Language-Integrated Query (LINQ)
+
+Language-Integrated Query brings first-class declarative query syntax directly into C#.
+
+```csharp
+int[] numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+
+// LINQ Method syntax:
+var evens = numbers.Where(n => n % 2 == 0).ToList();
+
+// LINQ Query syntax:
+var query = from n in numbers
+            where n > 5
+            select n * 2;
+```
+"""##,
+                contentMarkdownRU: ##"""
+# Языково-интегрированные запросы LINQ
+
+LINQ позволяет выполнять выразительные декларативные запросы к коллекциям и базам данных с проверкой типов на этапе компиляции.
+
+```csharp
+var scores = new List<int> { 97, 92, 81, 60 };
+var topScores = scores.Where(s => s >= 80).OrderByDescending(s => s);
+```
+"""##
+            ),
+
         ]
     }
     

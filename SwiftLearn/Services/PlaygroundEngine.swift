@@ -37,11 +37,12 @@ public final class PlaygroundEngine {
     public init() {}
     
     // MARK: - Core Execution
-    public func execute(code: String) async -> PlaygroundExecutionResult {
+    public func execute(code: String, language: TargetLanguage = .swift) async -> PlaygroundExecutionResult {
         return await Task.detached(priority: .userInitiated) {
             let start = DispatchTime.now()
+            let normalizedSource = PlaygroundEngine.normalizeCode(code, language: language)
             let interpreter = SwiftMiniInterpreter()
-            let result = interpreter.run(source: code)
+            let result = interpreter.run(source: normalizedSource)
             let end = DispatchTime.now()
             let durationMs = Double(end.uptimeNanoseconds - start.uptimeNanoseconds) / 1_000_000.0
             
@@ -53,6 +54,145 @@ public final class PlaygroundEngine {
                 error: result.error
             )
         }.value
+    }
+    
+    // MARK: - Multi-Language Normalization & Preprocessing
+    public static func normalizeCode(_ source: String, language: TargetLanguage) -> String {
+        switch language {
+        case .swift:
+            return source
+            
+        case .python:
+            return transpilePythonToSwift(source)
+            
+        case .csharp:
+            return transpileCSharpToSwift(source)
+        }
+    }
+    
+    private static func transpilePythonToSwift(_ source: String) -> String {
+        let lines = source.components(separatedBy: .newlines)
+        var outputLines: [String] = []
+        var indentStack: [Int] = [0]
+        
+        for rawLine in lines {
+            let trimmed = rawLine.trimmingCharacters(in: .whitespaces)
+            if trimmed.isEmpty {
+                outputLines.append("")
+                continue
+            }
+            if trimmed.hasPrefix("#") {
+                outputLines.append("//" + trimmed.dropFirst())
+                continue
+            }
+            
+            // Indentation stack management
+            let currentIndent = rawLine.prefix(while: { $0 == " " || $0 == "\t" }).count
+            while currentIndent < indentStack.last ?? 0 {
+                indentStack.removeLast()
+                let closingIndent = String(repeating: " ", count: indentStack.last ?? 0)
+                outputLines.append("\(closingIndent)}")
+            }
+            
+            // Function definition: def name(params):
+            if trimmed.hasPrefix("def ") && trimmed.hasSuffix(":") {
+                let sig = String(trimmed.dropFirst(4).dropLast()).trimmingCharacters(in: .whitespaces)
+                if let openP = sig.firstIndex(of: "("), let closeP = sig.lastIndex(of: ")") {
+                    let funcName = String(sig[..<openP]).trimmingCharacters(in: .whitespaces)
+                    let paramsStr = String(sig[sig.index(after: openP)..<closeP]).trimmingCharacters(in: .whitespaces)
+                    let pTokens = paramsStr.components(separatedBy: ",").map { $0.trimmingCharacters(in: .whitespaces) }.filter { !$0.isEmpty }
+                    let swiftParams = pTokens.map { "_ \($0): Any" }.joined(separator: ", ")
+                    
+                    let indentSpaces = String(repeating: " ", count: currentIndent)
+                    outputLines.append("\(indentSpaces)func \(funcName)(\(swiftParams)) {")
+                    indentStack.append(currentIndent + 4)
+                    continue
+                }
+            }
+            
+            var lineContent = trimmed
+            lineContent = lineContent.replacingOccurrences(of: "True", with: "true")
+            lineContent = lineContent.replacingOccurrences(of: "False", with: "false")
+            lineContent = lineContent.replacingOccurrences(of: "None", with: "nil")
+            lineContent = lineContent.replacingOccurrences(of: " and ", with: " && ")
+            lineContent = lineContent.replacingOccurrences(of: " or ", with: " || ")
+            if lineContent.hasPrefix("not ") {
+                lineContent = "!" + lineContent.dropFirst(4)
+            }
+            
+            let indentSpaces = String(repeating: " ", count: currentIndent)
+            outputLines.append("\(indentSpaces)\(lineContent)")
+        }
+        
+        while indentStack.count > 1 {
+            indentStack.removeLast()
+            let closingIndent = String(repeating: " ", count: indentStack.last ?? 0)
+            outputLines.append("\(closingIndent)}")
+        }
+        
+        return outputLines.joined(separator: "\n")
+    }
+    
+    private static func transpileCSharpToSwift(_ source: String) -> String {
+        let lines = source.components(separatedBy: .newlines)
+        var outputLines: [String] = []
+        
+        for rawLine in lines {
+            var trimmed = rawLine.trimmingCharacters(in: .whitespaces)
+            if trimmed.isEmpty || trimmed.hasPrefix("//") {
+                outputLines.append(rawLine)
+                continue
+            }
+            
+            // Console.WriteLine / Write
+            if trimmed.contains("Console.WriteLine(") {
+                trimmed = trimmed.replacingOccurrences(of: "Console.WriteLine(", with: "print(")
+            }
+            if trimmed.contains("Console.Write(") {
+                trimmed = trimmed.replacingOccurrences(of: "Console.Write(", with: "print(")
+            }
+            
+            // Replace C# method signature: e.g. public static int Add(int a, int b) {
+            if (trimmed.contains("public") || trimmed.contains("static") || trimmed.contains("void") || trimmed.contains("int ") || trimmed.contains("string ") || trimmed.contains("double ")) && trimmed.contains("(") && trimmed.contains(")") {
+                if !trimmed.hasPrefix("if") && !trimmed.hasPrefix("for") && !trimmed.hasPrefix("while") && !trimmed.hasPrefix("print") {
+                    let cleaned = trimmed
+                        .replacingOccurrences(of: "public ", with: "")
+                        .replacingOccurrences(of: "private ", with: "")
+                        .replacingOccurrences(of: "protected ", with: "")
+                        .replacingOccurrences(of: "internal ", with: "")
+                        .replacingOccurrences(of: "static ", with: "")
+                    
+                    if let openP = cleaned.firstIndex(of: "("), let closeP = cleaned.firstIndex(of: ")") {
+                        let beforeP = String(cleaned[..<openP]).trimmingCharacters(in: .whitespaces)
+                        let parts = beforeP.components(separatedBy: .whitespaces).filter { !$0.isEmpty }
+                        if parts.count >= 2 {
+                            let methodName = parts.last!
+                            let paramsStr = String(cleaned[cleaned.index(after: openP)..<closeP]).trimmingCharacters(in: .whitespaces)
+                            let pTokens = paramsStr.components(separatedBy: ",").map { $0.trimmingCharacters(in: .whitespaces) }.filter { !$0.isEmpty }
+                            let swiftParams = pTokens.map { token -> String in
+                                let tParts = token.components(separatedBy: .whitespaces).filter { !$0.isEmpty }
+                                let pName = tParts.last ?? token
+                                return "_ \(pName): Any"
+                            }.joined(separator: ", ")
+                            
+                            trimmed = "func \(methodName)(\(swiftParams)) {"
+                        }
+                    }
+                }
+            }
+            
+            // Strip trailing semicolons
+            if trimmed.hasSuffix(";") {
+                trimmed = String(trimmed.dropLast())
+            }
+            
+            trimmed = trimmed.replacingOccurrences(of: "null", with: "nil")
+            trimmed = trimmed.replacingOccurrences(of: "new ", with: "")
+            
+            outputLines.append(trimmed)
+        }
+        
+        return outputLines.joined(separator: "\n")
     }
 }
 

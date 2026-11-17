@@ -111,22 +111,44 @@ public final class CodeIntegrityValidator {
             let tokens = p.components(separatedBy: .whitespaces).filter { !$0.isEmpty }
             if tokens.count == 2 {
                 if tokens[1] != "_" {
-                    result.append(tokens[1]) // internal name: `_ value` -> `value`
+                    result.append(tokens[1]) // Swift: `_ value` -> `value` or C#: `int value` -> `value`
                 }
             } else if tokens.count == 1 && tokens[0] != "_" {
-                result.append(tokens[0])
+                result.append(tokens[0]) // Python: `value`
             }
         }
         return result
     }
     
     private func extractFunctionBody(from code: String) -> String? {
-        guard let firstBrace = code.firstIndex(of: "{"),
-              let lastBrace = code.lastIndex(of: "}") else {
-            return nil
+        if let firstBrace = code.firstIndex(of: "{"),
+           let lastBrace = code.lastIndex(of: "}") {
+            if firstBrace < lastBrace {
+                return String(code[code.index(after: firstBrace)..<lastBrace])
+            }
         }
-        guard firstBrace < lastBrace else { return nil }
-        return String(code[code.index(after: firstBrace)..<lastBrace])
+        // Python indentation-based function body
+        let lines = code.components(separatedBy: .newlines)
+        var bodyLines: [String] = []
+        var insideDef = false
+        for line in lines {
+            let trimmed = line.trimmingCharacters(in: .whitespaces)
+            if trimmed.hasPrefix("def ") && trimmed.contains(":") {
+                insideDef = true
+                continue
+            }
+            if insideDef {
+                if line.hasPrefix("    ") || line.hasPrefix("\t") {
+                    bodyLines.append(line)
+                } else if !trimmed.isEmpty {
+                    break
+                }
+            }
+        }
+        if !bodyLines.isEmpty {
+            return bodyLines.joined(separator: "\n")
+        }
+        return nil
     }
     
     private func stripCommentsAndStrings(from text: String) -> String {
@@ -145,16 +167,16 @@ public final class CodeIntegrityValidator {
                 i += 1
                 continue
             }
-            if ch == "\"" {
+            if ch == "\"" || ch == "'" {
                 inQuotes.toggle()
                 result.append(" ")
                 i += 1
                 continue
             }
             if !inQuotes {
-                if ch == "/" && i + 1 < chars.count && chars[i+1] == "/" {
+                if (ch == "/" && i + 1 < chars.count && chars[i+1] == "/") || ch == "#" {
                     inLineComment = true
-                    i += 2
+                    i += (ch == "#" ? 1 : 2)
                     continue
                 }
             }

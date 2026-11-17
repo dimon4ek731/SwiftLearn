@@ -559,6 +559,7 @@ public final class GutterView: UIView {
 // MARK: - Syntax Rules Constants
 private enum SyntaxRules {
     static let keywords: Set<String> = [
+        // Swift Keywords
         "associatedtype", "class", "deinit", "enum", "extension", "fileprivate",
         "func", "import", "init", "inout", "internal", "let", "open", "operator",
         "private", "protocol", "public", "rethrows", "static", "struct", "subscript",
@@ -568,15 +569,36 @@ private enum SyntaxRules {
         "self", "Self", "throw", "throws", "true", "try", "async", "await", "actor",
         "some", "any", "mutating", "nonmutating", "override", "weak", "unowned",
         "@State", "@Binding", "@Observable", "@MainActor", "@Environment",
-        "@Published", "@ObservedObject", "@StateObject", "@AppStorage"
+        "@Published", "@ObservedObject", "@StateObject", "@AppStorage",
+        
+        // Python Keywords
+        "def", "lambda", "None", "True", "False", "elif", "pass", "raise", "from",
+        "with", "yield", "finally", "except", "global", "nonlocal", "assert",
+        "not", "and", "or",
+        
+        // C# Keywords
+        "using", "namespace", "protected", "void", "string", "int", "double", "float",
+        "bool", "char", "object", "record", "interface", "new", "null", "this", "base",
+        "foreach", "typeof", "sizeof", "stackalloc", "checked", "unchecked",
+        "lock", "yield", "partial", "ref", "out", "params", "sealed", "virtual",
+        "abstract", "extern", "event", "delegate", "fixed", "stackalloc"
     ]
     
     static let builtInTypes: Set<String> = [
+        // Swift Types
         "Int", "Int8", "Int16", "Int32", "Int64", "UInt", "UInt8", "UInt16", "UInt32", "UInt64",
         "Double", "Float", "CGFloat", "Bool", "String", "Character", "Substring",
         "Array", "Dictionary", "Set", "Optional", "Result", "Task", "Date", "UUID", "Data", "URL",
         "View", "Text", "VStack", "HStack", "ZStack", "List", "ScrollView", "Button",
         "Image", "Color", "Spacer", "Divider", "NavigationStack", "NavigationLink",
-        "GeometryReader", "LazyVStack", "LazyHStack", "ForEach", "Toggle", "TextField"
+        "GeometryReader", "LazyVStack", "LazyHStack", "ForEach", "Toggle", "TextField",
+        
+        // Python Types & Builtins
+        "int", "float", "str", "list", "dict", "tuple", "set", "bool", "bytes", "bytearray",
+        "range", "len", "print", "type", "isinstance", "enumerate", "zip", "filter", "map",
+        
+        // C# Types & .NET
+        "Console", "List", "Dictionary", "HashSet", "IEnumerable", "ICollection", "IList",
+        "Task", "Action", "Func", "Math", "DateTime", "Guid", "HttpClient", "StringBuilder"
     ]
 }

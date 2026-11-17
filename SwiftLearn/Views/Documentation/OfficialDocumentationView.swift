@@ -9,6 +9,7 @@ public enum DocDisplayMode: Int, CaseIterable, Identifiable {
 
 public struct OfficialDocumentationView: View {
     @ObservedObject var lang = LanguageManager.shared
+    @State private var selectedLanguage: TargetLanguage = .swift
     @State private var displayMode: DocDisplayMode = .chapters
     @State private var searchText: String = ""
     @State private var selectedSection: DocSection? = nil
@@ -18,7 +19,7 @@ public struct OfficialDocumentationView: View {
     public init() {}
     
     private var filteredTopics: [OfficialDocTopic] {
-        var list = store.topics
+        var list = store.topics.filter { $0.language == selectedLanguage }
         if let s = selectedSection {
             list = list.filter { $0.section == s }
         }
@@ -34,20 +35,60 @@ public struct OfficialDocumentationView: View {
         return list
     }
     
+    private var liveWebURL: URL {
+        switch selectedLanguage {
+        case .swift:
+            return URL(string: "https://docs.swift.org/swift-book/documentation/the-swift-programming-language/")!
+        case .python:
+            return URL(string: "https://docs.python.org/3/tutorial/")!
+        case .csharp:
+            return URL(string: "https://learn.microsoft.com/en-us/dotnet/csharp/tour-of-csharp/")!
+        }
+    }
+    
     public var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
+                // Top Language Switcher
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 8) {
+                        ForEach(TargetLanguage.allCases) { item in
+                            Button(action: {
+                                withAnimation(.spring(response: 0.3, dampingFraction: 0.75)) {
+                                    selectedLanguage = item
+                                }
+                            }) {
+                                HStack(spacing: 6) {
+                                    Image(systemName: item.icon)
+                                        .font(.system(size: 12, weight: .semibold))
+                                    Text(item.displayName)
+                                        .font(.caption.weight(.bold))
+                                }
+                                .padding(.horizontal, 14)
+                                .padding(.vertical, 7)
+                                .background(selectedLanguage == item ? Color(red: 0.14, green: 0.38, blue: 0.88) : Color(UIColor.secondarySystemBackground))
+                                .foregroundColor(selectedLanguage == item ? .white : .primary)
+                                .clipShape(Capsule())
+                            }
+                            .buttonStyle(.plain)
+                        }
+                    }
+                    .padding(.horizontal)
+                    .padding(.vertical, 8)
+                }
+                .background(Color(UIColor.systemBackground))
+                
                 // Top Segmented Mode Picker
                 Picker("Режим", selection: $displayMode) {
                     Label(lang.localized("Главы книги", "Language Guide"), systemImage: "book.pages")
                         .tag(DocDisplayMode.chapters)
                     
-                    Label(lang.localized("docs.swift.org (Web)", "docs.swift.org (Web)"), systemImage: "globe")
+                    Label(lang.localized("Официальный Web", "Live Web Docs"), systemImage: "globe")
                         .tag(DocDisplayMode.liveWeb)
                 }
                 .pickerStyle(.segmented)
                 .padding(.horizontal)
-                .padding(.vertical, 8)
+                .padding(.bottom, 8)
                 .background(Color(UIColor.systemBackground))
                 
                 Divider()
@@ -57,10 +98,10 @@ public struct OfficialDocumentationView: View {
                 case .chapters:
                     chaptersListView
                 case .liveWeb:
-                    OfficialDocsWebView(url: URL(string: "https://docs.swift.org/swift-book/documentation/the-swift-programming-language/")!)
+                    OfficialDocsWebView(url: liveWebURL)
                 }
             }
-            .navigationTitle("Swift 6 Docs")
+            .navigationTitle("\(selectedLanguage.displayName) Docs")
             .navigationBarTitleDisplayMode(.inline)
         }
     }

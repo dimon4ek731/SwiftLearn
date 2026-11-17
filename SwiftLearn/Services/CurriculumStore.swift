@@ -4713,6 +4713,627 @@ struct CleanAppTemplate: App {
                     )
                 ]
             )
+,
+
+            // ==========================================
+            // PYTHON CORE & ADVANCED CURRICULUM
+            // ==========================================
+            Lesson(
+                id: "py_basics_types",
+                category: .pythonBasics,
+                titleRU: "Синтаксис Python, Переменные и Динамическая Типизация",
+                titleEN: "Python Syntax, Variables & Dynamic Typing",
+                summaryRU: "Основы языка Python: отступы как синтаксис (PEP 8), динамическая типизация, f-строки и ввод/вывод.",
+                summaryEN: "Python foundation: indentation semantics (PEP 8), dynamic typing, f-strings, and I/O.",
+                contentMarkdownRU: """
+### Отступы и философия Python (PEP 8)
+В Python блоки кода выделяются **отступами** (обычно 4 пробела), а не фигурными скобками:
+
+```python
+x = 10
+if x > 5:
+    print("x больше пяти")
+```
+
+### Динамическая типизация
+Переменная в Python — это имя-ссылка на объект в памяти:
+
+```python
+age = 25              # int
+pi = 3.1415           # float
+name = "Python 3.12"  # str
+is_active = True      # bool
+```
+
+### Форматирование строк (f-strings)
+Начиная с Python 3.6 f-строки являются стандартом форматирования:
+
+```python
+name = "Алексей"
+score = 98
+print(f"Студент {name} набрал {score} баллов.")
+```
+""",
+                contentMarkdownEN: """
+### Indentation and Syntax (PEP 8)
+In Python, indentation defines block scope instead of braces:
+
+```python
+x = 10
+if x > 5:
+    print("x is greater than 5")
+```
+
+### Dynamic Typing & F-Strings
+Variables are dynamic object references:
+
+```python
+name = "Guido"
+version = 3.12
+print(f"Language: {name}, version: {version}")
+```
+""",
+                codeSnippet: """
+city = "Tokyo"
+temp = 22.5
+status = f"Weather in {city}: {temp} degrees Celsius"
+print(status)
+""",
+                xpReward: 35
+            ),
+            Lesson(
+                id: "py_collections_lists_dicts",
+                category: .pythonCollections,
+                titleRU: "Списки (list), Словари (dict) и Comprehensions",
+                titleEN: "Lists, Dictionaries & Comprehensions",
+                summaryRU: "Главные структуры данных Python: индексация срезами [start:stop:step], ключи словарей и генераторы списков.",
+                summaryEN: "Core Python data structures: slice notation [start:stop:step], dictionary keys, and list comprehensions.",
+                contentMarkdownRU: """
+### Списки (list) и срезы (slices)
+Списки в Python изменяемы и поддерживают мощный синтаксис срезов:
+
+```python
+fruits = ["яблоко", "банан", "груша", "киви"]
+fruits.append("манго")
+sub = fruits[1:3]     # ['банан', 'груша']
+rev = fruits[::-1]    # разворот списка
+```
+
+### Словари (dict)
+Ассоциативные массивы со средней сложностью O(1) поиска по ключу:
+
+```python
+user = {"name": "Анна", "role": "Developer"}
+user["level"] = "Senior"
+print(user.get("role", "Guest"))
+```
+
+### Списковые включения (List Comprehensions)
+Элегантный и быстрый способ трансформации коллекций:
+
+```python
+numbers = [1, 2, 3, 4, 5]
+squares = [x * x for x in numbers if x % 2 == 1]
+# [1, 9, 25]
+```
+""",
+                contentMarkdownEN: """
+### Lists and Slices
+Lists are mutable ordered sequences:
+
+```python
+items = [10, 20, 30, 40]
+subset = items[1:3] # [20, 30]
+reversed_items = items[::-1]
+```
+
+### List Comprehensions
+Concise syntax for mapping and filtering:
+
+```python
+evens = [x for x in range(10) if x % 2 == 0]
+```
+""",
+                codeSnippet: """
+words = ["python", "swift", "kotlin", "csharp"]
+upper_words = [w.upper() for w in words if len(w) > 5]
+print(upper_words)
+""",
+                xpReward: 40
+            ),
+            Lesson(
+                id: "py_functions_args",
+                category: .pythonFunctions,
+                titleRU: "Функции, *args, **kwargs и Распаковка",
+                titleEN: "Functions, *args, **kwargs & Unpacking",
+                summaryRU: "Объявление функций (def), аргументы по умолчанию, произвольное количество позиционных (*args) и именованных (**kwargs) параметров.",
+                summaryEN: "Defining functions with def, default parameters, arbitrary *args, and keyword **kwargs.",
+                contentMarkdownRU: """
+### Объявление функций (`def`)
+```python
+def calculate_discount(price, discount=0.1):
+    return price * (1.0 - discount)
+
+final_price = calculate_discount(1000) # 900.0
+```
+
+### Переменное число аргументов: *args и **kwargs
+- `*args`: собирает лишние позиционные аргументы в кортеж (`tuple`).
+- `**kwargs`: собирает именованные аргументы в словарь (`dict`).
+
+```python
+def make_query(table, *columns, **filters):
+    cols = ", ".join(columns) if columns else "*"
+    print(f"SELECT {cols} FROM {table} WHERE {filters}")
+```
+""",
+                contentMarkdownEN: """
+### Defining Functions
+```python
+def greet(name, greeting="Hello"):
+    return f"{greeting}, {name}!"
+```
+
+### Arbitrary Arguments (*args, **kwargs)
+```python
+def log_event(event_name, *tags, **metadata):
+    print(f"Event: {event_name}, Tags: {tags}, Meta: {metadata}")
+```
+""",
+                codeSnippet: """
+def summarize_stats(*numbers):
+    count = len(numbers)
+    total = sum(numbers)
+    return count, total
+
+count, total = summarize_stats(10, 20, 30, 40)
+print(f"Count: {count}, Sum: {total}")
+""",
+                xpReward: 40
+            ),
+            Lesson(
+                id: "py_oop_classes",
+                category: .pythonOOP,
+                titleRU: "ООП в Python: Классы, __init__ и Наследование",
+                titleEN: "Python OOP: Classes, __init__ & Inheritance",
+                summaryRU: "Объектно-ориентированное программирование в Python: конструктор __init__, явный параметр self, наследование и вызов super().",
+                summaryEN: "Object-oriented programming in Python: __init__ constructor, self reference, inheritance, and super().",
+                contentMarkdownRU: """
+### Создание класса и конструктор `__init__`
+В Python каждый метод экземпляра явно принимает первый параметр `self` (ссылку на текущий объект):
+
+```python
+class BankAccount:
+    def __init__(self, owner, balance=0.0):
+        self.owner = owner
+        self.balance = balance
+
+    def deposit(self, amount):
+        if amount > 0:
+            self.balance += amount
+        return self.balance
+```
+
+### Наследование и super()
+```python
+class PremiumAccount(BankAccount):
+    def __init__(self, owner, balance=0.0, cashback_rate=0.05):
+        super().__init__(owner, balance)
+        self.cashback_rate = cashback_rate
+```
+""",
+                contentMarkdownEN: """
+### Class Syntax and `__init__`
+```python
+class Vehicle:
+    def __init__(self, make, model):
+        self.make = make
+        self.model = model
+
+    def info(self):
+        return f"{self.make} {self.model}"
+```
+""",
+                codeSnippet: """
+class Counter:
+    def __init__(self, start=0):
+        self.value = start
+    def increment(self):
+        self.value += 1
+        return self.value
+
+c = Counter(10)
+print(c.increment()) # 11
+""",
+                xpReward: 45
+            ),
+            Lesson(
+                id: "py_advanced_dunder_decorators",
+                category: .pythonAdvanced,
+                titleRU: "Магические методы (Dunder) и Декораторы (@)",
+                titleEN: "Dunder Methods & Decorators (@)",
+                summaryRU: "Методы __str__, __repr__, __len__, замыкания функций и паттерн декоратора для логирования, кэширования и валидации.",
+                summaryEN: "Special dunder methods (__str__, __len__), function closures, and decorators (@) for caching and validation.",
+                contentMarkdownRU: """
+### Магические методы (Dunder: Double Underscore)
+Позволяют интегрировать собственные классы со стандартными операторами Python:
+- `__str__(self)`: строковое представление для `print()` и `str()`.
+- `__len__(self)`: поведение при вызове функции `len()`.
+- `__eq__(self, other)`: поведение оператора `==`.
+
+```python
+class Vector:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+    def __add__(self, other):
+        return Vector(self.x + other.x, self.y + other.y)
+
+    def __repr__(self):
+        return f"Vector({self.x}, {self.y})"
+```
+
+### Декораторы (@decorator)
+Декоратор — это функция, принимающая другую функцию и расширяющая её поведение без изменения исходного кода:
+
+```python
+def timer_decorator(func):
+    def wrapper(*args, **kwargs):
+        print("Начало выполнения функции...")
+        res = func(*args, **kwargs)
+        print("Завершено!")
+        return res
+    return wrapper
+
+@timer_decorator
+def run_task():
+    print("Задача выполняется")
+```
+""",
+                contentMarkdownEN: """
+### Dunder Methods
+```python
+class Book:
+    def __init__(self, title, pages):
+        self.title = title
+        self.pages = pages
+    def __len__(self):
+        return self.pages
+```
+
+### Decorators
+```python
+def log(func):
+    def wrapper(*args, **kwargs):
+        print(f"Calling {func.__name__}")
+        return func(*args, **kwargs)
+    return wrapper
+```
+""",
+                codeSnippet: """
+def uppercase_decorator(func):
+    def wrapper():
+        result = func()
+        return result.upper()
+    return wrapper
+
+@uppercase_decorator
+def get_message():
+    return "hello from python"
+
+print(get_message()) # HELLO FROM PYTHON
+""",
+                xpReward: 50
+            ),
+
+            // ==========================================
+            // C# CORE & ADVANCED CURRICULUM
+            // ==========================================
+            Lesson(
+                id: "cs_basics_types",
+                category: .csharpBasics,
+                titleRU: "Синтаксис C#, Типы Данных и Управление",
+                titleEN: "C# Syntax, Value Types & Control Flow",
+                summaryRU: "Основы языка C# 12 и .NET: строгая статическая типизация, var, ссылочные и значимые типы, switch expressions.",
+                summaryEN: "C# 12 & .NET fundamentals: static typing, var, value vs reference types, and switch expressions.",
+                contentMarkdownRU: """
+### Структура программы C#
+Начиная с C# 9 и .NET 6 поддерживаются **Top-Level Statements** (инструкции верхнего уровня без громоздкого `class Program` и `static void Main`):
+
+```csharp
+using System;
+
+string greeting = "Привет, C# 12!";
+Console.WriteLine(greeting);
+```
+
+### Типы значений (Value Types) и Ссылочные типы (Reference Types)
+- **Значимые типы** (`struct`): хранятся на стеке (`int`, `double`, `bool`, `DateTime`).
+- **Ссылочные типы** (`class`): хранятся в куче (`string`, `object`, массивы, пользовательские классы).
+
+```csharp
+int counter = 42;
+double price = 99.99;
+bool isEnabled = true;
+var title = "Разработка на .NET"; // Неявная типизация компилятором
+```
+
+### Современный Switch Expression
+```csharp
+int status = 200;
+string message = status switch {
+    200 => "OK",
+    404 => "Not Found",
+    500 => "Server Error",
+    _ => "Unknown"
+};
+```
+""",
+                contentMarkdownEN: """
+### Top-Level Statements in C#
+```csharp
+using System;
+
+string greeting = "Hello, C# 12!";
+Console.WriteLine(greeting);
+```
+
+### Value Types vs Reference Types
+- Value types (`int`, `double`, `bool`, `struct`) live on the stack.
+- Reference types (`class`, `string`, arrays) live on the heap.
+
+```csharp
+var status = 200;
+string description = status switch {
+    200 => "OK",
+    _ => "Other"
+};
+```
+""",
+                codeSnippet: """
+int width = 10;
+int height = 20;
+int area = width * height;
+Console.WriteLine($"Rectangle Area: {area}");
+""",
+                xpReward: 35
+            ),
+            Lesson(
+                id: "cs_oop_classes_props",
+                category: .csharpOOP,
+                titleRU: "Классы, Свойства { get; set; } и Инкапсуляция",
+                titleEN: "Classes, Properties { get; set; } & Encapsulation",
+                summaryRU: "Объектно-ориентированное программирование в C#: автоматические свойства, модификаторы доступа, конструкторы и ключевое слово this.",
+                summaryEN: "OOP in C#: auto-properties, access modifiers, constructors, and encapsulation.",
+                contentMarkdownRU: """
+### Классы и Автосвойства (Auto-Properties)
+В C# свойства заменяют рутинные геттеры и сеттеры:
+
+```csharp
+public class User {
+    public string Name { get; set; }
+    public int Age { get; private set; } // Изменение только внутри класса
+
+    public User(string name, int age) {
+        Name = name;
+        Age = age;
+    }
+
+    public void CelebrateBirthday() {
+        Age++;
+    }
+}
+```
+
+### Вычисляемые свойства (Expression-Bodied Members)
+```csharp
+public class Rectangle {
+    public double Width { get; set; }
+    public double Height { get; set; }
+
+    public double Area => Width * Height; // Вычисляемое свойство
+}
+```
+""",
+                contentMarkdownEN: """
+### Auto-Implemented Properties
+```csharp
+public class Account {
+    public string Owner { get; set; }
+    public decimal Balance { get; private set; }
+
+    public Account(string owner, decimal balance) {
+        Owner = owner;
+        Balance = balance;
+    }
+}
+```
+""",
+                codeSnippet: """
+public class Device {
+    public string Model { get; set; } = "iPhone";
+    public int Battery { get; set; } = 100;
+}
+
+var d = new Device();
+Console.WriteLine($"{d.Model}: {d.Battery}%");
+""",
+                xpReward: 40
+            ),
+            Lesson(
+                id: "cs_interfaces_polymorphism",
+                category: .csharpInterfaces,
+                titleRU: "Интерфейсы (interface) и Полиморфизм",
+                titleEN: "Interfaces & Polymorphism in C#",
+                summaryRU: "Определение контрактов через interface, реализация нескольких интерфейсов, абстрактные классы и ключевые слова virtual / override.",
+                summaryEN: "Defining contracts with interface, multi-interface implementation, abstract classes, and virtual/override polymorphism.",
+                contentMarkdownRU: """
+### Интерфейсы (`interface`)
+Интерфейс задает контракт методов и свойств без их реализации (по конвенции C# имена начинаются с буквы `I`):
+
+```csharp
+public interface IPayable {
+    decimal CalculatePayment();
+}
+
+public class Freelancer : IPayable {
+    public decimal HourlyRate { get; set; }
+    public int HoursWorked { get; set; }
+
+    public decimal CalculatePayment() {
+        return HourlyRate * HoursWorked;
+    }
+}
+```
+
+### Полиморфизм через `virtual` и `override`
+```csharp
+public class BaseLogger {
+    public virtual void Log(string msg) => Console.WriteLine($"[INFO]: {msg}");
+}
+
+public class ErrorLogger : BaseLogger {
+    public override void Log(string msg) => Console.WriteLine($"[ERROR]: {msg}");
+}
+```
+""",
+                contentMarkdownEN: """
+### Interfaces
+```csharp
+public interface IRepository<T> {
+    T GetById(int id);
+    void Save(T item);
+}
+```
+""",
+                codeSnippet: """
+public interface IShape {
+    double GetArea();
+}
+
+public class Square : IShape {
+    public double Side { get; set; }
+    public Square(double s) => Side = s;
+    public double GetArea() => Side * Side;
+}
+
+IShape shape = new Square(5);
+Console.WriteLine(shape.GetArea()); // 25
+""",
+                xpReward: 45
+            ),
+            Lesson(
+                id: "cs_collections_linq",
+                category: .csharpLINQ,
+                titleRU: "Коллекции List<T>, Dictionary и Запросы LINQ",
+                titleEN: "List<T>, Dictionary & LINQ Queries",
+                summaryRU: "Мощный декларативный язык запросов LINQ: методы Where, Select, OrderBy, FirstOrDefault, Any и агрегация данных.",
+                summaryEN: "Declarative data querying with LINQ: Where, Select, OrderBy, FirstOrDefault, Any, and grouping operations.",
+                contentMarkdownRU: """
+### Дженерик-коллекции: `List<T>` и `Dictionary<TKey, TValue>`
+```csharp
+var numbers = new List<int> { 5, 12, 8, 21, 3, 18 };
+var scores = new Dictionary<string, int> {
+    ["Alice"] = 95,
+    ["Bob"] = 80
+};
+```
+
+### Запросы LINQ (Language Integrated Query)
+LINQ позволяет фильтровать, трансформировать и сортировать коллекции так же просто, как в SQL:
+
+```csharp
+using System.Linq;
+
+var numbers = new List<int> { 1, 2, 3, 4, 5, 6, 7, 8 };
+
+// Method Syntax
+var evenSquares = numbers
+    .Where(n => n % 2 == 0)
+    .Select(n => n * n)
+    .OrderByDescending(n => n)
+    .ToList();
+
+int maxEven = numbers.Where(n => n % 2 == 0).Max();
+bool hasLarge = numbers.Any(n => n > 100); // false
+```
+""",
+                contentMarkdownEN: """
+### LINQ Method Syntax
+```csharp
+using System.Linq;
+
+var names = new List<string> { "Alice", "Bob", "Charlie" };
+var result = names.Where(n => n.Length > 3).Select(n => n.ToUpper());
+```
+""",
+                codeSnippet: """
+using System.Linq;
+var list = new int[] { 10, 45, 32, 88, 5 };
+var topScores = list.Where(x => x > 20).OrderBy(x => x).ToArray();
+Console.WriteLine(string.Join(", ", topScores));
+""",
+                xpReward: 45
+            ),
+            Lesson(
+                id: "cs_modern_async_records",
+                category: .csharpModern,
+                titleRU: "Records, Pattern Matching и Асинхронность (async/await)",
+                titleEN: "Records, Pattern Matching & Async (Task)",
+                summaryRU: "Современные возможности C# 12: неизменяемые типы record, позиционный синтаксис, асинхронные задачи Task и ключевые слова async/await.",
+                summaryEN: "Modern C# 12: immutable record types, positional syntax, pattern matching, and async/await with Task.",
+                contentMarkdownRU: """
+### Неизменяемые рекорды (`record`)
+Рекорды предоставляют встроенную семантику сравнения по значениям (value equality) и лаконичный синтаксис:
+
+```csharp
+public record UserRecord(string Name, int Age);
+
+var u1 = new UserRecord("Иван", 25);
+var u2 = new UserRecord("Иван", 25);
+Console.WriteLine(u1 == u2); // True! Сравнение по свойствам
+```
+
+### Асинхронность: `async` и `await`
+Модель асинхронности на основе задач (Task-based Asynchronous Pattern, TAP):
+
+```csharp
+using System.Threading.Tasks;
+using System.Net.Http;
+
+public async Task<string> DownloadWebPageAsync(string url) {
+    using var client = new HttpClient();
+    string content = await client.GetStringAsync(url);
+    return content;
+}
+```
+""",
+                contentMarkdownEN: """
+### Records
+```csharp
+public record Point(int X, int Y);
+var p1 = new Point(1, 2);
+var p2 = new Point(1, 2);
+Console.WriteLine(p1 == p2); // True
+```
+
+### Async / Await
+```csharp
+public async Task<int> FetchDataAsync() {
+    await Task.Delay(100);
+    return 42;
+}
+```
+""",
+                codeSnippet: """
+public record Coordinate(double Lat, double Lon);
+var c = new Coordinate(55.75, 37.61);
+Console.WriteLine($"Location: {c.Lat}, {c.Lon}");
+""",
+                xpReward: 50
+            )
+
         ]
     }
 }

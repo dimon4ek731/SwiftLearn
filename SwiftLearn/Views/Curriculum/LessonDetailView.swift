@@ -464,13 +464,30 @@ public struct LessonDetailView: View {
         allTestCases.append(contentsOf: dynamicTests)
         
         for tc in allTestCases {
-            let testHarness = """
+            let testHarness: String
+            if challenge.language == .python {
+                testHarness = """
+\(code)
+
+__test_passed = \(tc.validationCode)
+print("__TEST_RESULT:" + str(__test_passed).lower())
+"""
+            } else if challenge.language == .csharp {
+                testHarness = """
+\(code)
+
+bool __testPassed = \(tc.validationCode);
+Console.WriteLine("__TEST_RESULT:" + __testPassed.ToString().ToLower());
+"""
+            } else {
+                testHarness = """
 \(code)
 
 let __testPassed = \(tc.validationCode)
 print("__TEST_RESULT:" + String(__testPassed))
 """
-            let exec = await PlaygroundEngine.shared.execute(code: testHarness)
+            }
+            let exec = await PlaygroundEngine.shared.execute(code: testHarness, language: challenge.language)
             
             if let err = exec.error {
                 results.append(LessonTestExecutionResult(

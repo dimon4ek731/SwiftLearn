@@ -6,6 +6,7 @@ public struct CurriculumView: View {
     @ObservedObject var nav = AppNavigationState.shared
     private let lessons = CurriculumStore.shared.lessons
     
+    @State private var selectedLanguage: TargetLanguage = .swift
     @State private var selectedTrack: CurriculumTrack = .swiftCore
     
     public init() {}
@@ -14,13 +15,16 @@ public struct CurriculumView: View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 18) {
-                    // 1. Track Switcher (Swift Core vs SwiftUI Pro)
+                    // 1. Language Switcher (Swift, Python, C#)
+                    languageSelector
+                    
+                    // 2. Track Switcher (Core vs Advanced)
                     trackSelector
                     
-                    // 2. Track Progress Banner
+                    // 3. Track Progress Banner
                     overallProgressCard
                     
-                    // 3. Categories & Lessons Breakdown
+                    // 4. Categories & Lessons Breakdown
                     let currentCategories = LessonCategory.allCases.filter { $0.track == selectedTrack }
                     ForEach(currentCategories) { category in
                         let catLessons = lessons.filter { $0.category == category }
@@ -44,10 +48,50 @@ public struct CurriculumView: View {
         }
     }
     
+    // MARK: - Language Selector
+    private var languageSelector: some View {
+        HStack(spacing: 8) {
+            ForEach(TargetLanguage.allCases) { item in
+                Button(action: {
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.75)) {
+                        selectedLanguage = item
+                        if let firstTrack = CurriculumTrack.allCases.first(where: { $0.language == item }) {
+                            selectedTrack = firstTrack
+                        }
+                    }
+                }) {
+                    HStack(spacing: 6) {
+                        Image(systemName: item.icon)
+                            .font(.system(size: 13, weight: .semibold))
+                        Text(item.displayName)
+                            .font(.subheadline.weight(.semibold))
+                    }
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 8)
+                    .background(
+                        selectedLanguage == item ?
+                        LinearGradient(colors: [Color(red: 0.14, green: 0.38, blue: 0.88), Color(red: 0.28, green: 0.52, blue: 0.95)], startPoint: .topLeading, endPoint: .bottomTrailing) :
+                        LinearGradient(colors: [Color(UIColor.secondarySystemBackground), Color(UIColor.secondarySystemBackground)], startPoint: .topLeading, endPoint: .bottomTrailing)
+                    )
+                    .foregroundColor(selectedLanguage == item ? .white : .primary)
+                    .clipShape(Capsule())
+                    .overlay(
+                        Capsule()
+                            .stroke(selectedLanguage == item ? Color.clear : Color.primary.opacity(0.08), lineWidth: 1)
+                    )
+                }
+                .buttonStyle(.plain)
+            }
+            Spacer()
+        }
+        .padding(.horizontal)
+    }
+    
     // MARK: - Track Selector
     private var trackSelector: some View {
-        Picker("Трек обучения", selection: $selectedTrack) {
-            ForEach(CurriculumTrack.allCases) { track in
+        let tracks = CurriculumTrack.allCases.filter { $0.language == selectedLanguage }
+        return Picker("Трек обучения", selection: $selectedTrack) {
+            ForEach(tracks) { track in
                 Text(track.title(for: lang.currentLanguage)).tag(track)
             }
         }
@@ -68,13 +112,23 @@ public struct CurriculumView: View {
             ? [Color(red: 0.35, green: 0.25, blue: 0.85), Color(red: 0.58, green: 0.28, blue: 0.95)]
             : [Color(red: 0.14, green: 0.38, blue: 0.82), Color(red: 0.25, green: 0.55, blue: 0.95)]
         
-        let cardTitle = isSwiftUI
-            ? lang.localized("Прогресс освоения SwiftUI", "SwiftUI Framework Mastery")
-            : lang.localized("Прогресс освоения Swift Core", "Swift Core Language Mastery")
+        let cardTitle = lang.localized("Прогресс освоения \(selectedTrack.title(for: lang.currentLanguage))", "\(selectedTrack.title(for: lang.currentLanguage)) Mastery")
         
-        let cardSubtitle = isSwiftUI
-            ? lang.localized("Анатомия View, стеки и layout, @Observable, адаптивные сетки, анимации и навигация.", "View anatomy, stacks, layout rules, @Observable, grids, physics animations, and navigation.")
-            : lang.localized("Полная спецификация Swift 6: типы, опционалы, замыкания, ООП/ARC, протоколы, дженерики и акторы.", "Full Swift 6 specification: types, optionals, closures, ARC, generics, typed throws, and actors.")
+        let cardSubtitle: String
+        switch selectedTrack {
+        case .swiftCore:
+            cardSubtitle = lang.localized("Полная спецификация Swift 6: типы, опционалы, замыкания, ООП/ARC, протоколы, дженерики и акторы.", "Full Swift 6 specification: types, optionals, closures, ARC, generics, typed throws, and actors.")
+        case .swiftUI:
+            cardSubtitle = lang.localized("Анатомия View, стеки и layout, @Observable, адаптивные сетки, анимации и навигация.", "View anatomy, stacks, layout rules, @Observable, grids, physics animations, and navigation.")
+        case .pythonCore:
+            cardSubtitle = lang.localized("Синтаксис Python 3.12, типизация, динамические списки, словари, функции и лямбды.", "Python 3.12 syntax, dynamic typing, lists, dicts, functions, and lambdas.")
+        case .pythonAdvanced:
+            cardSubtitle = lang.localized("Классы, наследование, dunder-методы, генераторы, итераторы и декораторы.", "Classes, inheritance, magic dunder methods, generators, and decorators.")
+        case .csharpCore:
+            cardSubtitle = lang.localized("Платформа .NET 8, строгая типизация C# 12, классы, свойства и интерфейсы.", ".NET 8 platform, C# 12 static typing, classes, properties, and interfaces.")
+        case .csharpAdvanced:
+            cardSubtitle = lang.localized("Обобщения (generics), LINQ-запросы, records и асинхронное программирование (async/await).", "Generics, LINQ queries, immutable records, and async/await programming.")
+        }
         
         return VStack(alignment: .leading, spacing: 14) {
             HStack(alignment: .top) {

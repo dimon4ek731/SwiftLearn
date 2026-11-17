@@ -29,6 +29,7 @@ public enum DocSection: String, CaseIterable, Identifiable, Codable {
 
 public struct OfficialDocTopic: Identifiable, Codable, Hashable {
     public let id: String
+    public let language: TargetLanguage
     public let section: DocSection
     public let chapterNumber: Int
     public let titleEN: String
@@ -40,11 +41,19 @@ public struct OfficialDocTopic: Identifiable, Codable, Hashable {
     public let contentMarkdownRU: String
     
     public var webURL: URL {
-        URL(string: "https://docs.swift.org/swift-book/documentation/the-swift-programming-language/\(webSlug)/")!
+        switch language {
+        case .swift:
+            return URL(string: "https://docs.swift.org/swift-book/documentation/the-swift-programming-language/\(webSlug)/")!
+        case .python:
+            return URL(string: "https://docs.python.org/3/\(webSlug)")!
+        case .csharp:
+            return URL(string: "https://learn.microsoft.com/en-us/dotnet/csharp/\(webSlug)")!
+        }
     }
     
     public init(
         id: String,
+        language: TargetLanguage = .swift,
         section: DocSection,
         chapterNumber: Int,
         titleEN: String,
@@ -56,6 +65,7 @@ public struct OfficialDocTopic: Identifiable, Codable, Hashable {
         contentMarkdownRU: String
     ) {
         self.id = id
+        self.language = language
         self.section = section
         self.chapterNumber = chapterNumber
         self.titleEN = titleEN
