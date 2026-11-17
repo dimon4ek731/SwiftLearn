@@ -50,6 +50,8 @@
 		E6C85ED53A5A929B040AA58A /* CurriculumMarkdownView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E0AB919E200D84760DB6E65 /* CurriculumMarkdownView.swift */; };
 		EEE8890AF2CF06DD6EE86956 /* OfficialDocsWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B227DE702BFAB19E3F64085 /* OfficialDocsWebView.swift */; };
 		EF7FCBA81CE40FF25814A50D /* TaskStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1601D19C30602D616347D4E7 /* TaskStore.swift */; };
+		AA2000000000000000000001 /* TaskStore+Python.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1000000000000000000001 /* TaskStore+Python.swift */; };
+		AA2000000000000000000002 /* TaskStore+CSharp.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1000000000000000000002 /* TaskStore+CSharp.swift */; };
 		F3078AEE84CAC26AABCEFC49 /* SwiftUISandboxView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 290DC5DECED55AF0191836E7 /* SwiftUISandboxView.swift */; };
 		F963416F7A7D6C01CDD49B49 /* OfficialDocTopic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 548D1630401E79F01A70E239 /* OfficialDocTopic.swift */; };
 /* End PBXBuildFile section */
@@ -58,6 +60,8 @@
 		1101B1CC3D96202800C3C691 /* OfficialDocumentationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OfficialDocumentationView.swift; sourceTree = "<group>"; };
 		12B43C32CF994F904BB7CED2 /* TaskDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskDetailView.swift; sourceTree = "<group>"; };
 		1601D19C30602D616347D4E7 /* TaskStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskStore.swift; sourceTree = "<group>"; };
+		AA1000000000000000000001 /* TaskStore+Python.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TaskStore+Python.swift"; sourceTree = "<group>"; };
+		AA1000000000000000000002 /* TaskStore+CSharp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TaskStore+CSharp.swift"; sourceTree = "<group>"; };
 		18B414C97B28CC62CB1FA896 /* SwiftLearn.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = SwiftLearn.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		18B87446573BB1510CB80CDE /* PlaygroundTemplate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaygroundTemplate.swift; sourceTree = "<group>"; };
 		216F96D9FE1D053E4D96C951 /* StorageService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorageService.swift; sourceTree = "<group>"; };
@@ -226,6 +230,8 @@
 				3D66633B672645DD38236AFE /* SwiftCompletionEngine.swift */,
 				5E21500A58CF478532BD5081 /* SwiftSyntaxHighlighter.swift */,
 				1601D19C30602D616347D4E7 /* TaskStore.swift */,
+				AA1000000000000000000001 /* TaskStore+Python.swift */,
+				AA1000000000000000000002 /* TaskStore+CSharp.swift */,
 				4ACABFC10F07ACC53413761E /* ZipArchiver.swift */,
 			);
 			path = Services;
@@ -390,6 +396,8 @@
 				B6B159A0EA1896F01611AEF2 /* SyntaxCodeEditor.swift in Sources */,
 				27441750AF5B80CB3AF681F1 /* TaskDetailView.swift in Sources */,
 				EF7FCBA81CE40FF25814A50D /* TaskStore.swift in Sources */,
+				AA2000000000000000000001 /* TaskStore+Python.swift in Sources */,
+				AA2000000000000000000002 /* TaskStore+CSharp.swift in Sources */,
 				03DC6BB7CC590B28275370C2 /* UserProfile.swift in Sources */,
 				4C20B7EF3F663D5DB855F47D /* XPBadgeView.swift in Sources */,
 				C73232FA8A683BD6B6E236E8 /* ZipArchiver.swift in Sources */,

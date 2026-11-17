@@ -6,7 +6,10 @@ public final class TaskStore {
     public let tasks: [CodingTask]
     
     private init() {
-        self.tasks = [
+        self.tasks = Self.baseTasks + Self.pythonTasks + Self.csharpTasks
+    }
+    
+    private static let baseTasks: [CodingTask] = [
             // Сумма двух чисел
             CodingTask(
                 id: "easy_sum_two",
@@ -5800,5 +5803,4 @@ SELECT customer_id, SUM(amount) AS total_spent, COUNT(*) AS orders_count FROM cu
                 xpReward: 50
             ),
         ]
-    }
 }

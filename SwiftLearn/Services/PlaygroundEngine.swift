@@ -1317,15 +1317,17 @@ final class SwiftMiniInterpreter {
             return .string(val.description)
         }
         
-        // Built-in functions: abs(x), min(a, b), max(a, b), sqrt(x)
-        if trimmed.hasPrefix("abs(") && trimmed.hasSuffix(")") {
-            let arg = String(trimmed.dropFirst(4).dropLast())
+        // Built-in functions: abs(x), min(a, b), max(a, b), sqrt(x), len(x), str(x), float(x), bool(x), int(x)
+        if (trimmed.hasPrefix("abs(") || trimmed.hasPrefix("Math.Abs(")) && trimmed.hasSuffix(")") {
+            let prefixLen = trimmed.hasPrefix("Math.Abs(") ? 9 : 4
+            let arg = String(trimmed.dropFirst(prefixLen).dropLast())
             let val = evaluateExpression(arg, lineNumber: lineNumber)
             if case .integer(let i) = val { return .integer(abs(i)) }
             if case .double(let d) = val { return .double(abs(d)) }
         }
-        if trimmed.hasPrefix("min(") && trimmed.hasSuffix(")") {
-            let args = splitTopLevelArguments(String(trimmed.dropFirst(4).dropLast()))
+        if (trimmed.hasPrefix("min(") || trimmed.hasPrefix("Math.Min(")) && trimmed.hasSuffix(")") {
+            let prefixLen = trimmed.hasPrefix("Math.Min(") ? 9 : 4
+            let args = splitTopLevelArguments(String(trimmed.dropFirst(prefixLen).dropLast()))
             if args.count == 2 {
                 let v1 = evaluateExpression(args[0], lineNumber: lineNumber)
                 let v2 = evaluateExpression(args[1], lineNumber: lineNumber)
@@ -1333,8 +1335,9 @@ final class SwiftMiniInterpreter {
                 if let d1 = v1.asDouble, let d2 = v2.asDouble { return .double(min(d1, d2)) }
             }
         }
-        if trimmed.hasPrefix("max(") && trimmed.hasSuffix(")") {
-            let args = splitTopLevelArguments(String(trimmed.dropFirst(4).dropLast()))
+        if (trimmed.hasPrefix("max(") || trimmed.hasPrefix("Math.Max(")) && trimmed.hasSuffix(")") {
+            let prefixLen = trimmed.hasPrefix("Math.Max(") ? 9 : 4
+            let args = splitTopLevelArguments(String(trimmed.dropFirst(prefixLen).dropLast()))
             if args.count == 2 {
                 let v1 = evaluateExpression(args[0], lineNumber: lineNumber)
                 let v2 = evaluateExpression(args[1], lineNumber: lineNumber)
@@ -1342,10 +1345,51 @@ final class SwiftMiniInterpreter {
                 if let d1 = v1.asDouble, let d2 = v2.asDouble { return .double(max(d1, d2)) }
             }
         }
-        if trimmed.hasPrefix("sqrt(") && trimmed.hasSuffix(")") {
-            let arg = String(trimmed.dropFirst(5).dropLast())
+        if (trimmed.hasPrefix("sqrt(") || trimmed.hasPrefix("Math.Sqrt(")) && trimmed.hasSuffix(")") {
+            let prefixLen = trimmed.hasPrefix("Math.Sqrt(") ? 10 : 5
+            let arg = String(trimmed.dropFirst(prefixLen).dropLast())
             let val = evaluateExpression(arg, lineNumber: lineNumber)
             if let d = val.asDouble { return .double(sqrt(d)) }
+        }
+        if trimmed.hasPrefix("Math.Pow(") && trimmed.hasSuffix(")") {
+            let args = splitTopLevelArguments(String(trimmed.dropFirst(9).dropLast()))
+            if args.count == 2 {
+                let v1 = evaluateExpression(args[0], lineNumber: lineNumber)
+                let v2 = evaluateExpression(args[1], lineNumber: lineNumber)
+                if let d1 = v1.asDouble, let d2 = v2.asDouble { return .double(pow(d1, d2)) }
+            }
+        }
+        if trimmed.hasPrefix("len(") && trimmed.hasSuffix(")") {
+            let arg = String(trimmed.dropFirst(4).dropLast())
+            let val = evaluateExpression(arg, lineNumber: lineNumber)
+            if case .string(let s) = val { return .integer(s.count) }
+            if case .array(let a) = val { return .integer(a.count) }
+        }
+        if trimmed.hasPrefix("str(") && trimmed.hasSuffix(")") {
+            let arg = String(trimmed.dropFirst(4).dropLast())
+            let val = evaluateExpression(arg, lineNumber: lineNumber)
+            return .string(val.description)
+        }
+        if (trimmed.hasPrefix("int(") || trimmed.hasPrefix("Int(")) && trimmed.hasSuffix(")") {
+            let prefixLen = trimmed.hasPrefix("int(") ? 4 : 4
+            let arg = String(trimmed.dropFirst(prefixLen).dropLast())
+            let val = evaluateExpression(arg, lineNumber: lineNumber)
+            if case .integer(let i) = val { return .integer(i) }
+            if case .double(let d) = val { return .integer(Int(d)) }
+            if case .string(let s) = val, let i = Int(s) { return .integer(i) }
+        }
+        if (trimmed.hasPrefix("float(") || trimmed.hasPrefix("Double(")) && trimmed.hasSuffix(")") {
+            let prefixLen = trimmed.hasPrefix("float(") ? 6 : 7
+            let arg = String(trimmed.dropFirst(prefixLen).dropLast())
+            let val = evaluateExpression(arg, lineNumber: lineNumber)
+            if let d = val.asDouble { return .double(d) }
+            if case .string(let s) = val, let d = Double(s) { return .double(d) }
+        }
+        if (trimmed.hasPrefix("bool(") || trimmed.hasPrefix("Bool(")) && trimmed.hasSuffix(")") {
+            let prefixLen = trimmed.hasPrefix("bool(") ? 5 : 5
+            let arg = String(trimmed.dropFirst(prefixLen).dropLast())
+            let val = evaluateExpression(arg, lineNumber: lineNumber)
+            return .boolean(val.asBool)
         }
         
         // Array subscript arr[idx]
@@ -1543,14 +1587,14 @@ final class SwiftMiniInterpreter {
         
         switch objVal {
         case .string(let s):
-            if prop == "count" { return .integer(s.count) }
+            if prop == "count" || prop == "Length" || prop == "length" { return .integer(s.count) }
             if prop == "isEmpty" { return .boolean(s.isEmpty) }
-            if prop == "uppercased()" { return .string(s.uppercased()) }
-            if prop == "lowercased()" { return .string(s.lowercased()) }
+            if prop == "uppercased()" || prop == "ToUpper()" || prop == "upper()" { return .string(s.uppercased()) }
+            if prop == "lowercased()" || prop == "ToLower()" || prop == "lower()" { return .string(s.lowercased()) }
             if prop == "reversed()" { return .string(String(s.reversed())) }
             
         case .array(let a):
-            if prop == "count" { return .integer(a.count) }
+            if prop == "count" || prop == "Length" || prop == "length" { return .integer(a.count) }
             if prop == "isEmpty" { return .boolean(a.isEmpty) }
             if prop == "first" { return a.first ?? .void }
             if prop == "last" { return a.last ?? .void }

@@ -70,7 +70,7 @@ public struct TaskDetailView: View {
                         Image(systemName: "chevron.left.forwardslash.chevron.right")
                             .font(.caption2.bold())
                             .foregroundColor(Color(red: 0.14, green: 0.38, blue: 0.82))
-                        Text(lang.localized("Решение (Swift 6)", "Solution (Swift 6)"))
+                        Text(lang.localized("Решение (\(task.language.displayName))", "Solution (\(task.language.displayName))"))
                             .font(.caption.bold())
                     }
                     
@@ -396,22 +396,30 @@ public struct TaskDetailView: View {
                     testHarness = """
 \(code)
 
-__test_passed = \(tc.validationCode)
-print("__TEST_RESULT:" + str(__test_passed).lower())
+if \(tc.validationCode):
+    print("__TEST_RESULT:true")
+else:
+    print("__TEST_RESULT:false")
 """
                 } else if task.language == .csharp {
                     testHarness = """
 \(code)
 
-bool __testPassed = \(tc.validationCode);
-Console.WriteLine("__TEST_RESULT:" + __testPassed.ToString().ToLower());
+if (\(tc.validationCode)) {
+    Console.WriteLine("__TEST_RESULT:true");
+} else {
+    Console.WriteLine("__TEST_RESULT:false");
+}
 """
                 } else {
                     testHarness = """
 \(code)
 
-let __testPassed = \(tc.validationCode)
-print("__TEST_RESULT:" + String(__testPassed))
+if \(tc.validationCode) {
+    print("__TEST_RESULT:true")
+} else {
+    print("__TEST_RESULT:false")
+}
 """
                 }
                 

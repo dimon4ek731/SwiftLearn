@@ -58,6 +58,12 @@ public struct ChallengesView: View {
                 if ProcessInfo.processInfo.arguments.contains("-sql") {
                     selectedLanguage = .sql
                 }
+                if ProcessInfo.processInfo.arguments.contains("-python") {
+                    selectedLanguage = .python
+                }
+                if ProcessInfo.processInfo.arguments.contains("-csharp") {
+                    selectedLanguage = .csharp
+                }
             }
         }
     }
