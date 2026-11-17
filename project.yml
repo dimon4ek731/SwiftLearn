@@ -1,0 +1,35 @@
+name: SwiftLearn
+options:
+  bundleIdPrefix: com.cirkovdmitrij
+  createIntermediateGroups: true
+  xcodeVersion: "16.0"
+settings:
+  base:
+    SWIFT_VERSION: "5.9"
+    IPHONEOS_DEPLOYMENT_TARGET: "17.0"
+    ENABLE_PREVIEWS: YES
+    DEVELOPMENT_TEAM: "J6W4WG4ULK"
+    CODE_SIGN_STYLE: "Automatic"
+targets:
+  SwiftLearn:
+    type: application
+    platform: iOS
+    deploymentTarget: "17.0"
+    sources:
+      - path: SwiftLearn
+    info:
+      path: SwiftLearn/Resources/Info.plist
+      properties:
+        UILaunchScreen: {}
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationPortraitUpsideDown
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.cirkovdmitrij.swiftlearn
+        DEVELOPMENT_TEAM: "J6W4WG4ULK"
+        CODE_SIGN_STYLE: "Automatic"
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor

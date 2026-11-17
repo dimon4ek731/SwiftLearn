@@ -1,0 +1,622 @@
+import Foundation
+
+public struct LessonTestExecutionResult: Identifiable {
+    public let id = UUID()
+    public let testCase: TaskTestCase
+    public let passed: Bool
+    public let message: String
+    
+    public init(testCase: TaskTestCase, passed: Bool, message: String) {
+        self.testCase = testCase
+        self.passed = passed
+        self.message = message
+    }
+}
+
+public final class LessonPracticeStore {
+    public static let shared = LessonPracticeStore()
+    
+    private var customChallenges: [String: LessonPracticeChallenge] = [:]
+    
+    public init() {
+        populateChallenges()
+    }
+    
+    public func challenge(for lesson: Lesson) -> LessonPracticeChallenge {
+        if let direct = lesson.practiceChallenge {
+            return direct
+        }
+        if let found = customChallenges[lesson.id] {
+            return found
+        }
+        // Fallback guaranteed challenge
+        return fallbackChallenge(for: lesson)
+    }
+    
+    public func dynamicStressTestCases(for challenge: LessonPracticeChallenge) -> [TaskTestCase] {
+        switch challenge.id {
+        case "practice_basics_var_let_types":
+            let randomYear = Int.random(in: 1980...2022)
+            let randomName = ["Elena", "Dmitry", "Sergey", "Marina", "Victor"].randomElement()!
+            let expectedAge = 2026 - randomYear
+            return [
+                TaskTestCase(
+                    title: "Динамический стресс-тест (защита от хардкода)",
+                    inputDescription: "computeStats(\"\(randomName)\", \(randomYear), 2026)",
+                    expectedOutput: "(\"\(randomName)\", \(expectedAge))",
+                    validationCode: "computeStats(name: \"\(randomName)\", birthYear: \(randomYear), currentYear: 2026) == (\"\(randomName)\", \(expectedAge))"
+                )
+            ]
+            
+        case "practice_basics_operators_ranges":
+            let rVal = Int.random(in: -10...30)
+            let isInside = (1...10).contains(rVal)
+            return [
+                TaskTestCase(
+                    title: "Динамический стресс-тест (защита от хардкода)",
+                    inputDescription: "isInRange(\(rVal), min: 1, max: 10)",
+                    expectedOutput: "\(isInside)",
+                    validationCode: "isInRange(\(rVal), min: 1, max: 10) == \(isInside)"
+                )
+            ]
+            
+        case "practice_basics_tuples_alias":
+            let rCode = [100, 200, 201, 204, 301, 400, 404, 500].randomElement()!
+            let isSuccess = (200...299).contains(rCode)
+            return [
+                TaskTestCase(
+                    title: "Динамический стресс-тест (защита от хардкода)",
+                    inputDescription: "createHTTPResponse(code: \(rCode), message: \"LiveTest\")",
+                    expectedOutput: "(\(rCode), \"LiveTest\", \(isSuccess))",
+                    validationCode: "createHTTPResponse(code: \(rCode), message: \"LiveTest\") == (\(rCode), \"LiveTest\", \(isSuccess))"
+                )
+            ]
+            
+        case "practice_control_loops_flow":
+            let rN = [8, 10, 12].randomElement()!
+            var expected = 0
+            for i in stride(from: 2, through: rN, by: 2) { expected += i * i }
+            return [
+                TaskTestCase(
+                    title: "Динамический стресс-тест (защита от хардкода)",
+                    inputDescription: "sumEvenSquares(upTo: \(rN))",
+                    expectedOutput: "\(expected)",
+                    validationCode: "sumEvenSquares(upTo: \(rN)) == \(expected)"
+                )
+            ]
+            
+        default:
+            return []
+        }
+    }
+    
+    private func populateChallenges() {
+        // 1. basics_var_let_types
+        customChallenges["basics_var_let_types"] = LessonPracticeChallenge(
+            id: "practice_basics_var_let_types",
+            titleRU: "Практика: Константы, Переменные и Вывод",
+            titleEN: "Practice: Variables & Constants",
+            taskPromptRU: "Напишите функцию `computeStats(name: String, birthYear: Int, currentYear: Int) -> (name: String, age: Int)`, возвращающую кортеж с именем и вычисленным возрастом.",
+            taskPromptEN: "Implement `computeStats(name: String, birthYear: Int, currentYear: Int) -> (name: String, age: Int)`.",
+            starterCode: ##"""
+func computeStats(name: String, birthYear: Int, currentYear: Int) -> (name: String, age: Int) {
+    // Ваша реализация
+    return (name, 0)
+}
+"""##,
+            solutionCode: ##"""
+func computeStats(name: String, birthYear: Int, currentYear: Int) -> (name: String, age: Int) {
+    let age = currentYear - birthYear
+    return (name, age)
+}
+"""##,
+            testCases: [
+                TaskTestCase(title: "Тест 1", inputDescription: "computeStats(\"Alice\", 2000, 2026)", expectedOutput: "(\"Alice\", 26)", validationCode: "computeStats(name: \"Alice\", birthYear: 2000, currentYear: 2026) == (\"Alice\", 26)"),
+                TaskTestCase(title: "Тест 2", inputDescription: "computeStats(\"Bob\", 1995, 2026)", expectedOutput: "(\"Bob\", 31)", validationCode: "computeStats(name: \"Bob\", birthYear: 1995, currentYear: 2026) == (\"Bob\", 31)")
+            ],
+            hintsRU: ["Используйте let age = currentYear - birthYear", "Верните кортеж (name, age)"],
+            hintsEN: ["Use let age = currentYear - birthYear"]
+        )
+        
+        // 2. basics_operators_ranges
+        customChallenges["basics_operators_ranges"] = LessonPracticeChallenge(
+            id: "practice_basics_operators_ranges",
+            titleRU: "Практика: Операторы диапазонов",
+            titleEN: "Practice: Range Operators",
+            taskPromptRU: "Напишите функцию `isInRange(_ value: Int, min: Int, max: Int) -> Bool`, проверяющую попадание в закрытый диапазон min...max.",
+            taskPromptEN: "Implement `isInRange(_ value: Int, min: Int, max: Int) -> Bool` using closed range.",
+            starterCode: ##"""
+func isInRange(_ value: Int, min: Int, max: Int) -> Bool {
+    return false
+}
+"""##,
+            solutionCode: ##"""
+func isInRange(_ value: Int, min: Int, max: Int) -> Bool {
+    return (min...max).contains(value)
+}
+"""##,
+            testCases: [
+                TaskTestCase(title: "Тест 1", inputDescription: "isInRange(5, min: 1, max: 10)", expectedOutput: "true", validationCode: "isInRange(5, min: 1, max: 10) == true"),
+                TaskTestCase(title: "Тест 2", inputDescription: "isInRange(15, min: 1, max: 10)", expectedOutput: "false", validationCode: "isInRange(15, min: 1, max: 10) == false"),
+                TaskTestCase(title: "Тест 3", inputDescription: "isInRange(10, min: 1, max: 10)", expectedOutput: "true", validationCode: "isInRange(10, min: 1, max: 10) == true")
+            ],
+            hintsRU: ["Используйте (min...max).contains(value)"],
+            hintsEN: ["Use (min...max).contains(value)"]
+        )
+        
+        // 3. basics_tuples_alias
+        customChallenges["basics_tuples_alias"] = LessonPracticeChallenge(
+            id: "practice_basics_tuples_alias",
+            titleRU: "Практика: Кортежи и Typealias",
+            titleEN: "Practice: Tuples and Typealias",
+            taskPromptRU: "Создайте функцию `createHTTPResponse(code: Int, message: String) -> (statusCode: Int, statusMessage: String, isSuccess: Bool)`, где isSuccess равен true для кодов от 200 до 299.",
+            taskPromptEN: "Create function `createHTTPResponse` returning named tuple with isSuccess.",
+            starterCode: ##"""
+func createHTTPResponse(code: Int, message: String) -> (statusCode: Int, statusMessage: String, isSuccess: Bool) {
+    return (code, message, false)
+}
+"""##,
+            solutionCode: ##"""
+func createHTTPResponse(code: Int, message: String) -> (statusCode: Int, statusMessage: String, isSuccess: Bool) {
+    let success = (200...299).contains(code)
+    return (statusCode: code, statusMessage: message, isSuccess: success)
+}
+"""##,
+            testCases: [
+                TaskTestCase(title: "Тест 1", inputDescription: "createHTTPResponse(code: 200, message: \"OK\")", expectedOutput: "isSuccess: true", validationCode: "createHTTPResponse(code: 200, message: \"OK\").isSuccess == true"),
+                TaskTestCase(title: "Тест 2", inputDescription: "createHTTPResponse(code: 404, message: \"Not Found\")", expectedOutput: "isSuccess: false", validationCode: "createHTTPResponse(code: 404, message: \"Not Found\").isSuccess == false")
+            ],
+            hintsRU: ["Проверьте (200...299).contains(code)"],
+            hintsEN: ["Check range 200...299"]
+        )
+        
+        // 4. control_optionals
+        customChallenges["control_optionals"] = LessonPracticeChallenge(
+            id: "practice_control_optionals",
+            titleRU: "Практика: Безопасное развертывание Optionals",
+            titleEN: "Practice: Safe Optional Unwrapping",
+            taskPromptRU: "Напишите функцию `safeParseScore(rawInput: String?, fallback: Int) -> Int`. Если ввод nil или не может быть преобразован в Int — верните fallback.",
+            taskPromptEN: "Implement `safeParseScore(rawInput: String?, fallback: Int) -> Int` using guard let.",
+            starterCode: ##"""
+func safeParseScore(rawInput: String?, fallback: Int) -> Int {
+    return fallback
+}
+"""##,
+            solutionCode: ##"""
+func safeParseScore(rawInput: String?, fallback: Int) -> Int {
+    guard let rawInput, let parsed = Int(rawInput) else {
+        return fallback
+    }
+    return parsed
+}
+"""##,
+            testCases: [
+                TaskTestCase(title: "Тест 1", inputDescription: "safeParseScore(\"42\", 0)", expectedOutput: "42", validationCode: "safeParseScore(rawInput: \"42\", fallback: 0) == 42"),
+                TaskTestCase(title: "Тест 2", inputDescription: "safeParseScore(nil, 10)", expectedOutput: "10", validationCode: "safeParseScore(rawInput: nil, fallback: 10) == 10"),
+                TaskTestCase(title: "Тест 3", inputDescription: "safeParseScore(\"invalid\", -1)", expectedOutput: "-1", validationCode: "safeParseScore(rawInput: \"invalid\", fallback: -1) == -1")
+            ],
+            hintsRU: ["Используйте guard let rawInput, let parsed = Int(rawInput) else { return fallback }"],
+            hintsEN: ["Use guard let with chained optional bindings"]
+        )
+        
+        // 5. control_loops_flow
+        customChallenges["control_loops_flow"] = LessonPracticeChallenge(
+            id: "practice_control_loops_flow",
+            titleRU: "Практика: Циклы и фильтрация",
+            titleEN: "Practice: Loops and Control Flow",
+            taskPromptRU: "Напишите функцию `sumEvenSquares(upTo n: Int) -> Int`, которая суммирует квадраты всех четных чисел от 2 до n включительно.",
+            taskPromptEN: "Calculate sum of squares of all even integers up to n.",
+            starterCode: ##"""
+func sumEvenSquares(upTo n: Int) -> Int {
+    return 0
+}
+"""##,
+            solutionCode: ##"""
+func sumEvenSquares(upTo n: Int) -> Int {
+    var sum = 0
+    for i in stride(from: 2, through: n, by: 2) {
+        sum += i * i
+    }
+    return sum
+}
+"""##,
+            testCases: [
+                TaskTestCase(title: "Тест 1", inputDescription: "sumEvenSquares(upTo: 4)", expectedOutput: "20", validationCode: "sumEvenSquares(upTo: 4) == 20"),
+                TaskTestCase(title: "Тест 2", inputDescription: "sumEvenSquares(upTo: 6)", expectedOutput: "56", validationCode: "sumEvenSquares(upTo: 6) == 56")
+            ],
+            hintsRU: ["Используйте stride(from: 2, through: n, by: 2) или if i % 2 == 0"],
+            hintsEN: ["Iterate through evens and accumulate i * i"]
+        )
+        
+        // 6. control_switch_pattern
+        customChallenges["control_switch_pattern"] = LessonPracticeChallenge(
+            id: "practice_control_switch_pattern",
+            titleRU: "Практика: Pattern Matching и Switch",
+            titleEN: "Practice: Pattern Matching & Switch",
+            taskPromptRU: "Напишите функцию `classifyHTTP(_ code: Int) -> String`: для 200...299 верните 'Success', для 400...499 — 'Client Error', для 500...599 — 'Server Error', иначе — 'Other'.",
+            taskPromptEN: "Classify HTTP status codes using switch statement.",
+            starterCode: ##"""
+func classifyHTTP(_ code: Int) -> String {
+    return ""
+}
+"""##,
+            solutionCode: ##"""
+func classifyHTTP(_ code: Int) -> String {
+    switch code {
+    case 200...299: return "Success"
+    case 400...499: return "Client Error"
+    case 500...599: return "Server Error"
+    default: return "Other"
+    }
+}
+"""##,
+            testCases: [
+                TaskTestCase(title: "Тест 1", inputDescription: "classifyHTTP(200)", expectedOutput: "\"Success\"", validationCode: "classifyHTTP(200) == \"Success\""),
+                TaskTestCase(title: "Тест 2", inputDescription: "classifyHTTP(404)", expectedOutput: "\"Client Error\"", validationCode: "classifyHTTP(404) == \"Client Error\""),
+                TaskTestCase(title: "Тест 3", inputDescription: "classifyHTTP(503)", expectedOutput: "\"Server Error\"", validationCode: "classifyHTTP(503) == \"Server Error\"")
+            ],
+            hintsRU: ["Используйте диапазоны case 200...299 в switch"],
+            hintsEN: ["Use ranges in switch cases"]
+        )
+        
+        // 7. collections_arrays_slices
+        customChallenges["collections_arrays_slices"] = LessonPracticeChallenge(
+            id: "practice_collections_arrays_slices",
+            titleRU: "Практика: Срезы массивов ArraySlice",
+            titleEN: "Practice: Array Slices",
+            taskPromptRU: "Напишите функцию `middleElements(_ nums: [Int]) -> [Int]`, которая возвращает новый массив без первого и последнего элементов. Если элементов <= 2, верните пустой массив.",
+            taskPromptEN: "Return all elements excluding the first and last.",
+            starterCode: ##"""
+func middleElements(_ nums: [Int]) -> [Int] {
+    return []
+}
+"""##,
+            solutionCode: ##"""
+func middleElements(_ nums: [Int]) -> [Int] {
+    guard nums.count > 2 else { return [] }
+    return Array(nums.dropFirst().dropLast())
+}
+"""##,
+            testCases: [
+                TaskTestCase(title: "Тест 1", inputDescription: "middleElements([10, 20, 30, 40])", expectedOutput: "[20, 30]", validationCode: "middleElements([10, 20, 30, 40]) == [20, 30]"),
+                TaskTestCase(title: "Тест 2", inputDescription: "middleElements([1, 2])", expectedOutput: "[]", validationCode: "middleElements([1, 2]) == []")
+            ],
+            hintsRU: ["Используйте nums.dropFirst().dropLast() и преобразуйте к Array"],
+            hintsEN: ["Use dropFirst and dropLast"]
+        )
+        
+        // 8. collections_dict_sets
+        customChallenges["collections_dict_sets"] = LessonPracticeChallenge(
+            id: "practice_collections_dict_sets",
+            titleRU: "Практика: Словари и Множества",
+            titleEN: "Practice: Dictionaries & Sets",
+            taskPromptRU: "Напишите функцию `uniqueWordCount(_ words: [String]) -> Int`, возвращающую количество уникальных слов без учета регистра.",
+            taskPromptEN: "Count case-insensitive unique words using Set.",
+            starterCode: ##"""
+func uniqueWordCount(_ words: [String]) -> Int {
+    return 0
+}
+"""##,
+            solutionCode: ##"""
+func uniqueWordCount(_ words: [String]) -> Int {
+    let lower = words.map { $0.lowercased() }
+    return Set(lower).count
+}
+"""##,
+            testCases: [
+                TaskTestCase(title: "Тест 1", inputDescription: "uniqueWordCount([\"Swift\", \"swift\", \"iOS\"])", expectedOutput: "2", validationCode: "uniqueWordCount([\"Swift\", \"swift\", \"iOS\"]) == 2"),
+                TaskTestCase(title: "Тест 2", inputDescription: "uniqueWordCount([\"a\", \"b\", \"c\"])", expectedOutput: "3", validationCode: "uniqueWordCount([\"a\", \"b\", \"c\"]) == 3")
+            ],
+            hintsRU: ["Приведите все слова к lowercased() и оберните в Set"],
+            hintsEN: ["Map to lowercased and count Set elements"]
+        )
+        
+        // 9. collections_higher_order
+        customChallenges["collections_higher_order"] = LessonPracticeChallenge(
+            id: "practice_collections_higher_order",
+            titleRU: "Практика: Функции высшего порядка (map/filter/reduce)",
+            titleEN: "Practice: Higher Order Functions",
+            taskPromptRU: "Напишите функцию `sumOfPositiveDoubles(_ nums: [Int]) -> Int`: отфильтруйте числа > 0, удвойте каждое и сложите результат через reduce.",
+            taskPromptEN: "Filter numbers > 0, double each, and calculate sum using reduce.",
+            starterCode: ##"""
+func sumOfPositiveDoubles(_ nums: [Int]) -> Int {
+    return 0
+}
+"""##,
+            solutionCode: ##"""
+func sumOfPositiveDoubles(_ nums: [Int]) -> Int {
+    return nums
+        .filter { $0 > 0 }
+        .map { $0 * 2 }
+        .reduce(0, +)
+}
+"""##,
+            testCases: [
+                TaskTestCase(title: "Тест 1", inputDescription: "sumOfPositiveDoubles([-2, 3, 5])", expectedOutput: "16", validationCode: "sumOfPositiveDoubles([-2, 3, 5]) == 16"),
+                TaskTestCase(title: "Тест 2", inputDescription: "sumOfPositiveDoubles([-1, -4])", expectedOutput: "0", validationCode: "sumOfPositiveDoubles([-1, -4]) == 0")
+            ],
+            hintsRU: ["Соедините цепочку: .filter { $0 > 0 }.map { $0 * 2 }.reduce(0, +)"],
+            hintsEN: ["Chain filter, map, and reduce"]
+        )
+        
+        // 10. closures_syntax_capture
+        customChallenges["closures_syntax_capture"] = LessonPracticeChallenge(
+            id: "practice_closures_syntax_capture",
+            titleRU: "Практика: Захват значений в замыканиях",
+            titleEN: "Practice: Closure Value Capture",
+            taskPromptRU: "Напишите фабрику счетчика `makeCounter(start: Int, step: Int) -> () -> Int`, которая возвращает функцию, увеличивающую счетчик на step при каждом вызове.",
+            taskPromptEN: "Create counter factory `makeCounter` with step.",
+            starterCode: ##"""
+func makeCounter(start: Int, step: Int) -> () -> Int {
+    return { 0 }
+}
+"""##,
+            solutionCode: ##"""
+func makeCounter(start: Int, step: Int) -> () -> Int {
+    var current = start
+    return {
+        current += step
+        return current
+    }
+}
+"""##,
+            testCases: [
+                TaskTestCase(title: "Тест 1", inputDescription: "счетчик с шагом 3", expectedOutput: "3 затем 6", validationCode: "({ let c = makeCounter(start: 0, step: 3); return c() == 3 && c() == 6 })()")
+            ],
+            hintsRU: ["Объявите var current = start внутри функции до возврата замыкания"],
+            hintsEN: ["Declare captured var current before returning closure"]
+        )
+        
+        // 11. types_structs_value
+        customChallenges["types_structs_value"] = LessonPracticeChallenge(
+            id: "practice_types_structs_value",
+            titleRU: "Практика: Структуры и Value Semantics",
+            titleEN: "Practice: Structs & Value Semantics",
+            taskPromptRU: "Создайте структуру `Rectangle` со свойствами `width: Double`, `height: Double` и методом `area() -> Double`. Добавьте mutating метод `scale(by factor: Double)`.",
+            taskPromptEN: "Create Rectangle struct with area() and mutating scale(by:).",
+            starterCode: ##"""
+struct Rectangle {
+    var width: Double
+    var height: Double
+    
+    func area() -> Double { return 0 }
+    mutating func scale(by factor: Double) {}
+}
+"""##,
+            solutionCode: ##"""
+struct Rectangle {
+    var width: Double
+    var height: Double
+    
+    func area() -> Double {
+        return width * height
+    }
+    
+    mutating func scale(by factor: Double) {
+        width *= factor
+        height *= factor
+    }
+}
+"""##,
+            testCases: [
+                TaskTestCase(title: "Тест 1", inputDescription: "Rectangle(4, 5).area()", expectedOutput: "20.0", validationCode: "Rectangle(width: 4, height: 5).area() == 20.0"),
+                TaskTestCase(title: "Тест 2", inputDescription: "scale(by: 2).area()", expectedOutput: "80.0", validationCode: "({ var r = Rectangle(width: 4, height: 5); r.scale(by: 2); return r.area() == 80.0 })()")
+            ],
+            hintsRU: ["Не забудьте ключевое слово mutating перед методом scale"],
+            hintsEN: ["Use mutating keyword for scale method"]
+        )
+        
+        // 12. pop_protocols_composition
+        customChallenges["pop_protocols_composition"] = LessonPracticeChallenge(
+            id: "practice_pop_protocols_composition",
+            titleRU: "Практика: Протоколы и композиция",
+            titleEN: "Practice: Protocols & Composition",
+            taskPromptRU: "Объявите протокол `Describable` с требованием `var summary: String { get }`. Создайте структуру `UserProfile: Describable` с полями name и role, возвращающую summary в формате 'Name (Role)'.",
+            taskPromptEN: "Create Describable protocol and UserProfile conforming to it.",
+            starterCode: ##"""
+protocol Describable {
+    var summary: String { get }
+}
+
+struct UserProfile: Describable {
+    let name: String
+    let role: String
+    var summary: String { return "" }
+}
+"""##,
+            solutionCode: ##"""
+protocol Describable {
+    var summary: String { get }
+}
+
+struct UserProfile: Describable {
+    let name: String
+    let role: String
+    var summary: String {
+        return "\(name) (\(role))"
+    }
+}
+"""##,
+            testCases: [
+                TaskTestCase(title: "Тест 1", inputDescription: "UserProfile(\"Alex\", \"Lead\").summary", expectedOutput: "\"Alex (Lead)\"", validationCode: "UserProfile(name: \"Alex\", role: \"Lead\").summary == \"Alex (Lead)\"")
+            ],
+            hintsRU: ["Верните строку \"\\(name) (\\(role))\""],
+            hintsEN: ["Format string with name and role"]
+        )
+        
+        // 13. generics_types_constraints
+        customChallenges["generics_types_constraints"] = LessonPracticeChallenge(
+            id: "practice_generics_types_constraints",
+            titleRU: "Практика: Универсальные типы (Generics)",
+            titleEN: "Practice: Generics",
+            taskPromptRU: "Напишите дженерик-структуру `Box<T>` со свойством `item: T` и методом `transform<U>(_ closure: (T) -> U) -> Box<U>`.",
+            taskPromptEN: "Create generic Box<T> struct with transform method.",
+            starterCode: ##"""
+struct Box<T> {
+    let item: T
+    func transform<U>(_ closure: (T) -> U) -> Box<U> {
+        return Box<U>(item: closure(item))
+    }
+}
+"""##,
+            solutionCode: ##"""
+struct Box<T> {
+    let item: T
+    func transform<U>(_ closure: (T) -> U) -> Box<U> {
+        return Box<U>(item: closure(item))
+    }
+}
+"""##,
+            testCases: [
+                TaskTestCase(title: "Тест 1", inputDescription: "Box(21).transform { $0 * 2 }.item", expectedOutput: "42", validationCode: "Box(item: 21).transform { $0 * 2 }.item == 42")
+            ],
+            hintsRU: ["Инициализируйте Box<U>(item: closure(item))"],
+            hintsEN: ["Return Box<U> with transformed item"]
+        )
+        
+        // 14. error_handling_result
+        customChallenges["error_handling_result"] = LessonPracticeChallenge(
+            id: "practice_error_handling_result",
+            titleRU: "Практика: Error Handling и Result",
+            titleEN: "Practice: Error Handling",
+            taskPromptRU: "Напишите функцию `divide(_ a: Double, by b: Double) -> Result<Double, String>`. Если b == 0, верните `.failure(\"Division by zero\")`, иначе `.success(a / b)`.",
+            taskPromptEN: "Return Result type for division handling division by zero.",
+            starterCode: ##"""
+func divide(_ a: Double, by b: Double) -> Result<Double, String> {
+    return .success(0)
+}
+"""##,
+            solutionCode: ##"""
+func divide(_ a: Double, by b: Double) -> Result<Double, String> {
+    guard b != 0 else {
+        return .failure("Division by zero")
+    }
+    return .success(a / b)
+}
+"""##,
+            testCases: [
+                TaskTestCase(title: "Тест 1", inputDescription: "divide(10, by: 2)", expectedOutput: ".success(5.0)", validationCode: "divide(10, by: 2) == .success(5.0)"),
+                TaskTestCase(title: "Тест 2", inputDescription: "divide(10, by: 0)", expectedOutput: ".failure(\"Division by zero\")", validationCode: "divide(10, by: 0) == .failure(\"Division by zero\")")
+            ],
+            hintsRU: ["Используйте guard b != 0 else { return .failure(...) }"],
+            hintsEN: ["Guard b != 0"]
+        )
+        
+        // 15. swiftui_state_observation_dataflow
+        customChallenges["swiftui_state_observation_dataflow"] = LessonPracticeChallenge(
+            id: "practice_swiftui_state_observation",
+            titleRU: "Практика: Реактивное состояние модели",
+            titleEN: "Practice: Reactive State Model",
+            taskPromptRU: "Создайте класс `ScoreKeeper` с полем `score: Int` (изначально 0), методами `addPoints(_ pts: Int)` и `reset()`. Баллы не могут быть отрицательными.",
+            taskPromptEN: "Implement ScoreKeeper class with positive score invariants.",
+            starterCode: ##"""
+class ScoreKeeper {
+    var score: Int = 0
+    func addPoints(_ pts: Int) {}
+    func reset() {}
+}
+"""##,
+            solutionCode: ##"""
+class ScoreKeeper {
+    var score: Int = 0
+    func addPoints(_ pts: Int) {
+        score = max(0, score + pts)
+    }
+    func reset() {
+        score = 0
+    }
+}
+"""##,
+            testCases: [
+                TaskTestCase(title: "Тест 1", inputDescription: "ScoreKeeper addPoints(50)", expectedOutput: "50", validationCode: "({ let sk = ScoreKeeper(); sk.addPoints(50); return sk.score == 50 })()"),
+                TaskTestCase(title: "Тест 2", inputDescription: "ScoreKeeper reset()", expectedOutput: "0", validationCode: "({ let sk = ScoreKeeper(); sk.addPoints(50); sk.reset(); return sk.score == 0 })()")
+            ],
+            hintsRU: ["Защитите счетчик через max(0, score + pts)"],
+            hintsEN: ["Clamp score using max(0, ...)"]
+        )
+    }
+    
+    private func fallbackChallenge(for lesson: Lesson) -> LessonPracticeChallenge {
+        // Generates an interactive tailored challenge based on lesson properties
+        let titleRU = "Практическое задание: \(lesson.titleRU)"
+        let titleEN = "Hands-on Practice: \(lesson.titleEN)"
+        
+        if lesson.category.track == .swiftUI {
+            return LessonPracticeChallenge(
+                id: "practice_\(lesson.id)",
+                titleRU: titleRU,
+                titleEN: titleEN,
+                taskPromptRU: "Реализуйте вспомогательную функцию для интерфейса: напишите функцию `calculateLayoutMetrics(containerWidth: Double, spacing: Double, columns: Int) -> Double`, возвращающую ширину одного элемента сетки.",
+                taskPromptEN: "Implement `calculateLayoutMetrics(containerWidth: Double, spacing: Double, columns: Int) -> Double`.",
+                starterCode: ##"""
+func calculateLayoutMetrics(containerWidth: Double, spacing: Double, columns: Int) -> Double {
+    // Ваша реализация
+    return 0.0
+}
+"""##,
+                solutionCode: ##"""
+func calculateLayoutMetrics(containerWidth: Double, spacing: Double, columns: Int) -> Double {
+    guard columns > 0 else { return 0.0 }
+    let totalSpacing = spacing * Double(columns - 1)
+    let available = max(0.0, containerWidth - totalSpacing)
+    return available / Double(columns)
+}
+"""##,
+                testCases: [
+                    TaskTestCase(
+                        title: "Тест 1",
+                        inputDescription: "calculateLayoutMetrics(containerWidth: 320, spacing: 10, columns: 3)",
+                        expectedOutput: "100.0",
+                        validationCode: "calculateLayoutMetrics(containerWidth: 320, spacing: 10, columns: 3) == 100.0"
+                    ),
+                    TaskTestCase(
+                        title: "Тест 2",
+                        inputDescription: "calculateLayoutMetrics(containerWidth: 200, spacing: 20, columns: 2)",
+                        expectedOutput: "90.0",
+                        validationCode: "calculateLayoutMetrics(containerWidth: 200, spacing: 20, columns: 2) == 90.0"
+                    )
+                ],
+                hintsRU: ["Общий отступ равен spacing * Double(columns - 1). Вычтите его из containerWidth и разделите на columns."],
+                hintsEN: ["Subtract total spacing from container width and divide by columns count."]
+            )
+        } else {
+            return LessonPracticeChallenge(
+                id: "practice_\(lesson.id)",
+                titleRU: titleRU,
+                titleEN: titleEN,
+                taskPromptRU: "Закрепите тему на практике: напишите функцию `processDataStream(_ numbers: [Int]) -> (count: Int, sum: Int, max: Int)`, возвращающую количество элементов, их сумму и максимальный элемент (или 0 для пустого массива).",
+                taskPromptEN: "Implement `processDataStream(_ numbers: [Int]) -> (count: Int, sum: Int, max: Int)`.",
+                starterCode: ##"""
+func processDataStream(_ numbers: [Int]) -> (count: Int, sum: Int, max: Int) {
+    // Ваша реализация
+    return (0, 0, 0)
+}
+"""##,
+                solutionCode: ##"""
+func processDataStream(_ numbers: [Int]) -> (count: Int, sum: Int, max: Int) {
+    let count = numbers.count
+    let sum = numbers.reduce(0, +)
+    let maxVal = numbers.max() ?? 0
+    return (count, sum, maxVal)
+}
+"""##,
+                testCases: [
+                    TaskTestCase(
+                        title: "Тест 1",
+                        inputDescription: "processDataStream([1, 4, 9])",
+                        expectedOutput: "(3, 14, 9)",
+                        validationCode: "processDataStream([1, 4, 9]) == (3, 14, 9)"
+                    ),
+                    TaskTestCase(
+                        title: "Тест 2",
+                        inputDescription: "processDataStream([])",
+                        expectedOutput: "(0, 0, 0)",
+                        validationCode: "processDataStream([]) == (0, 0, 0)"
+                    )
+                ],
+                hintsRU: ["Используйте numbers.count, numbers.reduce(0, +) и numbers.max() ?? 0"],
+                hintsEN: ["Use numbers.count, reduce, and max"]
+            )
+        }
+    }
+}
