@@ -9,6 +9,7 @@ public struct ProfileView: View {
     @State private var showingThemeSettings: Bool = false
     @State private var showingStreakSheet: Bool = false
     @State private var showingResetAlert: Bool = false
+    @State private var showingInterviewPrep: Bool = false
     
     public init() {}
     
@@ -97,6 +98,46 @@ public struct ProfileView: View {
                     }
                     .padding(.horizontal)
                     
+                    // Career & Interview Prep Section
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text(lang.localized("Карьера и собеседования", "Career & Interview Preparation"))
+                            .font(.headline)
+                            .padding(.horizontal)
+                        
+                        Button(action: { showingInterviewPrep = true }) {
+                            HStack(spacing: 12) {
+                                ZStack {
+                                    Circle()
+                                        .fill(Color(red: 0.14, green: 0.38, blue: 0.82).opacity(0.12))
+                                        .frame(width: 38, height: 38)
+                                    Image(systemName: "graduationcap.fill")
+                                        .font(.caption.bold())
+                                        .foregroundColor(Color(red: 0.14, green: 0.38, blue: 0.82))
+                                }
+                                
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text(lang.localized("Собеседование, Big-O и Языковая матрица", "Interview Prep, Big-O & Rosetta Stone"))
+                                        .font(.subheadline.bold())
+                                        .foregroundColor(.primary)
+                                    Text(lang.localized("Сложность алгоритмов, кросс-языковые шаблоны, топ вопросы", "Complexity cheat sheet, cross-language patterns, top Q&A"))
+                                        .font(.caption2)
+                                        .foregroundColor(.secondary)
+                                }
+                                
+                                Spacer()
+                                
+                                Image(systemName: "chevron.right")
+                                    .font(.caption)
+                                    .foregroundColor(.secondary.opacity(0.6))
+                            }
+                            .padding(12)
+                            .background(Color(UIColor.secondarySystemBackground))
+                            .clipShape(RoundedRectangle(cornerRadius: 12))
+                            .padding(.horizontal)
+                        }
+                        .buttonStyle(.plain)
+                    }
+
                     // Settings & IDE Environment Section
                     VStack(alignment: .leading, spacing: 12) {
                         Text(lang.localized("Среда разработки и Настройки", "Development Environment & Settings"))
@@ -227,6 +268,20 @@ public struct ProfileView: View {
             .sheet(isPresented: $showingStreakSheet) {
                 StreakDetailSheet()
             }
+            .sheet(isPresented: $showingInterviewPrep) {
+                NavigationStack {
+                    InterviewPrepView()
+                        .navigationTitle(lang.localized("Подготовка к собеседованию", "Interview Preparation"))
+                        .navigationBarTitleDisplayMode(.inline)
+                        .toolbar {
+                            ToolbarItem(placement: .topBarTrailing) {
+                                Button(lang.localized("Готово", "Done")) {
+                                    showingInterviewPrep = false
+                                }
+                            }
+                        }
+                }
+            }
             .alert(
                 lang.localized("Сбросить прогресс на ноль?", "Reset Progress to Zero?"),
                 isPresented: $showingResetAlert
@@ -238,8 +293,8 @@ public struct ProfileView: View {
                 }
             } message: {
                 Text(lang.localized(
-                    "Все набранные очки опыта (XP), решенные задачи (0/72), пройденные уроки и серия дней будут сброшены до абсолютного нуля.",
-                    "All XP points, solved challenges (0/72), completed lessons, and streak days will be reset to absolute zero."
+                    "Все набранные очки опыта (XP), решенные задачи (0/\(TaskStore.shared.tasks.count)), пройденные уроки и серия дней будут сброшены до абсолютного нуля.",
+                    "All XP points, solved challenges (0/\(TaskStore.shared.tasks.count)), completed lessons, and streak days will be reset to absolute zero."
                 ))
             }
         }

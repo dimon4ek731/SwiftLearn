@@ -9,6 +9,7 @@ public struct ChallengesView: View {
     @State private var selectedDifficulty: TaskDifficulty? = nil // nil = Все
     @State private var selectedPlatform: String? = nil // "LeetCode", "Codeforces", nil
     @State private var searchText: String = ""
+    @State private var showingBigOSheet: Bool = false
     
     public init() {}
     
@@ -46,8 +47,33 @@ public struct ChallengesView: View {
             .navigationTitle(lang.localized("Практикум Задач", "Code Challenges"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button {
+                        showingBigOSheet = true
+                    } label: {
+                        HStack(spacing: 4) {
+                            Image(systemName: "chart.line.uptrend.xyaxis")
+                            Text("Big-O")
+                                .font(.caption.bold())
+                        }
+                        .foregroundColor(Color(red: 0.14, green: 0.38, blue: 0.82))
+                    }
+                }
+                
                 ToolbarItem(placement: .topBarTrailing) {
                     XPBadgeView()
+                }
+            }
+            .sheet(isPresented: $showingBigOSheet) {
+                NavigationStack {
+                    BigOChartView()
+                        .toolbar {
+                            ToolbarItem(placement: .topBarTrailing) {
+                                Button(lang.localized("Готово", "Done")) {
+                                    showingBigOSheet = false
+                                }
+                            }
+                        }
                 }
             }
             .onAppear {

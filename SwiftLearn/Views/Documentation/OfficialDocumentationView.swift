@@ -2,7 +2,8 @@ import SwiftUI
 
 public enum DocDisplayMode: Int, CaseIterable, Identifiable {
     case chapters = 0
-    case liveWeb = 1
+    case interviewPrep = 1
+    case liveWeb = 2
     
     public var id: Int { rawValue }
 }
@@ -51,39 +52,44 @@ public struct OfficialDocumentationView: View {
     public var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
-                // Top Language Switcher
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 8) {
-                        ForEach(TargetLanguage.allCases) { item in
-                            Button(action: {
-                                withAnimation(.spring(response: 0.3, dampingFraction: 0.75)) {
-                                    selectedLanguage = item
+                // Top Language Switcher (only for chapters & liveWeb)
+                if displayMode != .interviewPrep {
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 8) {
+                            ForEach(TargetLanguage.allCases) { item in
+                                Button(action: {
+                                    withAnimation(.spring(response: 0.3, dampingFraction: 0.75)) {
+                                        selectedLanguage = item
+                                    }
+                                }) {
+                                    HStack(spacing: 6) {
+                                        Image(systemName: item.icon)
+                                            .font(.system(size: 12, weight: .semibold))
+                                        Text(item.displayName)
+                                            .font(.caption.weight(.bold))
+                                    }
+                                    .padding(.horizontal, 14)
+                                    .padding(.vertical, 7)
+                                    .background(selectedLanguage == item ? Color(red: 0.14, green: 0.38, blue: 0.88) : Color(UIColor.secondarySystemBackground))
+                                    .foregroundColor(selectedLanguage == item ? .white : .primary)
+                                    .clipShape(Capsule())
                                 }
-                            }) {
-                                HStack(spacing: 6) {
-                                    Image(systemName: item.icon)
-                                        .font(.system(size: 12, weight: .semibold))
-                                    Text(item.displayName)
-                                        .font(.caption.weight(.bold))
-                                }
-                                .padding(.horizontal, 14)
-                                .padding(.vertical, 7)
-                                .background(selectedLanguage == item ? Color(red: 0.14, green: 0.38, blue: 0.88) : Color(UIColor.secondarySystemBackground))
-                                .foregroundColor(selectedLanguage == item ? .white : .primary)
-                                .clipShape(Capsule())
+                                .buttonStyle(.plain)
                             }
-                            .buttonStyle(.plain)
                         }
+                        .padding(.horizontal)
+                        .padding(.vertical, 8)
                     }
-                    .padding(.horizontal)
-                    .padding(.vertical, 8)
+                    .background(Color(UIColor.systemBackground))
                 }
-                .background(Color(UIColor.systemBackground))
                 
                 // Top Segmented Mode Picker
                 Picker("Режим", selection: $displayMode) {
                     Label(lang.localized("Главы книги", "Language Guide"), systemImage: "book.pages")
                         .tag(DocDisplayMode.chapters)
+                    
+                    Label(lang.localized("Собеседование & Big-O", "Interview & Big-O"), systemImage: "graduationcap.fill")
+                        .tag(DocDisplayMode.interviewPrep)
                     
                     Label(lang.localized("Официальный Web", "Live Web Docs"), systemImage: "globe")
                         .tag(DocDisplayMode.liveWeb)
@@ -99,12 +105,19 @@ public struct OfficialDocumentationView: View {
                 switch displayMode {
                 case .chapters:
                     chaptersListView
+                case .interviewPrep:
+                    InterviewPrepView()
                 case .liveWeb:
                     OfficialDocsWebView(url: liveWebURL)
                 }
             }
-            .navigationTitle("\(selectedLanguage.displayName) Docs")
+            .navigationTitle(displayMode == .interviewPrep ? lang.localized("Собеседования и Big-O", "Interview Prep & Big-O") : "\(selectedLanguage.displayName) Docs")
             .navigationBarTitleDisplayMode(.inline)
+            .onAppear {
+                if ProcessInfo.processInfo.arguments.contains("-interview") {
+                    displayMode = .interviewPrep
+                }
+            }
         }
     }
     
